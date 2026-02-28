@@ -1,23 +1,51 @@
-# Hello, World
+import { Exercise } from '../components/Exercise'
+import initPerson from '../exercises/init-person'
+import whatIsAVariable from '../exercises/what-is-a-variable'
 
-This is a lesson rendered from an **MDX file**. Prose is written in Markdown;
-interactive exercises will be embedded as JSX components.
+# Variables and Functions
 
-## What this will become
+A **variable** is a named container that holds a value. You create one with `let` or
+`const`, give it a name, and assign a value:
 
-Each lesson will be a document like this one — a mix of explanation and
-practice. You'll write code directly on the page and get instant feedback, with
-no server involved.
+```ts
+const name = "Alice"
+let age = 30
+```
 
-## A sample code block
+The value stored in a `let` variable can be updated later; `const` values cannot.
+
+<Exercise exercise={whatIsAVariable} />
+
+## Functions
+
+A **function** is a reusable block of code. You define it once and call it whenever
+you need it:
 
 ```ts
 function greet(name: string): string {
   return `Hello, ${name}!`
 }
 
-console.log(greet('world')) // Hello, world!
+console.log(greet("world")) // Hello, world!
 ```
 
-When the full pipeline is wired up, read-only blocks like this will have syntax
-highlighting, and exercise blocks will be editable.
+Functions can accept **parameters** (inputs) and **return** a value. TypeScript lets
+you annotate both with types, so the editor catches mistakes before you run the code.
+
+## Objects
+
+An **object** groups related values under a single name:
+
+```ts
+const person = {
+  firstName: "Alice",
+  lastName: "Smith",
+}
+```
+
+You access fields with dot notation: `person.firstName` is `"Alice"`.
+
+Now try combining all three ideas — variables, functions, and objects — in the
+exercise below.
+
+<Exercise exercise={initPerson} />
