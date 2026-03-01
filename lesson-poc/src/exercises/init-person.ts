@@ -44,12 +44,10 @@ test("greet returns a greeting string", () => {
   expect(greeting).toBe("Hello, Tom Jones");
 });
 `,
-  hints: {
-    'initPerson creates a person with the right fields':
-      'Return an object literal with firstName and lastName set from the arguments.',
-    'greet returns a greeting string':
-      'Use initPerson to build the person, then return a template literal like `Hello, ${person.firstName} ${person.lastName}`.',
-  },
+  hints: [
+    'Return an object literal with firstName and lastName set from the arguments.',
+    'Use initPerson to build the person, then return a template literal like `Hello, ${person.firstName} ${person.lastName}`.',
+  ],
 }
 
 export default initPerson

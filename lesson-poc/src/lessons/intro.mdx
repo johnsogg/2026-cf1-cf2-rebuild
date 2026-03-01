@@ -4,33 +4,35 @@ import whatIsAVariable from '../exercises/what-is-a-variable'
 
 # Variables and Functions
 
-A **variable** is a named container that holds a value. You create one with `let` or
-`const`, give it a name, and assign a value:
+A **variable** is a named container that holds a value. You create one with
+`let` or `const`, give it a name, and assign a value:
 
 ```ts
-const name = "Alice"
+const name = 'Alice'
 let age = 30
 ```
 
-The value stored in a `let` variable can be updated later; `const` values cannot.
+The value stored in a `let` variable can be updated later; `const` values
+cannot.
 
 <Exercise exercise={whatIsAVariable} />
 
 ## Functions
 
-A **function** is a reusable block of code. You define it once and call it whenever
-you need it:
+A **function** is a reusable block of code. You define it once and call it
+whenever you need it:
 
 ```ts
 function greet(name: string): string {
   return `Hello, ${name}!`
 }
 
-console.log(greet("world")) // Hello, world!
+console.log(greet('world')) // Hello, world!
 ```
 
-Functions can accept **parameters** (inputs) and **return** a value. TypeScript lets
-you annotate both with types, so the editor catches mistakes before you run the code.
+Functions can accept **parameters** (inputs) and **return** a value. TypeScript
+lets you annotate both with types, so the editor catches mistakes before you run
+the code.
 
 ## Objects
 
@@ -38,8 +40,8 @@ An **object** groups related values under a single name:
 
 ```ts
 const person = {
-  firstName: "Alice",
-  lastName: "Smith",
+  firstName: 'Alice',
+  lastName: 'Smith',
 }
 ```
 

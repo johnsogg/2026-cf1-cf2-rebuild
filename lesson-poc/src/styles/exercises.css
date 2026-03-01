@@ -1,0 +1,239 @@
+/* ── Exercise wrapper ─────────────────────────────────────────────────────── */
+
+.exercise {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.exercise-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.exercise-description {
+  margin-bottom: 16px;
+  white-space: pre-line;
+  color: var(--text-muted);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn {
+  padding: 8px 20px;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.btn-primary:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* ── Action rows ──────────────────────────────────────────────────────────── */
+
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.exercise-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ── Hints ────────────────────────────────────────────────────────────────── */
+
+.exercise-hints {
+  margin-top: 12px;
+}
+
+.exercise-hint {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+  font-size: 13px;
+}
+
+.exercise-hint-action {
+  margin-top: 8px;
+}
+
+/* ── Complete badge ───────────────────────────────────────────────────────── */
+
+.exercise-complete-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 4px;
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  color: var(--success);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ── Editor ───────────────────────────────────────────────────────────────── */
+
+.exercise-editor-wrap {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+/* ── Test code details ────────────────────────────────────────────────────── */
+
+.exercise-test-details {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.exercise-test-details summary {
+  cursor: pointer;
+}
+
+.exercise-test-code {
+  background: var(--code-bg);
+  padding: 10px 14px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* ── Alerts (timeout, errors) ─────────────────────────────────────────────── */
+
+.exercise-alert {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.exercise-alert--warning {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+}
+
+.exercise-alert--error {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+/* ── Test results ─────────────────────────────────────────────────────────── */
+
+.exercise-test-results {
+  margin-bottom: 16px;
+}
+
+.exercise-result {
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.exercise-result--pass {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+}
+
+.exercise-result--fail {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+}
+
+.exercise-result-error {
+  margin-top: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--error);
+}
+
+/* ── Console output ───────────────────────────────────────────────────────── */
+
+.exercise-console {
+  background: var(--console-bg);
+  color: var(--console-text);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+/* ── Multiple choice ──────────────────────────────────────────────────────── */
+
+.exercise-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.exercise-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.exercise-option--selected {
+  background: var(--accent-subtle);
+}
+
+.exercise-option--correct {
+  background: var(--success-bg);
+  border-color: var(--success);
+}
+
+.exercise-option--incorrect {
+  background: var(--error-bg);
+  border-color: var(--error);
+}
+
+.exercise-option--submitted {
+  cursor: default;
+}
+
+.exercise-feedback {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.exercise-feedback--correct {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+}
+
+.exercise-feedback--incorrect {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+}

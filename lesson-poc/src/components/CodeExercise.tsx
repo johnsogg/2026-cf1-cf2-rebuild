@@ -18,7 +18,7 @@ export type CodeExerciseProps = {
   starterCode: string
   testCode: string
   moduleName: string
-  hints?: Record<string, string>
+  hints?: string[]
 }
 
 type TestResult = {
@@ -33,7 +33,13 @@ type WorkerResponse = {
   error?: string
 }
 
-export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
+export function CodeExercise({
+  exercise,
+  onComplete,
+}: {
+  exercise: CodeExerciseProps
+  onComplete?: () => void
+}) {
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
   const [code, setCode] = useState(exercise.starterCode)
@@ -62,6 +68,12 @@ export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
       editor.layout({ height: editorHeight, width: editor.getLayoutInfo().width })
     }
   }, [editorHeight])
+
+  useEffect(() => {
+    if (results.length > 0 && results.every((r) => r.passed)) {
+      onComplete?.()
+    }
+  }, [results, onComplete])
 
   if (window.innerWidth < 640) {
     return <p>This exercise requires a computer or tablet.</p>
@@ -99,24 +111,13 @@ export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
     })
   }
 
-  const handleReset = () => {
-    setCode(exercise.starterCode)
-    setResults([])
-    setLogs([])
-    setError(undefined)
-    setTimedOut(false)
-  }
-
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 6, padding: 20, marginBottom: 24 }}>
-      <h3 style={{ marginTop: 0, marginBottom: 8 }}>{exercise.title}</h3>
+    <>
       {exercise.description && (
-        <p style={{ marginBottom: 16, whiteSpace: 'pre-line', color: 'var(--text-muted)' }}>
-          {exercise.description}
-        </p>
+        <p className="exercise-description">{exercise.description}</p>
       )}
 
-      <div style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden', marginBottom: 12 }}>
+      <div className="exercise-editor-wrap">
         <Editor
           height={editorHeight}
           defaultLanguage="typescript"
@@ -133,98 +134,42 @@ export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
         />
       </div>
 
-      <details style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-muted)' }}>
-        <summary style={{ cursor: 'pointer' }}>View test code</summary>
-        <pre style={{
-          background: 'var(--code-bg)',
-          padding: '10px 14px',
-          borderRadius: 4,
-          overflowX: 'auto',
-          marginTop: 8,
-          fontSize: 12,
-        }}>
-          {exercise.testCode}
-        </pre>
+      <details className="exercise-test-details">
+        <summary>View test code</summary>
+        <pre className="exercise-test-code">{exercise.testCode}</pre>
       </details>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <button
-          onClick={handleRun}
-          disabled={running}
-          style={{
-            padding: '8px 20px',
-            fontSize: 15,
-            cursor: running ? 'not-allowed' : 'pointer',
-            background: running ? 'var(--text-muted)' : 'var(--accent)',
-            color: 'var(--accent-text)',
-            border: 'none',
-            borderRadius: 4,
-          }}
-        >
+      <div className="exercise-actions">
+        <button className="btn btn-primary" onClick={handleRun} disabled={running}>
           Run
-        </button>
-        <button
-          onClick={handleReset}
-          style={{
-            padding: '8px 20px',
-            fontSize: 15,
-            cursor: 'pointer',
-            background: 'transparent',
-            color: 'var(--text-muted)',
-            border: '1px solid var(--border)',
-            borderRadius: 4,
-          }}
-        >
-          Reset
         </button>
         {running && <span style={{ color: 'var(--text-muted)' }}>Running...</span>}
       </div>
 
       {timedOut && (
-        <div style={{ background: 'var(--warning-bg)', border: '1px solid var(--warning)', borderRadius: 4, padding: '10px 14px', marginBottom: 12 }}>
+        <div className="exercise-alert exercise-alert--warning">
           Execution timed out — possible infinite loop. The worker was terminated after 5 seconds.
         </div>
       )}
 
       {error && (
-        <div style={{ background: 'var(--error-bg)', border: '1px solid var(--error)', borderRadius: 4, padding: '10px 14px', marginBottom: 12, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+        <div className="exercise-alert exercise-alert--error">
           <strong>Error:</strong> {error}
         </div>
       )}
 
       {results.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="exercise-test-results">
           <h4 style={{ marginBottom: 8 }}>Results</h4>
           {results.map((r) => (
-            <div key={r.name}>
-              <div
-                style={{
-                  padding: '8px 12px',
-                  marginBottom: 4,
-                  borderRadius: 4,
-                  background: r.passed ? 'var(--success-bg)' : 'var(--error-bg)',
-                  border: `1px solid ${r.passed ? 'var(--success)' : 'var(--error)'}`,
-                }}
-              >
-                <span style={{ marginRight: 8 }}>{r.passed ? '✓' : '✗'}</span>
-                <strong>{r.name}</strong>
-                {!r.passed && r.error && (
-                  <div style={{ marginTop: 4, fontFamily: 'monospace', fontSize: 13, color: 'var(--error)' }}>
-                    {r.error}
-                  </div>
-                )}
-              </div>
-              {!r.passed && exercise.hints?.[r.name] && (
-                <div style={{
-                  padding: '8px 12px',
-                  marginBottom: 8,
-                  borderRadius: 4,
-                  background: 'var(--warning-bg)',
-                  border: '1px solid var(--warning)',
-                  fontSize: 13,
-                }}>
-                  <strong>Hint:</strong> {exercise.hints[r.name]}
-                </div>
+            <div
+              key={r.name}
+              className={`exercise-result ${r.passed ? 'exercise-result--pass' : 'exercise-result--fail'}`}
+            >
+              <span style={{ marginRight: 8 }}>{r.passed ? '✓' : '✗'}</span>
+              <strong>{r.name}</strong>
+              {!r.passed && r.error && (
+                <div className="exercise-result-error">{r.error}</div>
               )}
             </div>
           ))}
@@ -234,20 +179,9 @@ export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
       {logs.length > 0 && (
         <div>
           <h4 style={{ marginBottom: 8 }}>Console output</h4>
-          <pre style={{
-            background: 'var(--console-bg)',
-            color: 'var(--console-text)',
-            padding: '12px 16px',
-            borderRadius: 4,
-            fontFamily: 'monospace',
-            fontSize: 13,
-            overflowX: 'auto',
-            margin: 0,
-          }}>
-            {logs.join('\n')}
-          </pre>
+          <pre className="exercise-console">{logs.join('\n')}</pre>
         </div>
       )}
-    </div>
+    </>
   )
 }
