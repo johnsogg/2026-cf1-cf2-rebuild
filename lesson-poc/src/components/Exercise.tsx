@@ -100,21 +100,22 @@ const ExerciseHeader = ({
   attemptState,
   onReset,
 }: ExerciseHeaderProps) => {
-  console.log('attemptState:', attemptState)
+  const stateIcon = { idle: '☐', attempted: '✗', complete: '✓' }[attemptState]
   return (
     <div className="exercise-header">
-      <div className="exercise-header__question">{questionNumber}</div>
-      <div className="exercise-header__actions-container">
+      <div className="exercise-header__question-container">
         <div className={`exercise-header__attempt--${attemptState}`}>
-          {attemptState}
+          {stateIcon}
         </div>
-        <button
-          className="btn btn-secondary exercise-header__reset"
-          onClick={onReset}
-        >
-          Reset
-        </button>
+        <div className="exercise-header__question">{questionNumber}</div>
       </div>
+      <button
+        className="btn btn-secondary exercise-header__reset"
+        onClick={onReset}
+        aria-label="Reset"
+      >
+        ↺
+      </button>
     </div>
   )
 }

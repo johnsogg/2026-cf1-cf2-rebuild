@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 export type MultipleChoiceExerciseProps = {
   type: 'multiple-choice'
@@ -21,8 +21,6 @@ export function MultipleChoiceExercise({
 }) {
   const [selected, setSelected] = useState<number | null>(null)
   const [submitted, setSubmitted] = useState(false)
-  const lastClickRef = useRef<{ index: number; time: number } | null>(null)
-
   const isCorrect = selected === exercise.correct
 
   const handleSubmit = (selectedIndex: number) => {
@@ -38,15 +36,12 @@ export function MultipleChoiceExercise({
   const handleOptionClick = (i: number, e: React.MouseEvent) => {
     e.preventDefault()
     if (submitted) return
-    const now = Date.now()
-    const last = lastClickRef.current
-    if (last?.index === i && now - last.time < 500) {
-      handleSubmit(i)
-      lastClickRef.current = null
-    } else {
-      setSelected(i)
-      lastClickRef.current = { index: i, time: now }
-    }
+    setSelected(i)
+  }
+
+  const handleOptionDoubleClick = (i: number) => {
+    if (submitted) return
+    handleSubmit(i)
   }
 
   return (
@@ -75,6 +70,7 @@ export function MultipleChoiceExercise({
             <label
               key={i}
               onClick={(e) => handleOptionClick(i, e)}
+              onDoubleClick={() => handleOptionDoubleClick(i)}
               className={classes}
             >
               <input
@@ -83,9 +79,8 @@ export function MultipleChoiceExercise({
                 value={i}
                 checked={selected === i}
                 onChange={() => {}}
-                style={{ marginTop: 2 }}
               />
-              <span>
+              <span className="exercise-option__label-text">
                 {option.text}
                 {option.image && (
                   <img
