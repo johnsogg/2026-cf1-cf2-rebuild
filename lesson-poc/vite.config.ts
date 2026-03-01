@@ -7,7 +7,7 @@ import rehypeHighlight from 'rehype-highlight'
 export default defineConfig({
   base: '/2026-cf1-cf2-rebuild/',
   build: {
-    outDir: '../public-demo',
+    outDir: '../docs',
     emptyOutDir: true,
   },
   plugins: [
