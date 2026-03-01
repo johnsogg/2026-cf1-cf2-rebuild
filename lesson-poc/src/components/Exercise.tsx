@@ -8,7 +8,11 @@ export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
 
 const ExerciseNumberContext = createContext<(id: string) => number>(() => 0)
 
-export function ExerciseNumberProvider({ children }: { children: React.ReactNode }) {
+export function ExerciseNumberProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const counter = useRef(0)
   const assigned = useRef(new Map<string, number>())
   counter.current = 0
@@ -19,7 +23,11 @@ export function ExerciseNumberProvider({ children }: { children: React.ReactNode
     assigned.current.set(id, n)
     return n
   }, [])
-  return <ExerciseNumberContext.Provider value={getNext}>{children}</ExerciseNumberContext.Provider>
+  return (
+    <ExerciseNumberContext.Provider value={getNext}>
+      {children}
+    </ExerciseNumberContext.Provider>
+  )
 }
 
 export function Exercise({
@@ -58,7 +66,7 @@ export function Exercise({
     localStorage.removeItem(`exercise:${id}:state`)
   }
   return (
-    <div className="exercise">
+    <div className={`exercise exercise--${attemptState}`}>
       <ExerciseHeader
         questionNumber={resolvedNumber}
         attemptState={attemptState}
@@ -92,11 +100,14 @@ const ExerciseHeader = ({
   attemptState,
   onReset,
 }: ExerciseHeaderProps) => {
+  console.log('attemptState:', attemptState)
   return (
     <div className="exercise-header">
       <div className="exercise-header__question">{questionNumber}</div>
       <div className="exercise-header__actions-container">
-        <div className="exercise-header__attempt">{attemptState}</div>
+        <div className={`exercise-header__attempt--${attemptState}`}>
+          {attemptState}
+        </div>
         <button
           className="btn btn-secondary exercise-header__reset"
           onClick={onReset}

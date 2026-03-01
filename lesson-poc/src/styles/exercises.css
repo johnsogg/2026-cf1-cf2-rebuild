@@ -1,10 +1,22 @@
 /* ── Exercise wrapper ─────────────────────────────────────────────────────── */
 
 .exercise {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 20px;
   margin-bottom: 24px;
+  padding-left: 24px;
+  border-radius: 6px;
+  border-left: 4px solid var(--text-muted);
+}
+
+.exercise--idle {
+  border-color: var(--text-muted);
+}
+
+.exercise--complete {
+  border-color: var(--success);
+}
+
+.exercise--attempted {
+  border-color: var(--error);
 }
 
 .exercise-title {
@@ -15,7 +27,37 @@
 .exercise-description {
   margin-bottom: 16px;
   white-space: pre-line;
+  color: var(--text);
+}
+
+.exercise-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.exercise-header__question {
+  font-size: 175%;
+  font-weight: 800;
+}
+
+.exercise-header__actions-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.exercise-header__attempt--idle {
   color: var(--text-muted);
+}
+
+.exercise-header__attempt--attempted {
+  color: var(--error);
+}
+
+.exercise-header__attempt--complete {
+  color: var(--success);
 }
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */

@@ -51,22 +51,32 @@ export function MultipleChoiceExercise({
 
   return (
     <>
-      <p style={{ marginTop: 0, marginBottom: 16, fontWeight: 500 }}>{exercise.prompt}</p>
+      <p style={{ marginTop: 0, marginBottom: 16, fontWeight: 500 }}>
+        {exercise.prompt}
+      </p>
 
       <div className="exercise-options">
         {exercise.options.map((option, i) => {
           const classes = [
             'exercise-option',
             submitted ? 'exercise-option--submitted' : '',
-            submitted && i === exercise.correct ? 'exercise-option--correct' : '',
-            submitted && i !== exercise.correct && i === selected ? 'exercise-option--incorrect' : '',
+            submitted && i === exercise.correct
+              ? 'exercise-option--correct'
+              : '',
+            submitted && i !== exercise.correct && i === selected
+              ? 'exercise-option--incorrect'
+              : '',
             !submitted && selected === i ? 'exercise-option--selected' : '',
           ]
             .filter(Boolean)
             .join(' ')
 
           return (
-            <label key={i} onClick={(e) => handleOptionClick(i, e)} className={classes}>
+            <label
+              key={i}
+              onClick={(e) => handleOptionClick(i, e)}
+              className={classes}
+            >
               <input
                 type="radio"
                 name={exercise.id}
@@ -78,7 +88,11 @@ export function MultipleChoiceExercise({
               <span>
                 {option.text}
                 {option.image && (
-                  <img src={option.image} alt="" style={{ display: 'block', marginTop: 8, maxWidth: '100%' }} />
+                  <img
+                    src={option.image}
+                    alt=""
+                    style={{ display: 'block', marginTop: 8, maxWidth: '100%' }}
+                  />
                 )}
               </span>
             </label>
@@ -86,20 +100,16 @@ export function MultipleChoiceExercise({
         })}
       </div>
 
-      {!submitted ? (
+      {!submitted && (
         <button
           className="btn btn-primary"
-          onClick={() => { if (selected !== null) handleSubmit(selected) }}
+          onClick={() => {
+            if (selected !== null) handleSubmit(selected)
+          }}
           disabled={selected === null}
         >
           Submit
         </button>
-      ) : (
-        <div className={`exercise-feedback ${isCorrect ? 'exercise-feedback--correct' : 'exercise-feedback--incorrect'}`}>
-          {isCorrect
-            ? '✓ Correct!'
-            : `✗ Not quite. The correct answer is: "${exercise.options[exercise.correct].text}"`}
-        </div>
       )}
     </>
   )
