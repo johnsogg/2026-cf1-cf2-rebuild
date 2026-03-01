@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build && git -C .. add public-demo/"
   },
   "dependencies": {
     "@mdx-js/react": "^3.1.0",

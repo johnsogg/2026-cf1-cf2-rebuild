@@ -5,6 +5,11 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 
 export default defineConfig({
+  base: '/2026-cf1-cf2-rebuild/',
+  build: {
+    outDir: '../public-demo',
+    emptyOutDir: true,
+  },
   plugins: [
     {
       enforce: 'pre',
