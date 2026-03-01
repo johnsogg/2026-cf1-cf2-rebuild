@@ -12,9 +12,11 @@ export type MultipleChoiceExerciseProps = {
 
 export function MultipleChoiceExercise({
   exercise,
+  onAttempt,
   onComplete,
 }: {
   exercise: MultipleChoiceExerciseProps
+  onAttempt?: () => void
   onComplete?: () => void
 }) {
   const [selected, setSelected] = useState<number | null>(null)
@@ -28,6 +30,8 @@ export function MultipleChoiceExercise({
     setSubmitted(true)
     if (selectedIndex === exercise.correct) {
       onComplete?.()
+    } else {
+      onAttempt?.()
     }
   }
 

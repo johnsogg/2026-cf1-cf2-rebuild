@@ -16,37 +16,42 @@ export function Exercise({
   const { id, hints } = exercise
 
   const [resetKey, setResetKey] = useState(0)
-  // TODO: need to use a constrained string union AttemptedState instead of a boolean to mark progress - so replace isComplete with attemptState
-  const [isComplete, setIsComplete] = useState(
-    () => localStorage.getItem(`exercise:${id}:complete`) === 'true'
+  const [attemptState, setAttemptState] = useState<AttemptState>(
+    () =>
+      (localStorage.getItem(`exercise:${id}:state`) as AttemptState) ?? 'idle'
   )
   const [hintsRevealed, setHintsRevealed] = useState(0)
 
+  const handleAttempt = () => {
+    setAttemptState('attempted')
+    localStorage.setItem(`exercise:${id}:state`, 'attempted')
+  }
+
   const handleComplete = () => {
-    setIsComplete(true)
-    localStorage.setItem(`exercise:${id}:complete`, 'true')
+    setAttemptState('complete')
+    localStorage.setItem(`exercise:${id}:state`, 'complete')
   }
 
   const handleReset = () => {
     setResetKey((k) => k + 1)
-    setIsComplete(false)
+    setAttemptState('idle')
     setHintsRevealed(0)
-    localStorage.removeItem(`exercise:${id}:complete`)
+    localStorage.removeItem(`exercise:${id}:state`)
   }
   return (
     <div className="exercise">
       <ExerciseHeader
         questionNumber={questionNumber}
         attemptState={attemptState}
+        onReset={handleReset}
       />
       <ExerciseTitle title={exercise.title ?? ''} />
-      {/* TODO: Render child component based on the exercise type */}
       <ExerciseContent
         exercise={exercise}
         resetKey={resetKey}
-        handleComplete={handleComplete}
+        onAttempt={handleAttempt}
+        onComplete={handleComplete}
       />
-      {/* TODO: Render hints component */}
       <ExerciseHints
         hints={hints}
         hintsRevealed={hintsRevealed}
@@ -61,17 +66,24 @@ type AttemptState = 'idle' | 'attempted' | 'complete'
 type ExerciseHeaderProps = {
   questionNumber: number
   attemptState: AttemptState
+  onReset: VoidFunction
 }
 const ExerciseHeader = ({
   questionNumber,
   attemptState,
+  onReset,
 }: ExerciseHeaderProps) => {
   return (
     <div className="exercise-header">
       <div className="exercise-header__question">{questionNumber}</div>
       <div className="exercise-header__actions-container">
         <div className="exercise-header__attempt">{attemptState}</div>
-        <div className="exercise-header__reset">Reset Btn</div>
+        <button
+          className="btn btn-secondary exercise-header__reset"
+          onClick={onReset}
+        >
+          Reset
+        </button>
       </div>
     </div>
   )
@@ -87,12 +99,14 @@ const ExerciseTitle = ({ title }: ExerciseTitleProps) => {
 type ExerciseContentProps = {
   exercise: Exercise
   resetKey: number
-  handleComplete: VoidFunction
+  onAttempt: VoidFunction
+  onComplete: VoidFunction
 }
 const ExerciseContent = ({
   exercise,
   resetKey,
-  handleComplete,
+  onAttempt,
+  onComplete,
 }: ExerciseContentProps) => {
   switch (exercise.type) {
     case 'code':
@@ -100,7 +114,8 @@ const ExerciseContent = ({
         <CodeExercise
           key={resetKey}
           exercise={exercise}
-          onComplete={handleComplete}
+          onAttempt={onAttempt}
+          onComplete={onComplete}
         />
       )
     case 'multiple-choice':
@@ -108,7 +123,8 @@ const ExerciseContent = ({
         <MultipleChoiceExercise
           key={resetKey}
           exercise={exercise}
-          onComplete={handleComplete}
+          onAttempt={onAttempt}
+          onComplete={onComplete}
         />
       )
   }

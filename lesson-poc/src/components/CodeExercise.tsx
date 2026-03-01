@@ -35,9 +35,11 @@ type WorkerResponse = {
 
 export function CodeExercise({
   exercise,
+  onAttempt,
   onComplete,
 }: {
   exercise: CodeExerciseProps
+  onAttempt?: () => void
   onComplete?: () => void
 }) {
   const [appTheme] = useTheme()
@@ -70,10 +72,14 @@ export function CodeExercise({
   }, [editorHeight])
 
   useEffect(() => {
-    if (results.length > 0 && results.every((r) => r.passed)) {
-      onComplete?.()
+    if (results.length > 0) {
+      if (results.every((r) => r.passed)) {
+        onComplete?.()
+      } else {
+        onAttempt?.()
+      }
     }
-  }, [results, onComplete])
+  }, [results, onComplete, onAttempt])
 
   if (window.innerWidth < 640) {
     return <p>This exercise requires a computer or tablet.</p>
