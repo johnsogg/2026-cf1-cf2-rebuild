@@ -1,5 +1,5 @@
 import { MDXProvider } from '@mdx-js/react'
-import { Exercise } from './components/Exercise'
+import { Exercise, ExerciseNumberProvider } from './components/Exercise'
 import { ThemePicker } from './components/ThemePicker'
 import { ThemeProvider } from './hooks/useTheme'
 import Intro from './lessons/intro.mdx'
@@ -11,9 +11,11 @@ export default function App() {
     <ThemeProvider>
       <MDXProvider components={components}>
         <ThemePicker />
-        <div className="lesson">
-          <Intro />
-        </div>
+        <ExerciseNumberProvider>
+          <div className="lesson">
+            <Intro />
+          </div>
+        </ExerciseNumberProvider>
       </MDXProvider>
     </ThemeProvider>
   )

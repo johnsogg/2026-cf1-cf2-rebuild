@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import type { CodeExerciseProps } from './CodeExercise'
 import type { MultipleChoiceExerciseProps } from './MultipleChoiceExercise'
 import { CodeExercise } from './CodeExercise'
@@ -6,13 +6,32 @@ import { MultipleChoiceExercise } from './MultipleChoiceExercise'
 
 export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
 
+const ExerciseNumberContext = createContext<(id: string) => number>(() => 0)
+
+export function ExerciseNumberProvider({ children }: { children: React.ReactNode }) {
+  const counter = useRef(0)
+  const assigned = useRef(new Map<string, number>())
+  counter.current = 0
+  assigned.current = new Map()
+  const getNext = useCallback((id: string) => {
+    if (assigned.current.has(id)) return assigned.current.get(id)!
+    const n = ++counter.current
+    assigned.current.set(id, n)
+    return n
+  }, [])
+  return <ExerciseNumberContext.Provider value={getNext}>{children}</ExerciseNumberContext.Provider>
+}
+
 export function Exercise({
   exercise,
   questionNumber,
 }: {
   exercise: Exercise
-  questionNumber: number
+  questionNumber?: number
 }) {
+  const getNumber = useContext(ExerciseNumberContext)
+  const resolvedNumber = questionNumber ?? getNumber(exercise.id)
+
   const { id, hints } = exercise
 
   const [resetKey, setResetKey] = useState(0)
@@ -41,7 +60,7 @@ export function Exercise({
   return (
     <div className="exercise">
       <ExerciseHeader
-        questionNumber={questionNumber}
+        questionNumber={resolvedNumber}
         attemptState={attemptState}
         onReset={handleReset}
       />
