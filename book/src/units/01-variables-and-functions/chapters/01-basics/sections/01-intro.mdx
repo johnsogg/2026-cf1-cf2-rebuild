@@ -1,0 +1,53 @@
+import { Exercise } from 'immerse/components/Exercise'
+import initPerson from './exercises/init-person'
+import whatIsAVariable from './exercises/what-is-a-variable'
+
+# Variables and Functions
+
+A <Term>variable</Term> is a named <Term>container</Term> that holds a value. You create one with
+`let` or `const`, give it a name, and assign a value:
+
+```ts
+const name = 'Alice'
+let age = 30
+```
+
+The value stored in a `let` variable can be updated later; `const` values
+cannot.
+
+<Exercise exercise={whatIsAVariable} />
+
+## Functions
+
+A **function** is a reusable block of code. You define it once and call it
+whenever you need it:
+
+```ts
+function greet(name: string): string {
+  return `Hello, ${name}!`
+}
+
+console.log(greet('world')) // Hello, world!
+```
+
+Functions can accept **parameters** (inputs) and **return** a value. TypeScript
+lets you annotate both with types, so the editor catches mistakes before you run
+the code.
+
+## Objects
+
+An **object** groups related values under a single name:
+
+```ts
+const person = {
+  firstName: 'Alice',
+  lastName: 'Smith',
+}
+```
+
+You access fields with dot notation: `person.firstName` is `"Alice"`.
+
+Now try combining all three ideas — variables, functions, and objects — in the
+exercise below.
+
+<Exercise exercise={initPerson} />

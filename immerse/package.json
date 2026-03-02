@@ -1,0 +1,17 @@
+{
+  "name": "immerse",
+  "private": true,
+  "type": "module",
+  "peerDependencies": {
+    "@mdx-js/react": "^3",
+    "@monaco-editor/react": "^4",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}

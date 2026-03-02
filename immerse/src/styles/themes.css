@@ -1,0 +1,281 @@
+/* ── Theme palettes ────────────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #666666;
+  --border: #dddddd;
+  --border-light: #eeeeee;
+  --code-bg: #f5f5f5;
+  --accent: #1a73e8;
+  --accent-text: #ffffff;
+  --accent-subtle: #e8f0fe;
+  --success: #34a853;
+  --success-bg: #e6f4ea;
+  --error: #f44336;
+  --error-bg: #fdecea;
+  --warning: #f9a825;
+  --warning-bg: #fff8e1;
+  --console-bg: #1e1e1e;
+  --console-text: #d4d4d4;
+
+  --hljs-bg: #f5f5f5;
+  --hljs-fg: #24292e;
+  --hljs-keyword: #d73a49;
+  --hljs-title: #6f42c1;
+  --hljs-constant: #005cc5;
+  --hljs-string: #032f62;
+  --hljs-builtin: #e36209;
+  --hljs-comment: #6a737d;
+  --hljs-tag: #22863a;
+  --hljs-subst: #24292e;
+  --hljs-addition: #22863a;
+  --hljs-addition-bg: #f0fff4;
+  --hljs-deletion: #b31d28;
+  --hljs-deletion-bg: #ffeef0;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --border: #30363d;
+  --border-light: #21262d;
+  --code-bg: #161b22;
+  --accent: #79c0ff;
+  --accent-text: #0d1117;
+  --accent-subtle: #1a3050;
+  --success: #3fb950;
+  --success-bg: #0f2a18;
+  --error: #f85149;
+  --error-bg: #2a0a09;
+  --warning: #d29922;
+  --warning-bg: #271d00;
+  --console-bg: #010409;
+  --console-text: #c9d1d9;
+
+  --hljs-bg: #161b22;
+  --hljs-fg: #e6edf3;
+  --hljs-keyword: #ff7b72;
+  --hljs-title: #d2a8ff;
+  --hljs-constant: #79c0ff;
+  --hljs-string: #a5d6ff;
+  --hljs-builtin: #ffa657;
+  --hljs-comment: #8b949e;
+  --hljs-tag: #7ee787;
+  --hljs-subst: #e6edf3;
+  --hljs-addition: #aff5b4;
+  --hljs-addition-bg: #033a16;
+  --hljs-deletion: #ffdcd7;
+  --hljs-deletion-bg: #67060c;
+}
+
+[data-theme="neon"] {
+  --bg: #050510;
+  --text: #e0e8ff;
+  --text-muted: #7080bb;
+  --border: #1a1a4a;
+  --border-light: #0d0d30;
+  --code-bg: #08082a;
+  --accent: #00e5ff;
+  --accent-text: #050510;
+  --accent-subtle: #001a2a;
+  --success: #00ff9d;
+  --success-bg: #00200f;
+  --error: #ff3860;
+  --error-bg: #200010;
+  --warning: #ffee00;
+  --warning-bg: #1a1a00;
+  --console-bg: #020210;
+  --console-text: #a0b8ff;
+
+  --hljs-bg: #08082a;
+  --hljs-fg: #e0e8ff;
+  --hljs-keyword: #ff00ff;
+  --hljs-title: #00e5ff;
+  --hljs-constant: #00bcd4;
+  --hljs-string: #00ffff;
+  --hljs-builtin: #ff9100;
+  --hljs-comment: #4455aa;
+  --hljs-tag: #69ff47;
+  --hljs-subst: #e0e8ff;
+  --hljs-addition: #69ff47;
+  --hljs-addition-bg: #003300;
+  --hljs-deletion: #ff3860;
+  --hljs-deletion-bg: #330000;
+}
+
+[data-theme="cyberpunk"] {
+  --bg: #0f0e17;
+  --text: #fffffe;
+  --text-muted: #888899;
+  --border: #2a2a3a;
+  --border-light: #1a1a2a;
+  --code-bg: #14131e;
+  --accent: #ff2d78;
+  --accent-text: #fffffe;
+  --accent-subtle: #1a0020;
+  --success: #00ff9d;
+  --success-bg: #001a0a;
+  --error: #ff2d78;
+  --error-bg: #1a0010;
+  --warning: #ffd700;
+  --warning-bg: #1a1400;
+  --console-bg: #090914;
+  --console-text: #e0e0ff;
+
+  --hljs-bg: #14131e;
+  --hljs-fg: #fffffe;
+  --hljs-keyword: #ffd700;
+  --hljs-title: #ff2d78;
+  --hljs-constant: #00e5ff;
+  --hljs-string: #9d00ff;
+  --hljs-builtin: #ff6b00;
+  --hljs-comment: #666688;
+  --hljs-tag: #39ff14;
+  --hljs-subst: #fffffe;
+  --hljs-addition: #39ff14;
+  --hljs-addition-bg: #001500;
+  --hljs-deletion: #ff2d78;
+  --hljs-deletion-bg: #1a0010;
+}
+
+/* 2am, desk lamp on, empty Red Bull on the floor */
+[data-theme="college-dormitory"] {
+  --bg: #1c1b29;
+  --text: #e2d9c5;
+  --text-muted: #9e95a0;
+  --border: #312e42;
+  --border-light: #252336;
+  --code-bg: #221f30;
+  --accent: #f0c040;
+  --accent-text: #1c1b29;
+  --accent-subtle: #2d2a1a;
+  --success: #52d68a;
+  --success-bg: #0d2018;
+  --error: #ff6b6b;
+  --error-bg: #2a1010;
+  --warning: #ffa94d;
+  --warning-bg: #231a0d;
+  --console-bg: #111018;
+  --console-text: #c8bfe0;
+
+  --hljs-bg: #221f30;
+  --hljs-fg: #e2d9c5;
+  --hljs-keyword: #ff8fab;
+  --hljs-title: #f0c040;
+  --hljs-constant: #339af0;
+  --hljs-string: #52d68a;
+  --hljs-builtin: #ffa94d;
+  --hljs-comment: #7a708a;
+  --hljs-tag: #74c0fc;
+  --hljs-subst: #e2d9c5;
+  --hljs-addition: #52d68a;
+  --hljs-addition-bg: #0d2018;
+  --hljs-deletion: #ff6b6b;
+  --hljs-deletion-bg: #2a1010;
+}
+
+/* ── Highlight.js structural rules (written once, use vars) ───────────────── */
+
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+code.hljs {
+  padding: 3px 5px;
+}
+
+.hljs {
+  background: var(--hljs-bg);
+  color: var(--hljs-fg);
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  color: var(--hljs-keyword);
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  color: var(--hljs-title);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-variable {
+  color: var(--hljs-constant);
+}
+
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-string {
+  color: var(--hljs-string);
+}
+
+.hljs-built_in,
+.hljs-symbol {
+  color: var(--hljs-builtin);
+}
+
+.hljs-code,
+.hljs-comment,
+.hljs-formula {
+  color: var(--hljs-comment);
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-pseudo,
+.hljs-selector-tag {
+  color: var(--hljs-tag);
+}
+
+.hljs-subst {
+  color: var(--hljs-subst);
+}
+
+.hljs-section {
+  color: var(--hljs-title);
+  font-weight: bold;
+}
+
+.hljs-bullet {
+  color: var(--hljs-constant);
+}
+
+.hljs-emphasis {
+  color: var(--hljs-fg);
+  font-style: italic;
+}
+
+.hljs-strong {
+  color: var(--hljs-fg);
+  font-weight: bold;
+}
+
+.hljs-addition {
+  color: var(--hljs-addition);
+  background: var(--hljs-addition-bg);
+}
+
+.hljs-deletion {
+  color: var(--hljs-deletion);
+  background: var(--hljs-deletion-bg);
+}
