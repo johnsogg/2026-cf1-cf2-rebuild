@@ -4,3 +4,8 @@ declare module '*.mdx' {
   const MDXComponent: ComponentType
   export default MDXComponent
 }
+
+declare module '*?raw' {
+  const content: string
+  export default content
+}
