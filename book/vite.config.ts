@@ -5,8 +5,8 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { fileURLToPath } from 'node:url'
 
-export default defineConfig({
-  base: '/2026-cf1-cf2-rebuild/',
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/2026-cf1-cf2-rebuild/' : '/',
   build: {
     outDir: '../docs',
     emptyOutDir: true,
@@ -23,4 +23,4 @@ export default defineConfig({
     },
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
   ],
-})
+}))
