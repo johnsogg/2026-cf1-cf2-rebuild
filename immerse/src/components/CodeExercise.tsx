@@ -5,6 +5,8 @@ import ExecutorWorker from '../workers/executor.worker?worker'
 import { useTheme } from '../hooks/useTheme'
 import { registerMonacoThemes, monacoThemeName } from '../utils/monacoThemes'
 import type { Monaco } from '@monaco-editor/react'
+import s from './CodeExercise.module.css'
+import btn from '../styles/buttons.module.css'
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
@@ -120,10 +122,10 @@ export function CodeExercise({
   return (
     <>
       {exercise.description && (
-        <p className="exercise-description">{exercise.description}</p>
+        <p className={s.description}>{exercise.description}</p>
       )}
 
-      <div className="exercise-editor-wrap">
+      <div className={s.editorWrap}>
         <Editor
           height={editorHeight}
           defaultLanguage="typescript"
@@ -140,42 +142,42 @@ export function CodeExercise({
         />
       </div>
 
-      <details className="exercise-test-details">
+      <details className={s.testDetails}>
         <summary>View test code</summary>
-        <pre className="exercise-test-code">{exercise.testCode}</pre>
+        <pre className={s.testCode}>{exercise.testCode}</pre>
       </details>
 
-      <div className="exercise-actions">
-        <button className="btn btn-primary" onClick={handleRun} disabled={running}>
+      <div className={s.actions}>
+        <button className={btn.btnPrimary} onClick={handleRun} disabled={running}>
           Run
         </button>
         {running && <span style={{ color: 'var(--text-muted)' }}>Running...</span>}
       </div>
 
       {timedOut && (
-        <div className="exercise-alert exercise-alert--warning">
+        <div className={`${s.alert} ${s.alertWarning}`}>
           Execution timed out — possible infinite loop. The worker was terminated after 5 seconds.
         </div>
       )}
 
       {error && (
-        <div className="exercise-alert exercise-alert--error">
+        <div className={`${s.alert} ${s.alertError}`}>
           <strong>Error:</strong> {error}
         </div>
       )}
 
       {results.length > 0 && (
-        <div className="exercise-test-results">
+        <div className={s.testResults}>
           <h4 style={{ marginBottom: 8 }}>Results</h4>
           {results.map((r) => (
             <div
               key={r.name}
-              className={`exercise-result ${r.passed ? 'exercise-result--pass' : 'exercise-result--fail'}`}
+              className={`${s.result} ${r.passed ? s.resultPass : s.resultFail}`}
             >
               <span style={{ marginRight: 8 }}>{r.passed ? '✓' : '✗'}</span>
               <strong>{r.name}</strong>
               {!r.passed && r.error && (
-                <div className="exercise-result-error">{r.error}</div>
+                <div className={s.resultError}>{r.error}</div>
               )}
             </div>
           ))}
@@ -185,7 +187,7 @@ export function CodeExercise({
       {logs.length > 0 && (
         <div>
           <h4 style={{ marginBottom: 8 }}>Console output</h4>
-          <pre className="exercise-console">{logs.join('\n')}</pre>
+          <pre className={s.console}>{logs.join('\n')}</pre>
         </div>
       )}
     </>

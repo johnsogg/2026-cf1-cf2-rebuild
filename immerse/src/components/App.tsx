@@ -7,6 +7,7 @@ import { NavBar, TableOfContents } from './nav/Nav'
 import { ThemePicker } from './ThemePicker'
 import { ThemeProvider } from '../hooks/useTheme'
 import { NavProvider, useNav } from '../nav/NavContext'
+import s from './App.module.css'
 
 export type ImmersAppProps = {
   titles: Record<string, string>
@@ -43,7 +44,7 @@ export const ImmersApp = ({ titles, loaders, glossaryEntries, components }: Imme
                 <ThemePicker />
                 <TableOfContents />
                 <ExerciseNumberProvider>
-                  <div className="lesson">
+                  <div className={s.lesson}>
                     <CurrentSection />
                   </div>
                 </ExerciseNumberProvider>

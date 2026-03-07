@@ -3,6 +3,8 @@ import type { CodeExerciseProps } from './CodeExercise'
 import type { MultipleChoiceExerciseProps } from './MultipleChoiceExercise'
 import { CodeExercise } from './CodeExercise'
 import { MultipleChoiceExercise } from './MultipleChoiceExercise'
+import s from './Exercise.module.css'
+import btn from '../styles/buttons.module.css'
 
 export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
 
@@ -65,8 +67,11 @@ export function Exercise({
     setHintsRevealed(0)
     localStorage.removeItem(`exercise:${id}:state`)
   }
+
+  const stateClass = { idle: s.exerciseIdle, attempted: s.exerciseAttempted, complete: s.exerciseComplete }[attemptState]
+
   return (
-    <div className={`exercise exercise--${attemptState}`}>
+    <div className={`${s.exercise} ${stateClass}`}>
       <ExerciseHeader
         questionNumber={resolvedNumber}
         attemptState={attemptState}
@@ -101,16 +106,17 @@ const ExerciseHeader = ({
   onReset,
 }: ExerciseHeaderProps) => {
   const stateIcon = { idle: '☐', attempted: '✗', complete: '✓' }[attemptState]
+  const attemptClass = { idle: s.attemptIdle, attempted: s.attemptAttempted, complete: s.attemptComplete }[attemptState]
   return (
-    <div className="exercise-header">
-      <div className="exercise-header__question-container">
-        <div className={`exercise-header__attempt--${attemptState}`}>
+    <div className={s.header}>
+      <div className={s.questionContainer}>
+        <div className={attemptClass}>
           {stateIcon}
         </div>
-        <div className="exercise-header__question">{questionNumber}</div>
+        <div className={s.question}>{questionNumber}</div>
       </div>
       <button
-        className="btn btn-secondary exercise-header__reset"
+        className={s.resetBtn}
         onClick={onReset}
         aria-label="Reset"
       >
@@ -124,7 +130,7 @@ type ExerciseTitleProps = {
   title: string
 }
 const ExerciseTitle = ({ title }: ExerciseTitleProps) => {
-  return <div className="exercise-title">{title}</div>
+  return <div className={s.title}>{title}</div>
 }
 
 type ExerciseContentProps = {
@@ -173,16 +179,16 @@ const ExerciseHints = ({
 }: ExerciseHintsProps) => {
   if (hints == null || hints.length == 0) return null
   return (
-    <div className="exercise-hints">
+    <div className={s.hints}>
       {hints.slice(0, hintsRevealed).map((hint, i) => (
-        <div key={i} className="exercise-hint">
+        <div key={i} className={s.hint}>
           <strong>Hint {i + 1}:</strong> {hint}
         </div>
       ))}
       {hintsRevealed < hints.length && (
-        <div className="exercise-hint-action">
+        <div className={s.hintAction}>
           <button
-            className="btn btn-secondary"
+            className={btn.btnSecondary}
             onClick={() => setHintsRevealed((n) => n + 1)}
           >
             Get a hint

@@ -1,0 +1,25 @@
+.btn {
+  padding: 8px 20px;
+  font-size: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+}
+
+.btnPrimary {
+  composes: btn;
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.btnPrimary:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  composes: btn;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}

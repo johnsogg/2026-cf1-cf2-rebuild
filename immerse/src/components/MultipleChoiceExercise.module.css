@@ -1,0 +1,59 @@
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.option input[type='radio'] {
+  pointer-events: none;
+}
+
+.optionSelected {
+  background: var(--accent-subtle);
+}
+
+.optionCorrect {
+  background: var(--success-bg);
+  border-color: var(--success);
+}
+
+.optionIncorrect {
+  background: var(--error-bg);
+  border-color: var(--error);
+}
+
+.optionSubmitted {
+  cursor: default;
+}
+
+.labelText {
+  user-select: none;
+}
+
+.feedback {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.feedbackCorrect {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+}
+
+.feedbackIncorrect {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+}

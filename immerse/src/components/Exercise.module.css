@@ -1,0 +1,136 @@
+/* ── Exercise wrapper ─────────────────────────────────────────────────────── */
+
+.exercise {
+  margin-bottom: 24px;
+  padding-left: 24px;
+  border-radius: 6px;
+  border-left: 4px solid var(--text-muted);
+}
+
+.exerciseIdle {
+  border-color: var(--text-muted);
+}
+
+.exerciseComplete {
+  border-color: var(--success);
+}
+
+.exerciseAttempted {
+  border-color: var(--error);
+}
+
+.title {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.description {
+  margin-bottom: 16px;
+  white-space: pre-line;
+  color: var(--text);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.questionContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.question {
+  font-size: 175%;
+  font-weight: 800;
+}
+
+.attemptIdle,
+.attemptAttempted,
+.attemptComplete {
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.attemptIdle {
+  color: var(--text-muted);
+}
+
+.attemptAttempted {
+  color: var(--error);
+}
+
+.attemptComplete {
+  color: var(--success);
+}
+
+.resetBtn {
+  padding: 0;
+  font-size: 150%;
+  line-height: 1;
+  aspect-ratio: 1;
+  width: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ── Action rows ──────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ── Hints ────────────────────────────────────────────────────────────────── */
+
+.hints {
+  margin-top: 12px;
+}
+
+.hint {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+  font-size: 13px;
+}
+
+.hintAction {
+  margin-top: 8px;
+}
+
+/* ── Complete badge ───────────────────────────────────────────────────────── */
+
+.completeBadge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 4px;
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  color: var(--success);
+  font-weight: 600;
+  font-size: 14px;
+}

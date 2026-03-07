@@ -1,6 +1,7 @@
 import { useNav } from '../../nav/NavContext'
 import type { Chapter, Section, Unit } from '../../nav/navTree'
 import { NavSection } from './NavSection'
+import s from './Nav.module.css'
 
 export const NavBar = () => {
   const { currentSection, hasPrev, hasNext, goPrev, goNext } = useNav()
@@ -17,41 +18,6 @@ export const NavBar = () => {
     </nav>
   )
 }
-
-// export const TableOfContents2 = () => {
-//   const { tree, currentSection } = useNav()
-
-//   return (
-//     <nav aria-label="Table of contents">
-//       {tree.map((unit) => (
-//         <section key={unit.slug}>
-//           <strong>{unit.title}</strong>
-//           {unit.chapters.map((chapter) => (
-//             <section key={chapter.slug}>
-//               <em>{chapter.title}</em>
-//               <ul>
-//                 {chapter.sections.map((section) => (
-//                   <li key={section.path}>
-//                     <Link
-//                       to={section.urlPath}
-//                       aria-current={
-//                         section.path === currentSection.path
-//                           ? 'page'
-//                           : undefined
-//                       }
-//                     >
-//                       {section.title}
-//                     </Link>
-//                   </li>
-//                 ))}
-//               </ul>
-//             </section>
-//           ))}
-//         </section>
-//       ))}
-//     </nav>
-//   )
-// }
 
 export const TableOfContents = () => {
   const { tree, currentSection } = useNav()
@@ -78,7 +44,7 @@ const NavUnit = ({
 }) => {
   return (
     <>
-      <div className="nav-unit">{unit.title}</div>
+      <div className={s.unit}>{unit.title}</div>
       <ul>
         {unit.chapters.map((chapter, idx) => (
           <NavChapter
@@ -103,8 +69,8 @@ const NavChapter = ({
   currentSection: Section
 }) => {
   return (
-    <div className="nav-chapter">
-      <div className="nav-chapter__title">
+    <div className={s.chapter}>
+      <div className={s.chapterTitle}>
         {num}. {chapter.title}
       </div>
       <ul>

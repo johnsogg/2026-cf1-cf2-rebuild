@@ -6,14 +6,14 @@
   background: var(--code-bg);
 }
 
-.callout-info {
+.calloutInfo {
   border-color: #4a9eff;
 }
 
-.callout-warning {
+.calloutWarning {
   border-color: #f5a623;
 }
 
-.callout-tip {
+.calloutTip {
   border-color: #5cb85c;
 }

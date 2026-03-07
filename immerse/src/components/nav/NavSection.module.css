@@ -1,0 +1,12 @@
+.section {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.sectionSelected {
+  background: lightblue;
+}
+
+.sectionTitle {
+}

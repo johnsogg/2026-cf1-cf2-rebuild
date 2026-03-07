@@ -1,0 +1,106 @@
+.description {
+  margin-bottom: 16px;
+  white-space: pre-line;
+  color: var(--text);
+}
+
+/* ── Editor ───────────────────────────────────────────────────────────────── */
+
+.editorWrap {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+/* ── Test code details ────────────────────────────────────────────────────── */
+
+.testDetails {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.testDetails summary {
+  cursor: pointer;
+}
+
+.testCode {
+  background: var(--code-bg);
+  padding: 10px 14px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* ── Action rows ──────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ── Alerts (timeout, errors) ─────────────────────────────────────────────── */
+
+.alert {
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.alertWarning {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+}
+
+.alertError {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+/* ── Test results ─────────────────────────────────────────────────────────── */
+
+.testResults {
+  margin-bottom: 16px;
+}
+
+.result {
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.resultPass {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+}
+
+.resultFail {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+}
+
+.resultError {
+  margin-top: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--error);
+}
+
+/* ── Console output ───────────────────────────────────────────────────────── */
+
+.console {
+  background: var(--console-bg);
+  color: var(--console-text);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  margin: 0;
+}

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import s from './MultipleChoiceExercise.module.css'
+import btn from '../styles/buttons.module.css'
 
 export type MultipleChoiceExerciseProps = {
   type: 'multiple-choice'
@@ -49,18 +51,14 @@ export function MultipleChoiceExercise({
         {exercise.prompt}
       </p>
 
-      <div className="exercise-options">
+      <div className={s.options}>
         {exercise.options.map((option, i) => {
           const classes = [
-            'exercise-option',
-            submitted ? 'exercise-option--submitted' : '',
-            submitted && i === exercise.correct
-              ? 'exercise-option--correct'
-              : '',
-            submitted && i !== exercise.correct && i === selected
-              ? 'exercise-option--incorrect'
-              : '',
-            !submitted && selected === i ? 'exercise-option--selected' : '',
+            s.option,
+            submitted ? s.optionSubmitted : '',
+            submitted && i === exercise.correct ? s.optionCorrect : '',
+            submitted && i !== exercise.correct && i === selected ? s.optionIncorrect : '',
+            !submitted && selected === i ? s.optionSelected : '',
           ]
             .filter(Boolean)
             .join(' ')
@@ -79,7 +77,7 @@ export function MultipleChoiceExercise({
                 checked={selected === i}
                 onChange={() => {}}
               />
-              <span className="exercise-option__label-text">
+              <span className={s.labelText}>
                 {option.text}
                 {option.image && (
                   <img
@@ -96,7 +94,7 @@ export function MultipleChoiceExercise({
 
       {!submitted && (
         <button
-          className="btn btn-primary"
+          className={btn.btnPrimary}
           onClick={() => {
             if (selected !== null) handleSubmit(selected)
           }}
