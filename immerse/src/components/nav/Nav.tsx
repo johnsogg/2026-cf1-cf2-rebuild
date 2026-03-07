@@ -1,7 +1,4 @@
 import { useNav } from '../../nav/NavContext'
-import type { Chapter, Section, Unit } from '../../nav/navTree'
-import { NavSection } from './NavSection'
-import s from './Nav.module.css'
 
 export const NavBar = () => {
   const { currentSection, hasPrev, hasNext, goPrev, goNext } = useNav()
@@ -16,74 +13,5 @@ export const NavBar = () => {
         Next →
       </button>
     </nav>
-  )
-}
-
-export const TableOfContents = () => {
-  const { tree, currentSection } = useNav()
-
-  return (
-    <nav aria-label="Table of contents">
-      {tree.map((unit) => (
-        <NavUnit
-          key={unit.slug}
-          unit={unit}
-          currentSection={currentSection}
-        ></NavUnit>
-      ))}
-    </nav>
-  )
-}
-
-const NavUnit = ({
-  unit,
-  currentSection,
-}: {
-  unit: Unit
-  currentSection: Section
-}) => {
-  return (
-    <>
-      <div className={s.unit}>{unit.title}</div>
-      <ul>
-        {unit.chapters.map((chapter, idx) => (
-          <NavChapter
-            key={chapter.slug}
-            chapter={chapter}
-            num={idx + 1}
-            currentSection={currentSection}
-          />
-        ))}
-      </ul>
-    </>
-  )
-}
-
-const NavChapter = ({
-  chapter,
-  num,
-  currentSection,
-}: {
-  chapter: Chapter
-  num: number
-  currentSection: Section
-}) => {
-  return (
-    <div className={s.chapter}>
-      <div className={s.chapterTitle}>
-        {num}. {chapter.title}
-      </div>
-      <ul>
-        {chapter.sections.map((section, idx) => (
-          <NavSection
-            key={section.path}
-            path={[num, idx + 1]}
-            status="idle"
-            section={section}
-            isCurrentSection={currentSection === section}
-          />
-        ))}
-      </ul>
-    </div>
   )
 }

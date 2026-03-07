@@ -3,11 +3,12 @@ import { useEffect, useState, type ComponentType } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
 import { GlossaryProvider, Term, type GlossaryEntry } from './Glossary'
-import { NavBar, TableOfContents } from './nav/Nav'
+import { NavBar } from './nav/Nav'
 import { ThemePicker } from './ThemePicker'
 import { ThemeProvider } from '../hooks/useTheme'
 import { NavProvider, useNav } from '../nav/NavContext'
 import s from './ImmerseApp.module.css'
+import { TableOfContents } from './nav/TableOfContents'
 
 export type ImmersAppProps = {
   titles: Record<string, string>

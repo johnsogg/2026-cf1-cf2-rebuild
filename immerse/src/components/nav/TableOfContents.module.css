@@ -1,0 +1,29 @@
+.unit {
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.chapter {
+}
+
+.chapterTitle {
+  font-size: 18px;
+}
+
+.chapter ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.section {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.sectionSelected {
+  background: lightblue;
+}
+
+.sectionTitle {
+}
