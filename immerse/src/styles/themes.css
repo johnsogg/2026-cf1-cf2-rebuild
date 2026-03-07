@@ -37,7 +37,7 @@
 
 [data-theme="dark"] {
   --bg: #0d1117;
-  --text: #e6edf3;
+  --text: #cdc7c1;
   --text-muted: #8b949e;
   --border: #30363d;
   --border-light: #21262d;
@@ -138,6 +138,76 @@
   --hljs-addition-bg: #001500;
   --hljs-deletion: #ff2d78;
   --hljs-deletion-bg: #1a0010;
+}
+
+[data-theme="clouds"] {
+  --bg: #f4f7ff;
+  --text: #1e2a3a;
+  --text-muted: #6b7f9a;
+  --border: #c8d4e8;
+  --border-light: #dde6f5;
+  --code-bg: #e8eef8;
+  --accent: #2d78d6;
+  --accent-text: #ffffff;
+  --accent-subtle: #daeaff;
+  --success: #2e9e5e;
+  --success-bg: #dcf3e8;
+  --error: #d63a3a;
+  --error-bg: #fde8e8;
+  --warning: #c97b00;
+  --warning-bg: #fff3d0;
+  --console-bg: #1a2030;
+  --console-text: #c8d4e8;
+
+  --hljs-bg: #e8eef8;
+  --hljs-fg: #1e2a3a;
+  --hljs-keyword: #0050a0;
+  --hljs-title: #6030b0;
+  --hljs-constant: #005cc5;
+  --hljs-string: #237a28;
+  --hljs-builtin: #c05a00;
+  --hljs-comment: #6b7f9a;
+  --hljs-tag: #0f7a4a;
+  --hljs-subst: #1e2a3a;
+  --hljs-addition: #0f7a4a;
+  --hljs-addition-bg: #d0f0e0;
+  --hljs-deletion: #a02020;
+  --hljs-deletion-bg: #f8d8d8;
+}
+
+[data-theme="disco"] {
+  --bg: #fdf4e7;
+  --text: #2a1040;
+  --text-muted: #8a5a9a;
+  --border: #e0c0e8;
+  --border-light: #f0daf8;
+  --code-bg: #f8e8f8;
+  --accent: #c918a8;
+  --accent-text: #ffffff;
+  --accent-subtle: #fce0f8;
+  --success: #2d9e5e;
+  --success-bg: #dcf3e8;
+  --error: #d62060;
+  --error-bg: #fde0ea;
+  --warning: #c08000;
+  --warning-bg: #fff3c0;
+  --console-bg: #1a0030;
+  --console-text: #f0c0f0;
+
+  --hljs-bg: #f8e8f8;
+  --hljs-fg: #2a1040;
+  --hljs-keyword: #c918a8;
+  --hljs-title: #8010c0;
+  --hljs-constant: #c08000;
+  --hljs-string: #1a7a50;
+  --hljs-builtin: #a04000;
+  --hljs-comment: #8a5a9a;
+  --hljs-tag: #008080;
+  --hljs-subst: #2a1040;
+  --hljs-addition: #1a7a50;
+  --hljs-addition-bg: #d8f0e8;
+  --hljs-deletion: #d62060;
+  --hljs-deletion-bg: #fcd8e8;
 }
 
 /* 2am, desk lamp on, empty Red Bull on the floor */

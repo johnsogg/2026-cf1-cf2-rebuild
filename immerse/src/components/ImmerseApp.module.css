@@ -1,7 +1,7 @@
 .lesson {
   max-width: 1024px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 0 4rem;
 }
 
 .lesson h1 {
@@ -33,4 +33,5 @@
 .layout {
   display: flex;
   flex-direction: row;
+  padding: 32px;
 }

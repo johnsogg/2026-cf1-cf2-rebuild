@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import { NavBar } from './Nav'
 import { useNav } from '../../nav/NavContext'
 import type { Unit, Section, Chapter } from '../../nav/navTree'
 import type { AttemptState } from '../Exercise'
@@ -10,7 +11,8 @@ export const TableOfContents = () => {
   const { tree, currentSection } = useNav()
 
   return (
-    <nav aria-label="Table of contents">
+    <nav aria-label="Table of contents" className={s.toc}>
+      <NavBar />
       {tree.map((unit) => (
         <TocUnit
           key={unit.slug}
@@ -58,7 +60,7 @@ const TocChapter = ({
   return (
     <div className={s.chapter}>
       <div className={s.chapterTitle}>
-        {num}. {chapter.title}
+        <span>{num}.</span> <span>{chapter.title}</span>
       </div>
       <ul>
         {chapter.sections.map((section, idx) => (
@@ -100,14 +102,12 @@ export const TocSection = ({
   isCurrentSection,
 }: TocSectionProps) => {
   return (
-    <li>
+    <li className={`${s.section} ${isCurrentSection ? s.sectionSelected : ''}`}>
       <Link
         to={section.urlPath}
         aria-current={isCurrentSection ? 'page' : undefined}
       >
-        <div
-          className={`${s.section} ${isCurrentSection ? s.sectionSelected : ''}`}
-        >
+        <div className={`${s.sectionText}`}>
           <div>{getAttemptSymbol(status)}</div>
           <div>{path.join('.')}</div>
           <div className={s.sectionTitle}>{section.title}</div>

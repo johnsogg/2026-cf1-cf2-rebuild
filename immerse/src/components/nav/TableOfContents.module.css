@@ -1,13 +1,22 @@
+.toc {
+  flex: 432px 0 1;
+  color: var(--text);
+}
+
 .unit {
-  font-weight: 800;
-  font-size: 24px;
+  font-weight: 600;
+  font-size: 20px;
 }
 
 .chapter {
+  font-size: 18px;
 }
 
 .chapterTitle {
   font-size: 18px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
 }
 
 .chapter ul {
@@ -15,14 +24,27 @@
   padding: 0;
   margin: 0;
 }
+
 .section {
+  padding: 2px 16px;
+  border-radius: 8px;
+  & a {
+    color: inherit;
+    text-decoration: none;
+  }
+  &:hover {
+    background: color-mix(in srgb, var(--accent-subtle) 50%, var(--bg));
+  }
+}
+
+.sectionText {
   display: flex;
   flex-direction: row;
   gap: 16px;
 }
 
 .sectionSelected {
-  background: lightblue;
+  background: var(--accent-subtle);
 }
 
 .sectionTitle {

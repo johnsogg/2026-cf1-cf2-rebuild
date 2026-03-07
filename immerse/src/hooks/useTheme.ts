@@ -1,7 +1,7 @@
 import { createElement, createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
-export type Theme = 'light' | 'dark' | 'neon' | 'cyberpunk' | 'college-dormitory'
+export type Theme = 'light' | 'dark' | 'clouds' | 'disco' | 'neon' | 'cyberpunk' | 'college-dormitory'
 
 type ThemeContextValue = [Theme, (t: Theme) => void]
 

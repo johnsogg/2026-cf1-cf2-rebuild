@@ -1,0 +1,31 @@
+.group {
+  padding: 4px 0;
+}
+
+.groupLabel {
+  font-weight: 700;
+  padding: 6px 16px 2px;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.themeItem {
+  display: block;
+  width: 100%;
+  padding: 8px 0 8px 24px;
+  cursor: pointer;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 18px;
+}
+
+.themeItem:hover {
+  background: var(--accent-subtle);
+}
+
+.themeItemActive {
+  color: var(--accent);
+  font-weight: 600;
+}
