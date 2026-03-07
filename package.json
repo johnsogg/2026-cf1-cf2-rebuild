@@ -1,1 +1,1 @@
-{"private":true,"workspaces":["immerse","book"],"devDependencies":{"prettier":"^3.8.1"}}
+{"private":true,"workspaces":["immerse","book"],"devDependencies":{"prettier":"^3.8.1","typescript-plugin-css-modules":"^5.2.0"}}

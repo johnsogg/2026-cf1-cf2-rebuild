@@ -7,7 +7,7 @@ import { NavBar, TableOfContents } from './nav/Nav'
 import { ThemePicker } from './ThemePicker'
 import { ThemeProvider } from '../hooks/useTheme'
 import { NavProvider, useNav } from '../nav/NavContext'
-import s from './App.module.css'
+import s from './ImmerseApp.module.css'
 
 export type ImmersAppProps = {
   titles: Record<string, string>
@@ -32,7 +32,12 @@ const CurrentSection = () => {
 
 const defaultComponents = { Exercise, Term }
 
-export const ImmersApp = ({ titles, loaders, glossaryEntries, components }: ImmersAppProps) => {
+export const ImmersApp = ({
+  titles,
+  loaders,
+  glossaryEntries,
+  components,
+}: ImmersAppProps) => {
   const mdxComponents = { ...defaultComponents, ...components }
   return (
     <BrowserRouter>
@@ -40,7 +45,7 @@ export const ImmersApp = ({ titles, loaders, glossaryEntries, components }: Imme
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
             <NavProvider titles={titles} loaders={loaders}>
-              <div id="xndr">
+              <div className={s.layout}>
                 <ThemePicker />
                 <TableOfContents />
                 <ExerciseNumberProvider>

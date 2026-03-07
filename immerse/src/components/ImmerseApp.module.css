@@ -29,3 +29,9 @@
 .lesson code {
   font-family: 'Fira Mono', ui-monospace, monospace;
 }
+
+.layout {
+  display: flex;
+  flex-direction: row;
+  background-color: dodgerblue;
+}

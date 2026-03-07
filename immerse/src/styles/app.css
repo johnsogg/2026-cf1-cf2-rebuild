@@ -5,8 +5,3 @@ body {
   color: var(--text);
   background: var(--bg);
 }
-
-#xndr {
-  display: flex;
-  flex-direction: row;
-}

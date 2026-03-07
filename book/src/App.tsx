@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { ImmersApp } from 'immerse/components/App'
+import { ImmersApp } from 'immerse/components/ImmerseApp'
 import { glossaryEntries } from './glossary'
 import { Callout } from './components/Callout' // book-specific content component
 
