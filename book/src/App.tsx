@@ -1,48 +1,13 @@
-import { MDXProvider } from '@mdx-js/react'
-import { Exercise, ExerciseNumberProvider } from 'immerse/components/Exercise'
-import { GlossaryProvider, Term } from 'immerse/components/Glossary'
-import { ThemePicker } from 'immerse/components/ThemePicker'
-import { ThemeProvider } from 'immerse/hooks/useTheme'
-import { useEffect, useState, type ComponentType } from 'react'
-import { BrowserRouter } from 'react-router-dom'
-import { NavBar, TableOfContents } from './Nav'
-import { NavProvider, useNav } from './NavContext'
+import type { ComponentType } from 'react'
+import { ImmersApp } from 'immerse/components/App'
 import { glossaryEntries } from './glossary'
+import { Callout } from './components/Callout'
 
-const components = { Exercise, Term }
+const titles = import.meta.glob<string>('./units/**/*.mdx', { import: 'title', eager: true })
+const loaders = import.meta.glob<{ default: ComponentType }>('./units/**/*.mdx')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const components: Record<string, ComponentType<any>> = { Callout }
 
-function CurrentSection() {
-  const { currentSection } = useNav()
-  const [Component, setComponent] = useState<ComponentType | null>(null)
-
-  useEffect(() => {
-    setComponent(null)
-    currentSection.load().then(mod => setComponent(() => mod.default))
-  }, [currentSection])
-
-  if (!Component) return <p>Loading…</p>
-  return <Component />
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <GlossaryProvider entries={glossaryEntries}>
-          <MDXProvider components={components}>
-            <NavProvider>
-              <ThemePicker />
-              <TableOfContents />
-              <ExerciseNumberProvider>
-                <div className="lesson">
-                  <CurrentSection />
-                </div>
-              </ExerciseNumberProvider>
-              <NavBar />
-            </NavProvider>
-          </MDXProvider>
-        </GlossaryProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  )
-}
+export default () => (
+  <ImmersApp titles={titles} loaders={loaders} glossaryEntries={glossaryEntries} components={components} />
+)

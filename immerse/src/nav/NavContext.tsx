@@ -2,9 +2,6 @@ import { createContext, useContext, useEffect, useMemo, type ComponentType, type
 import { useLocation, useNavigate } from 'react-router-dom'
 import { buildNavTree, type Section, type Unit } from './navTree'
 
-const titles = import.meta.glob<string>('./units/**/*.mdx', { import: 'title', eager: true })
-const loaders = import.meta.glob<{ default: ComponentType }>('./units/**/*.mdx')
-
 type NavContextValue = {
   tree: Unit[]
   currentSection: Section
@@ -17,7 +14,13 @@ type NavContextValue = {
 
 const NavContext = createContext<NavContextValue | null>(null)
 
-export function NavProvider({ children }: { children: ReactNode }) {
+type NavProviderProps = {
+  titles: Record<string, string>
+  loaders: Record<string, () => Promise<{ default: ComponentType }>>
+  children: ReactNode
+}
+
+export const NavProvider = ({ titles, loaders, children }: NavProviderProps) => {
   const tree = useMemo(() => buildNavTree(titles, loaders), [])
   const flat = useMemo<Section[]>(() => tree.flatMap(u => u.chapters.flatMap(c => c.sections)), [tree])
 
@@ -46,7 +49,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   return <NavContext.Provider value={value}>{children}</NavContext.Provider>
 }
 
-export function useNav(): NavContextValue {
+export const useNav = (): NavContextValue => {
   const ctx = useContext(NavContext)
   if (!ctx) throw new Error('useNav must be used within NavProvider')
   return ctx

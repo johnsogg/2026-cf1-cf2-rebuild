@@ -19,7 +19,7 @@ export type Unit = {
   chapters: Chapter[]
 }
 
-export function slugToTitle(slug: string): string {
+export const slugToTitle = (slug: string): string => {
   const withoutPrefix = slug.replace(/^\d+-/, '')
   const words = withoutPrefix.split('-')
   return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -27,10 +27,10 @@ export function slugToTitle(slug: string): string {
 
 const SECTION_RE = /\.\/units\/([\w-]+)\/chapters\/([\w-]+)\/sections\/([\w-]+)\.mdx$/
 
-export function buildNavTree(
+export const buildNavTree = (
   titles: Record<string, string>,
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
-): Unit[] {
+): Unit[] => {
   const unitMap = new Map<string, Unit>()
 
   for (const path of Object.keys(titles)) {
@@ -40,11 +40,7 @@ export function buildNavTree(
     const [, unitSlug, chapterSlug, sectionSlug] = match
 
     if (!unitMap.has(unitSlug)) {
-      unitMap.set(unitSlug, {
-        slug: unitSlug,
-        title: slugToTitle(unitSlug),
-        chapters: [],
-      })
+      unitMap.set(unitSlug, { slug: unitSlug, title: slugToTitle(unitSlug), chapters: [] })
     }
     const unit = unitMap.get(unitSlug)!
 
@@ -63,7 +59,6 @@ export function buildNavTree(
   }
 
   const units = Array.from(unitMap.values())
-
   units.sort((a, b) => a.slug.localeCompare(b.slug))
   for (const unit of units) {
     unit.chapters.sort((a, b) => a.slug.localeCompare(b.slug))

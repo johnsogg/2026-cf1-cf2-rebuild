@@ -2,8 +2,8 @@
 import { greet, square } from './solution'
 
 test('greet returns a greeting', () => {
-  expect(greet('Alice')).toBe('Hello Alice')
-  expect(greet('World')).toBe('Hello World')
+  expect(greet('Alice')).toBe('Hello, Alice')
+  expect(greet('World')).toBe('Hello, World')
 })
 
 test('square returns the square of a number', () => {

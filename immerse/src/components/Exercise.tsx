@@ -88,7 +88,7 @@ export function Exercise({
   )
 }
 
-type AttemptState = 'idle' | 'attempted' | 'complete'
+export type AttemptState = 'idle' | 'attempted' | 'complete'
 
 type ExerciseHeaderProps = {
   questionNumber: number
