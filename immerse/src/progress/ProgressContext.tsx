@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react"
@@ -35,6 +36,14 @@ const ProgressContext = createContext<ProgressContextValue | null>(null)
 
 export const ProgressProvider = ({ children }: { children: ReactNode }) => {
   const [version, setVersion] = useState(0)
+
+  useEffect(() => {
+    setStorageValue((d) => {
+      for (const section of Object.values(d.sections ?? {})) {
+        section.exercises = []
+      }
+    })
+  }, [])
 
   const notifyExerciseChange = useCallback(() => {
     setVersion((v) => v + 1)

@@ -55,17 +55,6 @@
   align-items: center;
 }
 
-.resetBtn {
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 /* ── Action rows ──────────────────────────────────────────────────────────── */
 
 .actions {

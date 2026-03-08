@@ -10,6 +10,7 @@ import type { CodeExerciseProps } from "./CodeExercise"
 import type { MultipleChoiceExerciseProps } from "./MultipleChoiceExercise"
 import { CodeExercise } from "./CodeExercise"
 import { MultipleChoiceExercise } from "./MultipleChoiceExercise"
+import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./Exercise.module.css"
 import btn from "../styles/buttons.module.css"
@@ -56,10 +57,11 @@ export function Exercise({
   const { id, hints } = exercise
   const { registerExerciseInSection, notifyExerciseChange } = useProgress()
   const { currentSection } = useNav()
+  const sectionPath = useRef(currentSection.urlPath)
 
   useEffect(() => {
-    registerExerciseInSection(id, currentSection.urlPath)
-  }, [id, currentSection.urlPath]) // eslint-disable-line react-hooks/exhaustive-deps
+    registerExerciseInSection(id, sectionPath.current)
+  }, [id, registerExerciseInSection])
 
   const [resetKey, setResetKey] = useState(0)
   const [attemptState, setAttemptState] = useState<AttemptState>(
@@ -146,9 +148,9 @@ const ExerciseHeader = ({
         <div className={s.attemptIcon}>{stateIcon}</div>
         <div className={s.question}>{questionNumber}</div>
       </div>
-      <button className={s.resetBtn} onClick={onReset} aria-label="Reset">
+      <IconButton onClick={onReset} aria-label="Reset">
         <SvgIcon name="refresh" size={18} intent="muted" />
-      </button>
+      </IconButton>
     </div>
   )
 }
