@@ -1,5 +1,5 @@
 import { MDXProvider } from '@mdx-js/react'
-import { useEffect, useRef, useState, type ComponentType } from 'react'
+import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
 import { GlossaryProvider, Term, type GlossaryEntry } from './Glossary'
@@ -18,7 +18,7 @@ export type ImmersAppProps = {
   components?: Record<string, ComponentType<any>>
 }
 
-const CurrentSection = () => {
+const CurrentSection = ({ onLoaded }: { onLoaded: () => void }) => {
   const { currentSection } = useNav()
   const [Component, setComponent] = useState<ComponentType | null>(null)
 
@@ -26,6 +26,10 @@ const CurrentSection = () => {
     setComponent(null)
     currentSection.load().then((mod) => setComponent(() => mod.default))
   }, [currentSection])
+
+  useEffect(() => {
+    if (Component) onLoaded()
+  }, [Component]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!Component) return <p>Loading…</p>
   return <Component />
@@ -37,6 +41,8 @@ const AppLayout = () => {
   const { currentSection } = useNav()
   const contentAreaRef = useRef<HTMLDivElement>(null)
   const scrollPositions = useRef<Map<string, number>>(new Map())
+  const currentPathRef = useRef(currentSection.urlPath)
+  currentPathRef.current = currentSection.urlPath
 
   useEffect(() => {
     const el = contentAreaRef.current
@@ -48,11 +54,11 @@ const AppLayout = () => {
     return () => el.removeEventListener('scroll', handleScroll)
   }, [currentSection.urlPath])
 
-  useEffect(() => {
+  const handleSectionLoaded = useCallback(() => {
     const el = contentAreaRef.current
     if (!el) return
-    el.scrollTop = scrollPositions.current.get(currentSection.urlPath) ?? 0
-  }, [currentSection.urlPath])
+    el.scrollTop = scrollPositions.current.get(currentPathRef.current) ?? 0
+  }, [])
 
   return (
     <div className={s.layout}>
@@ -61,7 +67,7 @@ const AppLayout = () => {
       <div ref={contentAreaRef} className={s.contentArea}>
         <ExerciseNumberProvider>
           <div className={s.lesson}>
-            <CurrentSection />
+            <CurrentSection onLoaded={handleSectionLoaded} />
             <NavBar />
           </div>
         </ExerciseNumberProvider>
