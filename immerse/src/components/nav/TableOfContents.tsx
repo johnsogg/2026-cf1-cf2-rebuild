@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
+import { GlossaryContext } from '../Glossary'
 import { useNav } from '../../nav/NavContext'
 import type { Unit, Section, Chapter } from '../../nav/navTree'
 import type { AttemptState } from '../Exercise'
@@ -132,7 +133,26 @@ export const TableOfContents = () => {
           onToggleChapter={toggleChapter}
         />
       ))}
+      <TocGlossary />
     </nav>
+  )
+}
+
+const TocGlossary = () => {
+  const ctx = useContext(GlossaryContext)
+  const location = useLocation()
+
+  if (!ctx || ctx.sortedEntries.length === 0) return null
+
+  const isActive = location.pathname === '/glossary'
+
+  return (
+    <Link
+      to="/glossary"
+      className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ''}`}
+    >
+      Glossary
+    </Link>
   )
 }
 

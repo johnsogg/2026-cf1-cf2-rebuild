@@ -2,7 +2,7 @@ import { MDXProvider } from '@mdx-js/react'
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 import { BrowserRouter, Link, useLocation } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
-import { GlossaryProvider, Term, type GlossaryEntry } from './Glossary'
+import { GlossaryProvider, GlossaryView, Term, type GlossaryEntry } from './Glossary'
 import { ThemeProvider } from '../hooks/useTheme'
 import { Tools } from './Tools'
 import { NavProvider, useNav } from '../nav/NavContext'
@@ -68,18 +68,19 @@ const AppLayout = () => {
   currentPathRef.current = currentSection.urlPath
 
   const isRoot = location.pathname === '/'
+  const isGlossary = location.pathname === '/glossary'
 
-  // Persist last visited section (not when at root)
+  // Persist last visited section (not when at root or glossary)
   useEffect(() => {
-    if (!isRoot) {
+    if (!isRoot && !isGlossary) {
       setStorageValue((d) => {
         ;(d.nav ??= {}).lastSection = currentSection.urlPath
       })
     }
-  }, [currentSection.urlPath, isRoot])
+  }, [currentSection.urlPath, isRoot, isGlossary])
 
   useEffect(() => {
-    if (isRoot) return
+    if (isRoot || isGlossary) return
     const el = contentAreaRef.current
     if (!el) return
     const urlPath = currentSection.urlPath
@@ -95,7 +96,7 @@ const AppLayout = () => {
     }
     el.addEventListener('scroll', handleScroll, { passive: true })
     return () => el.removeEventListener('scroll', handleScroll)
-  }, [currentSection.urlPath, notifyExerciseChange, isRoot])
+  }, [currentSection.urlPath, notifyExerciseChange, isRoot, isGlossary])
 
   const handleSectionLoaded = useCallback(() => {
     const el = contentAreaRef.current
@@ -120,6 +121,10 @@ const AppLayout = () => {
       <div ref={contentAreaRef} className={s.contentArea}>
         {isRoot ? (
           <OrientationView />
+        ) : isGlossary ? (
+          <div className={s.lesson}>
+            <GlossaryView />
+          </div>
         ) : (
           <ExerciseNumberProvider>
             <div className={s.lesson}>

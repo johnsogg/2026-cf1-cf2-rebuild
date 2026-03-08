@@ -124,3 +124,15 @@
 .sectionTitle {
   flex: 1;
 }
+
+.unitLink {
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.unitLinkActive {
+  color: var(--accent);
+}

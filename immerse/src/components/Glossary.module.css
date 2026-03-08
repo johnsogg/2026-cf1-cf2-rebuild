@@ -1,0 +1,48 @@
+.termMissing {
+  color: hotpink;
+  font-weight: bold;
+}
+
+.termAnchor {
+  position: relative;
+}
+
+.termTrigger {
+  border-bottom: 2px dotted currentColor;
+  cursor: pointer;
+}
+
+.termPopoverTop,
+.termPopoverBottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
+  border-radius: 6px;
+  padding: 10px 14px;
+  width: 260px;
+  font-size: 14px;
+  line-height: 1.5;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: default;
+  white-space: normal;
+}
+
+.termPopoverTop {
+  bottom: calc(100% + 6px);
+}
+
+.termPopoverBottom {
+  top: calc(100% + 6px);
+}
+
+.termPopoverTitle {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.glossaryEntry {
+  margin-bottom: 1.5em;
+}
