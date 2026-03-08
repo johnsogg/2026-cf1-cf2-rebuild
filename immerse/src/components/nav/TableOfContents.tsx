@@ -48,25 +48,31 @@ export const TableOfContents = () => {
         if (chapter.sections.includes(currentSection)) {
           setExpandedUnits((prev) => {
             const next = new Set([...prev, unit.slug])
-            setStorageValue((d) => { (d.toc ??= {}).expandedUnits = [...next] })
+            setStorageValue((d) => {
+              ;(d.toc ??= {}).expandedUnits = [...next]
+            })
             return next
           })
           setExpandedChapters((prev) => {
             const next = new Set([...prev, chapter.slug])
-            setStorageValue((d) => { (d.toc ??= {}).expandedChapters = [...next] })
+            setStorageValue((d) => {
+              ;(d.toc ??= {}).expandedChapters = [...next]
+            })
             return next
           })
           return
         }
       }
     }
-  }, [currentSection])
+  }, [currentSection, tree])
 
   const toggleUnit = (slug: string) =>
     setExpandedUnits((prev) => {
       const next = new Set(prev)
       next.has(slug) ? next.delete(slug) : next.add(slug)
-      setStorageValue((d) => { (d.toc ??= {}).expandedUnits = [...next] })
+      setStorageValue((d) => {
+        ;(d.toc ??= {}).expandedUnits = [...next]
+      })
       return next
     })
 
@@ -74,17 +80,21 @@ export const TableOfContents = () => {
     setExpandedChapters((prev) => {
       const next = new Set(prev)
       next.has(slug) ? next.delete(slug) : next.add(slug)
-      setStorageValue((d) => { (d.toc ??= {}).expandedChapters = [...next] })
+      setStorageValue((d) => {
+        ;(d.toc ??= {}).expandedChapters = [...next]
+      })
       return next
     })
 
   const revealAll = () => {
     const nextUnits = new Set(tree.map((u) => u.slug))
-    const nextChapters = new Set(tree.flatMap((u) => u.chapters.map((c) => c.slug)))
+    const nextChapters = new Set(
+      tree.flatMap((u) => u.chapters.map((c) => c.slug))
+    )
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
     setStorageValue((d) => {
-      (d.toc ??= {}).expandedUnits = [...nextUnits]
+      ;(d.toc ??= {}).expandedUnits = [...nextUnits]
       d.toc.expandedChapters = [...nextChapters]
     })
   }
@@ -93,7 +103,7 @@ export const TableOfContents = () => {
     setExpandedUnits(new Set())
     setExpandedChapters(new Set())
     setStorageValue((d) => {
-      (d.toc ??= {}).expandedUnits = []
+      ;(d.toc ??= {}).expandedUnits = []
       d.toc.expandedChapters = []
     })
   }
@@ -104,7 +114,7 @@ export const TableOfContents = () => {
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
     setStorageValue((d) => {
-      (d.toc ??= {}).expandedUnits = [...nextUnits]
+      ;(d.toc ??= {}).expandedUnits = [...nextUnits]
       d.toc.expandedChapters = [...nextChapters]
     })
   }
@@ -114,11 +124,17 @@ export const TableOfContents = () => {
       <div className={s.tocHeader}>
         <span className={s.tocTitle}>Table of Contents</span>
         <span className={s.revealControls}>
-          <button className={s.revealBtn} onClick={revealAll}>all</button>
+          <button className={s.revealBtn} onClick={revealAll}>
+            all
+          </button>
           {' / '}
-          <button className={s.revealBtn} onClick={revealNone}>none</button>
+          <button className={s.revealBtn} onClick={revealNone}>
+            none
+          </button>
           {' / '}
-          <button className={s.revealBtn} onClick={revealCurrent}>current</button>
+          <button className={s.revealBtn} onClick={revealCurrent}>
+            current
+          </button>
         </span>
       </div>
       {tree.map((unit) => (
@@ -181,7 +197,9 @@ const TocUnit = ({
         <span>{unit.title}</span>
         <SvgIcon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={18} />
       </div>
-      <div className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}>
+      <div
+        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}
+      >
         <ul>
           {unit.chapters.map((chapter, idx) => (
             <TocChapter

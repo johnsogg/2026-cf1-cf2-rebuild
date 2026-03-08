@@ -33,7 +33,7 @@ export const NavProvider = ({
   loaders,
   children,
 }: NavProviderProps) => {
-  const tree = useMemo(() => buildNavTree(titles, loaders), [])
+  const tree = useMemo(() => buildNavTree(titles, loaders), [loaders, titles])
   const flat = useMemo<Section[]>(
     () => tree.flatMap((u) => u.chapters.flatMap((c) => c.sections)),
     [tree]
