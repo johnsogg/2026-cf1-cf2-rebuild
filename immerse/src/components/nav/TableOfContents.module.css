@@ -85,6 +85,20 @@
   margin: 0;
 }
 
+.collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+  & > ul {
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.collapsibleOpen {
+  grid-template-rows: 1fr;
+}
+
 .section {
   padding: 2px 16px;
   border-radius: 8px;

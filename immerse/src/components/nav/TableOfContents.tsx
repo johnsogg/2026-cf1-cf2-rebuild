@@ -127,7 +127,7 @@ const TocUnit = ({
         <span>{unit.title}</span>
         <SvgIcon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={18} />
       </div>
-      {isExpanded && (
+      <div className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}>
         <ul>
           {unit.chapters.map((chapter, idx) => (
             <TocChapter
@@ -140,7 +140,7 @@ const TocUnit = ({
             />
           ))}
         </ul>
-      )}
+      </div>
     </>
   )
 }
@@ -158,6 +158,16 @@ const TocChapter = ({
   isExpanded: boolean
   onToggle: () => void
 }) => {
+  const collapsibleRef = useRef<HTMLDivElement>(null)
+
+  const handleTransitionEnd = () => {
+    if (isExpanded) {
+      collapsibleRef.current
+        ?.querySelector('[aria-current="page"]')
+        ?.scrollIntoView({ block: 'nearest' })
+    }
+  }
+
   return (
     <div className={s.chapter}>
       <div
@@ -170,7 +180,11 @@ const TocChapter = ({
         <span className={s.chapterTitleText}>{chapter.title}</span>
         <SvgIcon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={16} />
       </div>
-      {isExpanded && (
+      <div
+        ref={collapsibleRef}
+        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}
+        onTransitionEnd={handleTransitionEnd}
+      >
         <ul>
           {chapter.sections.map((section, idx) => (
             <TocSection
@@ -182,7 +196,7 @@ const TocChapter = ({
             />
           ))}
         </ul>
-      )}
+      </div>
     </div>
   )
 }
@@ -214,8 +228,8 @@ export const TocSection = ({
   const ref = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
-    if (isCurrentSection) {
-      ref.current?.scrollIntoView({ block: 'nearest' })
+    if (isCurrentSection && ref.current && ref.current.offsetHeight > 0) {
+      ref.current.scrollIntoView({ block: 'nearest' })
     }
   }, [isCurrentSection])
 
