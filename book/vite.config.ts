@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react"
 import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
 import { fileURLToPath } from "node:url"
+import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
 
 export default defineConfig(({ command }) => ({
   base: command === "build" ? "/2026-cf1-cf2-rebuild/" : "/",
@@ -26,5 +27,6 @@ export default defineConfig(({ command }) => ({
       }),
     },
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
+    exerciseCountPlugin(),
   ],
 }))
