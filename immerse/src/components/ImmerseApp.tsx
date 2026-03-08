@@ -222,7 +222,7 @@ export const ImmerseApp = ({
   initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ThemeProvider>
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
