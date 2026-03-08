@@ -1,5 +1,5 @@
 import { MDXProvider } from '@mdx-js/react'
-import { useEffect, useState, type ComponentType } from 'react'
+import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
 import { GlossaryProvider, Term, type GlossaryEntry } from './Glossary'
@@ -33,6 +33,43 @@ const CurrentSection = () => {
 
 const defaultComponents = { Exercise, Term }
 
+const AppLayout = () => {
+  const { currentSection } = useNav()
+  const contentAreaRef = useRef<HTMLDivElement>(null)
+  const scrollPositions = useRef<Map<string, number>>(new Map())
+
+  useEffect(() => {
+    const el = contentAreaRef.current
+    if (!el) return
+    const handleScroll = () => {
+      scrollPositions.current.set(currentSection.urlPath, el.scrollTop)
+    }
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [currentSection.urlPath])
+
+  useEffect(() => {
+    const el = contentAreaRef.current
+    if (!el) return
+    el.scrollTop = scrollPositions.current.get(currentSection.urlPath) ?? 0
+  }, [currentSection.urlPath])
+
+  return (
+    <div className={s.layout}>
+      <Tools />
+      <TableOfContents />
+      <div ref={contentAreaRef} className={s.contentArea}>
+        <ExerciseNumberProvider>
+          <div className={s.lesson}>
+            <CurrentSection />
+            <NavBar />
+          </div>
+        </ExerciseNumberProvider>
+      </div>
+    </div>
+  )
+}
+
 export const ImmersApp = ({
   titles,
   loaders,
@@ -46,18 +83,7 @@ export const ImmersApp = ({
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
             <NavProvider titles={titles} loaders={loaders}>
-              <div className={s.layout}>
-                <Tools />
-                <TableOfContents />
-                <div className={s.contentArea}>
-                  <ExerciseNumberProvider>
-                    <div className={s.lesson}>
-                      <CurrentSection />
-                      <NavBar />
-                    </div>
-                  </ExerciseNumberProvider>
-                </div>
-              </div>
+              <AppLayout />
             </NavProvider>
           </MDXProvider>
         </GlossaryProvider>

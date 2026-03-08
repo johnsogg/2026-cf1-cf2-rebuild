@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useNav } from '../../nav/NavContext'
@@ -99,8 +100,16 @@ export const TocSection = ({
   status,
   isCurrentSection,
 }: TocSectionProps) => {
+  const ref = useRef<HTMLLIElement>(null)
+
+  useEffect(() => {
+    if (isCurrentSection) {
+      ref.current?.scrollIntoView({ block: 'nearest' })
+    }
+  }, [isCurrentSection])
+
   return (
-    <li className={`${s.section} ${isCurrentSection ? s.sectionSelected : ''}`}>
+    <li ref={ref} className={`${s.section} ${isCurrentSection ? s.sectionSelected : ''}`}>
       <Link
         to={section.urlPath}
         aria-current={isCurrentSection ? 'page' : undefined}
