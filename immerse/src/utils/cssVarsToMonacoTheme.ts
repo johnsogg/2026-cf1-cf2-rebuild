@@ -132,7 +132,7 @@ function stripHash(hex: string): string {
  */
 export function parseThemeBlocks(css: string): Record<string, string> {
   const blocks: Record<string, string> = {}
-  for (const match of css.matchAll(/\[data-theme="([^"]+)"\]\s*\{([^}]+)\}/g)) {
+  for (const match of css.matchAll(/\[data-theme=['"]([^'"]+)['"]\]\s*\{([^}]+)\}/g)) {
     blocks[match[1]] = match[2]
   }
   return blocks
