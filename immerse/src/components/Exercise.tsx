@@ -1,14 +1,21 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import type { CodeExerciseProps } from './CodeExercise'
-import type { MultipleChoiceExerciseProps } from './MultipleChoiceExercise'
-import { CodeExercise } from './CodeExercise'
-import { MultipleChoiceExercise } from './MultipleChoiceExercise'
-import { SvgIcon } from './SvgIcon'
-import s from './Exercise.module.css'
-import btn from '../styles/buttons.module.css'
-import { useProgress } from '../progress/ProgressContext'
-import { useNav } from '../nav/NavContext'
-import { getStorageValue, setStorageValue } from '../storage'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
+import type { CodeExerciseProps } from "./CodeExercise"
+import type { MultipleChoiceExerciseProps } from "./MultipleChoiceExercise"
+import { CodeExercise } from "./CodeExercise"
+import { MultipleChoiceExercise } from "./MultipleChoiceExercise"
+import { SvgIcon } from "./SvgIcon"
+import s from "./Exercise.module.css"
+import btn from "../styles/buttons.module.css"
+import { useProgress } from "../progress/ProgressContext"
+import { useNav } from "../nav/NavContext"
+import { getStorageValue, setStorageValue } from "../storage"
 
 export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
 
@@ -56,31 +63,43 @@ export function Exercise({
 
   const [resetKey, setResetKey] = useState(0)
   const [attemptState, setAttemptState] = useState<AttemptState>(
-    () => (getStorageValue((d) => d.exercises?.[id]?.state) as AttemptState) ?? 'idle'
+    () =>
+      (getStorageValue((d) => d.exercises?.[id]?.state) as AttemptState) ??
+      "idle",
   )
   const [hintsRevealed, setHintsRevealed] = useState(0)
 
   const handleAttempt = useCallback(() => {
-    setAttemptState('attempted')
-    setStorageValue((d) => { ((d.exercises ??= {})[id] ??= {}).state = 'attempted' })
+    setAttemptState("attempted")
+    setStorageValue((d) => {
+      ;((d.exercises ??= {})[id] ??= {}).state = "attempted"
+    })
     notifyExerciseChange()
   }, [id, notifyExerciseChange])
 
   const handleComplete = useCallback(() => {
-    setAttemptState('complete')
-    setStorageValue((d) => { ((d.exercises ??= {})[id] ??= {}).state = 'complete' })
+    setAttemptState("complete")
+    setStorageValue((d) => {
+      ;((d.exercises ??= {})[id] ??= {}).state = "complete"
+    })
     notifyExerciseChange()
   }, [id, notifyExerciseChange])
 
   const handleReset = useCallback(() => {
     setResetKey((k) => k + 1)
-    setAttemptState('idle')
+    setAttemptState("idle")
     setHintsRevealed(0)
-    setStorageValue((d) => { delete (d.exercises ??= {})[id] })
+    setStorageValue((d) => {
+      delete (d.exercises ??= {})[id]
+    })
     notifyExerciseChange()
   }, [id, notifyExerciseChange])
 
-  const stateClass = { idle: s.exerciseIdle, attempted: s.exerciseAttempted, complete: s.exerciseComplete }[attemptState]
+  const stateClass = {
+    idle: s.exerciseIdle,
+    attempted: s.exerciseAttempted,
+    complete: s.exerciseComplete,
+  }[attemptState]
   return (
     <div className={`${s.exercise} ${stateClass}`}>
       <ExerciseHeader
@@ -88,7 +107,7 @@ export function Exercise({
         attemptState={attemptState}
         onReset={handleReset}
       />
-      <ExerciseTitle title={exercise.title ?? ''} />
+      <ExerciseTitle title={exercise.title ?? ""} />
       <ExerciseContent
         exercise={exercise}
         resetKey={resetKey}
@@ -104,7 +123,7 @@ export function Exercise({
   )
 }
 
-export type AttemptState = 'idle' | 'attempted' | 'complete'
+export type AttemptState = "idle" | "attempted" | "complete"
 
 type ExerciseHeaderProps = {
   questionNumber: number
@@ -124,16 +143,10 @@ const ExerciseHeader = ({
   return (
     <div className={s.header}>
       <div className={s.questionContainer}>
-        <div className={s.attemptIcon}>
-          {stateIcon}
-        </div>
+        <div className={s.attemptIcon}>{stateIcon}</div>
         <div className={s.question}>{questionNumber}</div>
       </div>
-      <button
-        className={s.resetBtn}
-        onClick={onReset}
-        aria-label="Reset"
-      >
+      <button className={s.resetBtn} onClick={onReset} aria-label="Reset">
         <SvgIcon name="refresh" size={18} intent="muted" />
       </button>
     </div>
@@ -160,7 +173,7 @@ const ExerciseContent = ({
   onComplete,
 }: ExerciseContentProps) => {
   switch (exercise.type) {
-    case 'code':
+    case "code":
       return (
         <CodeExercise
           key={resetKey}
@@ -169,7 +182,7 @@ const ExerciseContent = ({
           onComplete={onComplete}
         />
       )
-    case 'multiple-choice':
+    case "multiple-choice":
       return (
         <MultipleChoiceExercise
           key={resetKey}

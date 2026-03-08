@@ -10,9 +10,10 @@
  */
 export default {
   meta: {
-    type: 'suggestion',
+    type: "suggestion",
     docs: {
-      description: 'Glossary entries must be sorted alphabetically by their first term (case-insensitive).',
+      description:
+        "Glossary entries must be sorted alphabetically by their first term (case-insensitive).",
     },
     messages: {
       outOfOrder:
@@ -25,10 +26,10 @@ export default {
       VariableDeclarator(node) {
         // Only look at `glossaryEntries = [...]`
         if (
-          node.id.type !== 'Identifier' ||
-          node.id.name !== 'glossaryEntries' ||
+          node.id.type !== "Identifier" ||
+          node.id.name !== "glossaryEntries" ||
           !node.init ||
-          node.init.type !== 'ArrayExpression'
+          node.init.type !== "ArrayExpression"
         ) {
           return
         }
@@ -37,26 +38,36 @@ export default {
 
         // Extract the primary (first) term string from each entry
         const terms = elements.map((el) => {
-          if (el.type !== 'ObjectExpression') return null
+          if (el.type !== "ObjectExpression") return null
           const termProp = el.properties.find(
             (p) =>
-              p.type === 'Property' &&
-              p.key.type === 'Identifier' &&
-              p.key.name === 'term',
+              p.type === "Property" &&
+              p.key.type === "Identifier" &&
+              p.key.name === "term",
           )
-          if (!termProp || termProp.value.type !== 'ArrayExpression') return null
+          if (!termProp || termProp.value.type !== "ArrayExpression")
+            return null
           const first = termProp.value.elements[0]
-          if (!first || first.type !== 'Literal' || typeof first.value !== 'string') return null
+          if (
+            !first ||
+            first.type !== "Literal" ||
+            typeof first.value !== "string"
+          )
+            return null
           return first.value
         })
 
         // Report the first element that is out of alphabetical order
         for (let i = 1; i < terms.length; i++) {
           if (terms[i] === null || terms[i - 1] === null) continue
-          if (terms[i].localeCompare(terms[i - 1], undefined, { sensitivity: 'base' }) < 0) {
+          if (
+            terms[i].localeCompare(terms[i - 1], undefined, {
+              sensitivity: "base",
+            }) < 0
+          ) {
             context.report({
               node: elements[i],
-              messageId: 'outOfOrder',
+              messageId: "outOfOrder",
               data: { current: terms[i], previous: terms[i - 1] },
             })
           }

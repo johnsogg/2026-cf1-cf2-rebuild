@@ -16,7 +16,7 @@
  */
 
 type MonacoThemeData = {
-  base: 'vs' | 'vs-dark' | 'hc-black'
+  base: "vs" | "vs-dark" | "hc-black"
   inherit: boolean
   rules: Array<{ token: string; foreground?: string; fontStyle?: string }>
   colors: Record<string, string>
@@ -25,101 +25,78 @@ type MonacoThemeData = {
 // CSS variable → Monaco editor color keys
 // https://code.visualstudio.com/api/references/theme-color
 const COLOR_MAP: Record<string, string[]> = {
-  '--bg': [
-    'editor.background',
-    'editorWidget.background',
-    'editorSuggestWidget.background',
-    'editorHoverWidget.background',
-    'minimap.background',
+  "--bg": [
+    "editor.background",
+    "editorWidget.background",
+    "editorSuggestWidget.background",
+    "editorHoverWidget.background",
+    "minimap.background",
   ],
-  '--text': [
-    'editor.foreground',
-    'editorSuggestWidget.foreground',
-    'editorHoverWidget.foreground',
+  "--text": [
+    "editor.foreground",
+    "editorSuggestWidget.foreground",
+    "editorHoverWidget.foreground",
   ],
-  '--text-muted': [
-    'editorLineNumber.foreground',
-    'editorGhostText.foreground',
+  "--text-muted": ["editorLineNumber.foreground", "editorGhostText.foreground"],
+  "--accent": [
+    "editorCursor.foreground",
+    "editorSuggestWidget.highlightForeground",
+    "editorLineNumber.activeForeground",
   ],
-  '--accent': [
-    'editorCursor.foreground',
-    'editorSuggestWidget.highlightForeground',
-    'editorLineNumber.activeForeground',
+  "--accent-subtle": [
+    "editor.selectionBackground",
+    "editor.inactiveSelectionBackground",
+    "editorSuggestWidget.selectedBackground",
+    "editor.wordHighlightBackground",
   ],
-  '--accent-subtle': [
-    'editor.selectionBackground',
-    'editor.inactiveSelectionBackground',
-    'editorSuggestWidget.selectedBackground',
-    'editor.wordHighlightBackground',
+  "--border": [
+    "editorWidget.border",
+    "editorSuggestWidget.border",
+    "editorHoverWidget.border",
   ],
-  '--border': [
-    'editorWidget.border',
-    'editorSuggestWidget.border',
-    'editorHoverWidget.border',
-  ],
-  '--border-light': [
-    'editorIndentGuide.background1',
-    'editorRuler.foreground',
-  ],
-  '--code-bg': [
-    'editor.lineHighlightBackground',
-  ],
+  "--border-light": ["editorIndentGuide.background1", "editorRuler.foreground"],
+  "--code-bg": ["editor.lineHighlightBackground"],
 }
 
 // CSS variable → TextMate token scopes
 // Rules foreground values must be hex WITHOUT the leading #
 const TOKEN_MAP: Record<string, string[]> = {
-  '--hljs-keyword': [
-    'keyword',
-    'keyword.control',
-    'keyword.operator',
-    'storage',
-    'storage.type',
-    'storage.modifier',
+  "--hljs-keyword": [
+    "keyword",
+    "keyword.control",
+    "keyword.operator",
+    "storage",
+    "storage.type",
+    "storage.modifier",
   ],
-  '--hljs-title': [
-    'entity.name.function',
-    'entity.name.type',
-    'entity.name.class',
-    'entity.other.inherited-class',
+  "--hljs-title": [
+    "entity.name.function",
+    "entity.name.type",
+    "entity.name.class",
+    "entity.other.inherited-class",
   ],
-  '--hljs-constant': [
-    'constant.numeric',
-    'constant.language',
-    'constant.character',
-    'variable.language',
-    'support.constant',
-    'support.type.property-name',
+  "--hljs-constant": [
+    "constant.numeric",
+    "constant.language",
+    "constant.character",
+    "variable.language",
+    "support.constant",
+    "support.type.property-name",
   ],
-  '--hljs-string': [
-    'string',
-    'string.quoted',
-    'string.template',
+  "--hljs-string": ["string", "string.quoted", "string.template"],
+  "--hljs-builtin": ["support.function", "support.class", "support.type"],
+  "--hljs-comment": [
+    "comment",
+    "comment.line",
+    "comment.block",
+    "punctuation.definition.comment",
   ],
-  '--hljs-builtin': [
-    'support.function',
-    'support.class',
-    'support.type',
-  ],
-  '--hljs-comment': [
-    'comment',
-    'comment.line',
-    'comment.block',
-    'punctuation.definition.comment',
-  ],
-  '--hljs-tag': [
-    'entity.name.tag',
-    'support.class.component',
-  ],
-  '--hljs-subst': [
-    'variable',
-    'variable.other',
-    'variable.other.readwrite',
-  ],
+  "--hljs-tag": ["entity.name.tag", "support.class.component"],
+  "--hljs-subst": ["variable", "variable.other", "variable.other.readwrite"],
 }
 
 function stripHash(hex: string): string {
-  return hex.startsWith('#') ? hex.slice(1) : hex
+  return hex.startsWith("#") ? hex.slice(1) : hex
 }
 
 /**
@@ -132,7 +109,9 @@ function stripHash(hex: string): string {
  */
 export function parseThemeBlocks(css: string): Record<string, string> {
   const blocks: Record<string, string> = {}
-  for (const match of css.matchAll(/\[data-theme=['"]([^'"]+)['"]\]\s*\{([^}]+)\}/g)) {
+  for (const match of css.matchAll(
+    /\[data-theme=['"]([^'"]+)['"]\]\s*\{([^}]+)\}/g,
+  )) {
     blocks[match[1]] = match[2]
   }
   return blocks
@@ -143,7 +122,7 @@ function parseCssVars(css: string): Record<string, string> {
   const vars: Record<string, string> = {}
   for (const match of css.matchAll(/--[\w-]+\s*:\s*([^;]+);/g)) {
     const [full, value] = match
-    const name = full.slice(0, full.indexOf(':'))
+    const name = full.slice(0, full.indexOf(":"))
     vars[name.trim()] = value.trim()
   }
   return vars
@@ -151,7 +130,7 @@ function parseCssVars(css: string): Record<string, string> {
 
 export function cssVarsToMonacoTheme(
   css: string,
-  base: 'vs' | 'vs-dark' | 'hc-black' = 'vs-dark',
+  base: "vs" | "vs-dark" | "hc-black" = "vs-dark",
 ): MonacoThemeData {
   const vars = parseCssVars(css)
 
@@ -164,7 +143,7 @@ export function cssVarsToMonacoTheme(
     }
   }
 
-  const rules: MonacoThemeData['rules'] = []
+  const rules: MonacoThemeData["rules"] = []
   for (const [cssVar, tokens] of Object.entries(TOKEN_MAP)) {
     const value = vars[cssVar]
     if (!value) continue

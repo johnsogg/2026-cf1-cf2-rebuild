@@ -1,21 +1,21 @@
-import { useEffect, useRef, useState } from 'react'
-import Editor from '@monaco-editor/react'
-import type { OnMount } from '@monaco-editor/react'
-import ExecutorWorker from '../workers/executor.worker?worker'
-import { useTheme } from '../hooks/useTheme'
-import { registerMonacoThemes, monacoThemeName } from '../utils/monacoThemes'
-import type { Monaco } from '@monaco-editor/react'
-import s from './CodeExercise.module.css'
-import btn from '../styles/buttons.module.css'
-import { getStorageValue, setStorageValue } from '../storage'
-import { SvgIcon } from './SvgIcon'
+import { useEffect, useRef, useState } from "react"
+import Editor from "@monaco-editor/react"
+import type { OnMount } from "@monaco-editor/react"
+import ExecutorWorker from "../workers/executor.worker?worker"
+import { useTheme } from "../hooks/useTheme"
+import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
+import type { Monaco } from "@monaco-editor/react"
+import s from "./CodeExercise.module.css"
+import btn from "../styles/buttons.module.css"
+import { getStorageValue, setStorageValue } from "../storage"
+import { SvgIcon } from "./SvgIcon"
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
 }
 
 export type CodeExerciseProps = {
-  type: 'code'
+  type: "code"
   id: string
   title: string
   description?: string
@@ -49,10 +49,12 @@ export function CodeExercise({
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
   const [code, setCode] = useState(
-    () => getStorageValue(d => d.exercises?.[exercise.id]?.code) ?? exercise.starterCode
+    () =>
+      getStorageValue((d) => d.exercises?.[exercise.id]?.code) ??
+      exercise.starterCode,
   )
   const [results, setResults] = useState<TestResult[]>(
-    () => getStorageValue(d => d.exercises?.[exercise.id]?.results) ?? []
+    () => getStorageValue((d) => d.exercises?.[exercise.id]?.results) ?? [],
   )
   const [logs, setLogs] = useState<string[]>([])
   const [running, setRunning] = useState(false)
@@ -75,13 +77,18 @@ export function CodeExercise({
   useEffect(() => {
     const editor = editorRef.current
     if (editor) {
-      editor.layout({ height: editorHeight, width: editor.getLayoutInfo().width })
+      editor.layout({
+        height: editorHeight,
+        width: editor.getLayoutInfo().width,
+      })
     }
   }, [editorHeight])
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setStorageValue(d => { ((d.exercises ??= {})[exercise.id] ??= {}).code = code })
+      setStorageValue((d) => {
+        ;((d.exercises ??= {})[exercise.id] ??= {}).code = code
+      })
     }, 500)
     return () => clearTimeout(timer)
   }, [code, exercise.id])
@@ -123,7 +130,9 @@ export function CodeExercise({
       setLogs(e.data.logs)
       setError(e.data.error)
       setRunning(false)
-      setStorageValue(d => { ((d.exercises ??= {})[exercise.id] ??= {}).results = e.data.results })
+      setStorageValue((d) => {
+        ;((d.exercises ??= {})[exercise.id] ??= {}).results = e.data.results
+      })
     }
 
     worker.postMessage({
@@ -144,7 +153,7 @@ export function CodeExercise({
           height={editorHeight}
           defaultLanguage="typescript"
           value={code}
-          onChange={(val) => setCode(val ?? '')}
+          onChange={(val) => setCode(val ?? "")}
           onMount={handleEditorMount}
           beforeMount={handleBeforeMount}
           theme={monacoTheme}
@@ -162,7 +171,11 @@ export function CodeExercise({
       </details>
 
       <div className={s.actions}>
-        <button className={btn.btnPrimary} onClick={handleRun} disabled={running}>
+        <button
+          className={btn.btnPrimary}
+          onClick={handleRun}
+          disabled={running}
+        >
           Run
         </button>
         {running && <span className={s.running}>Running...</span>}
@@ -170,7 +183,8 @@ export function CodeExercise({
 
       {timedOut && (
         <div className={`${s.alert} ${s.alertWarning}`}>
-          Execution timed out — possible infinite loop. The worker was terminated after 5 seconds.
+          Execution timed out — possible infinite loop. The worker was
+          terminated after 5 seconds.
         </div>
       )}
 
@@ -188,7 +202,11 @@ export function CodeExercise({
               key={r.name}
               className={`${s.result} ${r.passed ? s.resultPass : s.resultFail}`}
             >
-              <SvgIcon name={r.passed ? 'statusComplete' : 'statusAttempted'} size={14} intent={r.passed ? 'success' : 'error'} />
+              <SvgIcon
+                name={r.passed ? "statusComplete" : "statusAttempted"}
+                size={14}
+                intent={r.passed ? "success" : "error"}
+              />
               <strong>{r.name}</strong>
               {!r.passed && r.error && (
                 <div className={s.resultError}>{r.error}</div>
@@ -201,7 +219,7 @@ export function CodeExercise({
       {logs.length > 0 && (
         <div className={s.consoleOutput}>
           <h4>Console output</h4>
-          <pre className={s.console}>{logs.join('\n')}</pre>
+          <pre className={s.console}>{logs.join("\n")}</pre>
         </div>
       )}
     </>

@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import s from './MultipleChoiceExercise.module.css'
-import btn from '../styles/buttons.module.css'
-import { getStorageValue, setStorageValue } from '../storage'
+import { useState } from "react"
+import s from "./MultipleChoiceExercise.module.css"
+import btn from "../styles/buttons.module.css"
+import { getStorageValue, setStorageValue } from "../storage"
 
 export type MultipleChoiceExerciseProps = {
-  type: 'multiple-choice'
+  type: "multiple-choice"
   id: string
   title?: string
   prompt: string
@@ -23,16 +23,17 @@ export function MultipleChoiceExercise({
   onComplete?: () => void
 }) {
   const [selected, setSelected] = useState<number | null>(
-    () => getStorageValue(d => d.exercises?.[exercise.id]?.selected) ?? null
+    () => getStorageValue((d) => d.exercises?.[exercise.id]?.selected) ?? null,
   )
   const [submitted, setSubmitted] = useState(
-    () => getStorageValue(d => d.exercises?.[exercise.id]?.submitted) ?? false
+    () =>
+      getStorageValue((d) => d.exercises?.[exercise.id]?.submitted) ?? false,
   )
 
   const handleSubmit = (selectedIndex: number) => {
     setSelected(selectedIndex)
     setSubmitted(true)
-    setStorageValue(d => {
+    setStorageValue((d) => {
       const e = ((d.exercises ??= {})[exercise.id] ??= {})
       e.selected = selectedIndex
       e.submitted = true
@@ -57,21 +58,21 @@ export function MultipleChoiceExercise({
 
   return (
     <>
-      <p className={s.prompt}>
-        {exercise.prompt}
-      </p>
+      <p className={s.prompt}>{exercise.prompt}</p>
 
       <div className={s.options}>
         {exercise.options.map((option, i) => {
           const classes = [
             s.option,
-            submitted ? s.optionSubmitted : '',
-            submitted && i === exercise.correct ? s.optionCorrect : '',
-            submitted && i !== exercise.correct && i === selected ? s.optionIncorrect : '',
-            !submitted && selected === i ? s.optionSelected : '',
+            submitted ? s.optionSubmitted : "",
+            submitted && i === exercise.correct ? s.optionCorrect : "",
+            submitted && i !== exercise.correct && i === selected
+              ? s.optionIncorrect
+              : "",
+            !submitted && selected === i ? s.optionSelected : "",
           ]
             .filter(Boolean)
-            .join(' ')
+            .join(" ")
 
           return (
             <label
@@ -90,11 +91,7 @@ export function MultipleChoiceExercise({
               <span className={s.labelText}>
                 {option.text}
                 {option.image && (
-                  <img
-                    src={option.image}
-                    alt=""
-                    className={s.optionImage}
-                  />
+                  <img src={option.image} alt="" className={s.optionImage} />
                 )}
               </span>
             </label>

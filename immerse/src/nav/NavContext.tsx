@@ -4,9 +4,9 @@ import {
   useMemo,
   type ComponentType,
   type ReactNode,
-} from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { buildNavTree, type Section, type Unit } from './navTree'
+} from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { buildNavTree, type Section, type Unit } from "./navTree"
 
 type NavContextValue = {
   tree: Unit[]
@@ -36,7 +36,7 @@ export const NavProvider = ({
   const tree = useMemo(() => buildNavTree(titles, loaders), [loaders, titles])
   const flat = useMemo<Section[]>(
     () => tree.flatMap((u) => u.chapters.flatMap((c) => c.sections)),
-    [tree]
+    [tree],
   )
 
   const location = useLocation()
@@ -51,9 +51,9 @@ export const NavProvider = ({
     currentSection,
     hasPrev: currentIndex > 0,
     hasNext: currentIndex < flat.length - 1,
-    getPrevName: () => (currentIndex > 0 ? flat[currentIndex - 1].title : ''),
+    getPrevName: () => (currentIndex > 0 ? flat[currentIndex - 1].title : ""),
     getNextName: () =>
-      currentIndex < flat.length - 1 ? flat[currentIndex + 1].title : '',
+      currentIndex < flat.length - 1 ? flat[currentIndex + 1].title : "",
     goPrev: () => navigate(flat[currentIndex - 1].urlPath),
     goNext: () => navigate(flat[currentIndex + 1].urlPath),
     goTo: (urlPath) => navigate(urlPath),
@@ -64,6 +64,6 @@ export const NavProvider = ({
 
 export const useNav = (): NavContextValue => {
   const ctx = useContext(NavContext)
-  if (!ctx) throw new Error('useNav must be used within NavProvider')
+  if (!ctx) throw new Error("useNav must be used within NavProvider")
   return ctx
 }

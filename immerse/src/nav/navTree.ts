@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType } from "react"
 
 export type Section = {
   path: string
@@ -20,16 +20,17 @@ export type Unit = {
 }
 
 export const slugToTitle = (slug: string): string => {
-  const withoutPrefix = slug.replace(/^\d+-/, '')
-  const words = withoutPrefix.split('-')
-  return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  const withoutPrefix = slug.replace(/^\d+-/, "")
+  const words = withoutPrefix.split("-")
+  return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
 }
 
-const SECTION_RE = /\.\/units\/([\w-]+)\/chapters\/([\w-]+)\/sections\/([\w-]+)\.mdx$/
+const SECTION_RE =
+  /\.\/units\/([\w-]+)\/chapters\/([\w-]+)\/sections\/([\w-]+)\.mdx$/
 
 export const buildNavTree = (
   titles: Record<string, string>,
-  loaders: Record<string, () => Promise<{ default: ComponentType }>>
+  loaders: Record<string, () => Promise<{ default: ComponentType }>>,
 ): Unit[] => {
   const unitMap = new Map<string, Unit>()
 
@@ -40,13 +41,21 @@ export const buildNavTree = (
     const [, unitSlug, chapterSlug, sectionSlug] = match
 
     if (!unitMap.has(unitSlug)) {
-      unitMap.set(unitSlug, { slug: unitSlug, title: slugToTitle(unitSlug), chapters: [] })
+      unitMap.set(unitSlug, {
+        slug: unitSlug,
+        title: slugToTitle(unitSlug),
+        chapters: [],
+      })
     }
     const unit = unitMap.get(unitSlug)!
 
-    let chapter = unit.chapters.find(c => c.slug === chapterSlug)
+    let chapter = unit.chapters.find((c) => c.slug === chapterSlug)
     if (!chapter) {
-      chapter = { slug: chapterSlug, title: slugToTitle(chapterSlug), sections: [] }
+      chapter = {
+        slug: chapterSlug,
+        title: slugToTitle(chapterSlug),
+        sections: [],
+      }
       unit.chapters.push(chapter)
     }
 

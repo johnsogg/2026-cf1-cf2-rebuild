@@ -1,8 +1,17 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import s from './Glossary.module.css'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react"
+import s from "./Glossary.module.css"
 
 export type GlossaryEntry = {
-  term: string[]   // first element is primary; rest are variants
+  term: string[] // first element is primary; rest are variants
   definition: string
 }
 
@@ -13,7 +22,13 @@ type GlossaryContextValue = {
 
 export const GlossaryContext = createContext<GlossaryContextValue | null>(null)
 
-export function GlossaryProvider({ entries, children }: { entries: GlossaryEntry[], children: ReactNode }) {
+export function GlossaryProvider({
+  entries,
+  children,
+}: {
+  entries: GlossaryEntry[]
+  children: ReactNode
+}) {
   const map = useMemo(() => {
     const m = new Map<string, GlossaryEntry>()
     for (const entry of entries) {
@@ -26,15 +41,19 @@ export function GlossaryProvider({ entries, children }: { entries: GlossaryEntry
 
   const sortedEntries = useMemo(
     () => [...entries].sort((a, b) => a.term[0].localeCompare(b.term[0])),
-    [entries]
+    [entries],
   )
 
   const value = useMemo(
     () => ({ lookup: (t: string) => map.get(t.toLowerCase()), sortedEntries }),
-    [map, sortedEntries]
+    [map, sortedEntries],
   )
 
-  return <GlossaryContext.Provider value={value}>{children}</GlossaryContext.Provider>
+  return (
+    <GlossaryContext.Provider value={value}>
+      {children}
+    </GlossaryContext.Provider>
+  )
 }
 
 export function GlossaryView() {
@@ -64,18 +83,21 @@ export function Term({ children }: { children: string }) {
   const ctx = useContext(GlossaryContext)
   const entry = ctx?.lookup(children)
   const [open, setOpen] = useState(false)
-  const [placement, setPlacement] = useState<'top' | 'bottom'>('top')
+  const [placement, setPlacement] = useState<"top" | "bottom">("top")
   const ref = useRef<HTMLSpanElement>(null)
   const popoverRef = useRef<HTMLSpanElement>(null)
 
   useLayoutEffect(() => {
     if (!open || !popoverRef.current) return
     const { top } = popoverRef.current.getBoundingClientRect()
-    if (top < 0) setPlacement('bottom')
+    if (top < 0) setPlacement("bottom")
   }, [open, placement])
 
   useEffect(() => {
-    if (!open) { setPlacement('top'); return }
+    if (!open) {
+      setPlacement("top")
+      return
+    }
 
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -83,13 +105,13 @@ export function Term({ children }: { children: string }) {
       }
     }
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === "Escape") setOpen(false)
     }
-    document.addEventListener('click', handleClick)
-    document.addEventListener('keydown', handleKey)
+    document.addEventListener("click", handleClick)
+    document.addEventListener("keydown", handleKey)
     return () => {
-      document.removeEventListener('click', handleClick)
-      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener("click", handleClick)
+      document.removeEventListener("keydown", handleKey)
     }
   }, [open])
 
@@ -103,7 +125,12 @@ export function Term({ children }: { children: string }) {
         {children}
       </span>
       {open && (
-        <span ref={popoverRef} className={placement === 'top' ? s.termPopoverTop : s.termPopoverBottom}>
+        <span
+          ref={popoverRef}
+          className={
+            placement === "top" ? s.termPopoverTop : s.termPopoverBottom
+          }
+        >
           <strong className={s.termPopoverTitle}>{entry.term[0]}</strong>
           {entry.definition}
         </span>

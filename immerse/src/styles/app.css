@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: 'Public Sans', system-ui, sans-serif;
+  font-family: "Public Sans", system-ui, sans-serif;
   line-height: 1.7;
   color: var(--text);
   background: var(--bg);

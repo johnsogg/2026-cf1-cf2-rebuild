@@ -1,4 +1,4 @@
-import s from './UserMenu.module.css'
+import s from "./UserMenu.module.css"
 
 export const UserMenu = () => {
   return (

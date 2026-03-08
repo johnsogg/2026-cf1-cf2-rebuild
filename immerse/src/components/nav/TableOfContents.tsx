@@ -1,24 +1,24 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useContext, useEffect, useRef, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
 
-import { GlossaryContext } from '../Glossary'
-import { useNav } from '../../nav/NavContext'
-import type { Unit, Section, Chapter } from '../../nav/navTree'
-import type { AttemptState } from '../Exercise'
-import { SvgIcon } from '../SvgIcon'
-import s from './TableOfContents.module.css'
-import { useProgress, getSectionStatus } from '../../progress/ProgressContext'
-import { getStorageValue, setStorageValue } from '../../storage'
+import { GlossaryContext } from "../Glossary"
+import { useNav } from "../../nav/NavContext"
+import type { Unit, Section, Chapter } from "../../nav/navTree"
+import type { AttemptState } from "../Exercise"
+import { SvgIcon } from "../SvgIcon"
+import s from "./TableOfContents.module.css"
+import { useProgress, getSectionStatus } from "../../progress/ProgressContext"
+import { getStorageValue, setStorageValue } from "../../storage"
 
 function findContaining(
   tree: Unit[],
   section: Section,
-  level: 'unit' | 'chapter'
+  level: "unit" | "chapter",
 ): Set<string> {
   for (const unit of tree) {
     for (const chapter of unit.chapters) {
       if (chapter.sections.includes(section)) {
-        return new Set([level === 'unit' ? unit.slug : chapter.slug])
+        return new Set([level === "unit" ? unit.slug : chapter.slug])
       }
     }
   }
@@ -33,13 +33,13 @@ export const TableOfContents = () => {
     const stored = getStorageValue((d) => d.toc?.expandedUnits)
     return stored && stored.length > 0
       ? new Set(stored)
-      : findContaining(tree, currentSection, 'unit')
+      : findContaining(tree, currentSection, "unit")
   })
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => {
     const stored = getStorageValue((d) => d.toc?.expandedChapters)
     return stored && stored.length > 0
       ? new Set(stored)
-      : findContaining(tree, currentSection, 'chapter')
+      : findContaining(tree, currentSection, "chapter")
   })
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export const TableOfContents = () => {
   const revealAll = () => {
     const nextUnits = new Set(tree.map((u) => u.slug))
     const nextChapters = new Set(
-      tree.flatMap((u) => u.chapters.map((c) => c.slug))
+      tree.flatMap((u) => u.chapters.map((c) => c.slug)),
     )
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
@@ -109,8 +109,8 @@ export const TableOfContents = () => {
   }
 
   const revealCurrent = () => {
-    const nextUnits = findContaining(tree, currentSection, 'unit')
-    const nextChapters = findContaining(tree, currentSection, 'chapter')
+    const nextUnits = findContaining(tree, currentSection, "unit")
+    const nextChapters = findContaining(tree, currentSection, "chapter")
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
     setStorageValue((d) => {
@@ -127,11 +127,11 @@ export const TableOfContents = () => {
           <button className={s.revealBtn} onClick={revealAll}>
             all
           </button>
-          {' / '}
+          {" / "}
           <button className={s.revealBtn} onClick={revealNone}>
             none
           </button>
-          {' / '}
+          {" / "}
           <button className={s.revealBtn} onClick={revealCurrent}>
             current
           </button>
@@ -159,12 +159,12 @@ const TocGlossary = () => {
 
   if (!ctx || ctx.sortedEntries.length === 0) return null
 
-  const isActive = location.pathname === '/glossary'
+  const isActive = location.pathname === "/glossary"
 
   return (
     <Link
       to="/glossary"
-      className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ''}`}
+      className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ""}`}
     >
       Glossary
     </Link>
@@ -195,10 +195,10 @@ const TocUnit = ({
         aria-expanded={isExpanded}
       >
         <span>{unit.title}</span>
-        <SvgIcon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={18} />
+        <SvgIcon name={isExpanded ? "chevronUp" : "chevronDown"} size={18} />
       </div>
       <div
-        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}
+        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ""}`}
       >
         <ul>
           {unit.chapters.map((chapter, idx) => (
@@ -236,7 +236,7 @@ const TocChapter = ({
     if (isExpanded) {
       collapsibleRef.current
         ?.querySelector('[aria-current="page"]')
-        ?.scrollIntoView({ block: 'nearest' })
+        ?.scrollIntoView({ block: "nearest" })
     }
   }
 
@@ -248,13 +248,13 @@ const TocChapter = ({
         role="button"
         aria-expanded={isExpanded}
       >
-        <span>{num}.</span>{' '}
+        <span>{num}.</span>{" "}
         <span className={s.chapterTitleText}>{chapter.title}</span>
-        <SvgIcon name={isExpanded ? 'chevronUp' : 'chevronDown'} size={16} />
+        <SvgIcon name={isExpanded ? "chevronUp" : "chevronDown"} size={16} />
       </div>
       <div
         ref={collapsibleRef}
-        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ''}`}
+        className={`${s.collapsible} ${isExpanded ? s.collapsibleOpen : ""}`}
         onTransitionEnd={handleTransitionEnd}
       >
         <ul>
@@ -282,11 +282,11 @@ interface TocSectionProps {
 
 const getAttemptSymbol = (status: AttemptState) => {
   switch (status) {
-    case 'idle':
+    case "idle":
       return <SvgIcon name="statusIdle" size={10} intent="muted" />
-    case 'attempted':
+    case "attempted":
       return <SvgIcon name="statusAttempted" size={10} intent="danger" />
-    case 'complete':
+    case "complete":
       return <SvgIcon name="statusComplete" size={10} intent="success" />
   }
 }
@@ -301,22 +301,22 @@ export const TocSection = ({
 
   useEffect(() => {
     if (isCurrentSection && ref.current && ref.current.offsetHeight > 0) {
-      ref.current.scrollIntoView({ block: 'nearest' })
+      ref.current.scrollIntoView({ block: "nearest" })
     }
   }, [isCurrentSection])
 
   return (
     <li
       ref={ref}
-      className={`${s.section} ${isCurrentSection ? s.sectionSelected : ''}`}
+      className={`${s.section} ${isCurrentSection ? s.sectionSelected : ""}`}
     >
       <Link
         to={section.urlPath}
-        aria-current={isCurrentSection ? 'page' : undefined}
+        aria-current={isCurrentSection ? "page" : undefined}
       >
         <div className={`${s.sectionText}`}>
           <div>{getAttemptSymbol(status)}</div>
-          <div>{path.join('.')}</div>
+          <div>{path.join(".")}</div>
           <div className={s.sectionTitle}>{section.title}</div>
         </div>
       </Link>

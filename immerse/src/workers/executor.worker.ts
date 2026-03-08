@@ -1,31 +1,31 @@
-import * as ts from "typescript";
+import * as ts from "typescript"
 
 type TestResult = {
-  name: string;
-  passed: boolean;
-  error?: string;
-};
+  name: string
+  passed: boolean
+  error?: string
+}
 
 type WorkerMessage = {
-  studentCode: string;
-  testCode: string;
-  moduleName: string;
-};
+  studentCode: string
+  testCode: string
+  moduleName: string
+}
 
 type WorkerResponse = {
-  results: TestResult[];
-  logs: string[];
-  error?: string;
-};
+  results: TestResult[]
+  logs: string[]
+  error?: string
+}
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const { studentCode, testCode, moduleName } = e.data;
-  const logs: string[] = [];
+  const { studentCode, testCode, moduleName } = e.data
+  const logs: string[] = []
 
-  const originalLog = console.log;
+  const originalLog = console.log
   console.log = (...args: unknown[]) => {
-    logs.push(args.map(String).join(" "));
-  };
+    logs.push(args.map(String).join(" "))
+  }
 
   try {
     const transpileOpts: ts.TranspileOptions = {
@@ -34,28 +34,32 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
         target: ts.ScriptTarget.ES2020,
         strict: false,
       },
-    };
+    }
 
-    const studentJS = ts.transpileModule(studentCode, transpileOpts).outputText;
-    const testJS = ts.transpileModule(testCode, transpileOpts).outputText;
+    const studentJS = ts.transpileModule(studentCode, transpileOpts).outputText
+    const testJS = ts.transpileModule(testCode, transpileOpts).outputText
 
-    const script = buildScript(studentJS, testJS, moduleName);
+    const script = buildScript(studentJS, testJS, moduleName)
 
-    const fn = new Function(script);
-    const results: TestResult[] = fn();
+    const fn = new Function(script)
+    const results: TestResult[] = fn()
 
-    const response: WorkerResponse = { results, logs };
-    self.postMessage(response);
+    const response: WorkerResponse = { results, logs }
+    self.postMessage(response)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    const response: WorkerResponse = { results: [], logs, error: message };
-    self.postMessage(response);
+    const message = err instanceof Error ? err.message : String(err)
+    const response: WorkerResponse = { results: [], logs, error: message }
+    self.postMessage(response)
   } finally {
-    console.log = originalLog;
+    console.log = originalLog
   }
-};
+}
 
-function buildScript(studentJS: string, testJS: string, moduleName: string): string {
+function buildScript(
+  studentJS: string,
+  testJS: string,
+  moduleName: string,
+): string {
   return `
     // --- Minimal module system ---
     const studentExports = {};
@@ -123,5 +127,5 @@ function buildScript(studentJS: string, testJS: string, moduleName: string): str
     ${testJS}
 
     return results;
-  `;
+  `
 }

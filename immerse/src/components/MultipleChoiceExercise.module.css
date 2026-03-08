@@ -16,7 +16,7 @@
   cursor: pointer;
 }
 
-.option input[type='radio'] {
+.option input[type="radio"] {
   pointer-events: none;
 }
 

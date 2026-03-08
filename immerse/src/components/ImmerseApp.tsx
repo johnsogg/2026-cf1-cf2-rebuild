@@ -1,27 +1,27 @@
-import { MDXProvider } from '@mdx-js/react'
+import { MDXProvider } from "@mdx-js/react"
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
   type ComponentType,
-} from 'react'
-import { BrowserRouter, Link, useLocation } from 'react-router-dom'
-import { Exercise, ExerciseNumberProvider } from './Exercise'
+} from "react"
+import { BrowserRouter, Link, useLocation } from "react-router-dom"
+import { Exercise, ExerciseNumberProvider } from "./Exercise"
 import {
   GlossaryProvider,
   GlossaryView,
   Term,
   type GlossaryEntry,
-} from './Glossary'
-import { ThemeProvider } from '../hooks/useTheme'
-import { Tools } from './Tools'
-import { NavProvider, useNav } from '../nav/NavContext'
-import { ProgressProvider, useProgress } from '../progress/ProgressContext'
-import s from './ImmerseApp.module.css'
-import { TableOfContents } from './nav/TableOfContents'
-import { NavBar } from './nav/Nav'
-import { initStorage, getStorageValue, setStorageValue } from '../storage'
+} from "./Glossary"
+import { ThemeProvider } from "../hooks/useTheme"
+import { Tools } from "./Tools"
+import { NavProvider, useNav } from "../nav/NavContext"
+import { ProgressProvider, useProgress } from "../progress/ProgressContext"
+import s from "./ImmerseApp.module.css"
+import { TableOfContents } from "./nav/TableOfContents"
+import { NavBar } from "./nav/Nav"
+import { initStorage, getStorageValue, setStorageValue } from "../storage"
 
 export type ImmerseAppProps = {
   bookSlug: string
@@ -60,7 +60,7 @@ const OrientationView = () => {
   return (
     <div className={s.lesson}>
       <p>
-        {isResume ? 'Ready to pick up where you left off?' : 'Get started:'}{' '}
+        {isResume ? "Ready to pick up where you left off?" : "Get started:"}{" "}
         <Link to={section.urlPath}>{section.title}</Link>
       </p>
     </div>
@@ -78,8 +78,8 @@ const AppLayout = () => {
   const currentPathRef = useRef(currentSection.urlPath)
   currentPathRef.current = currentSection.urlPath
 
-  const isRoot = location.pathname === '/'
-  const isGlossary = location.pathname === '/glossary'
+  const isRoot = location.pathname === "/"
+  const isGlossary = location.pathname === "/glossary"
 
   // Persist last visited section (not when at root or glossary)
   useEffect(() => {
@@ -108,8 +108,8 @@ const AppLayout = () => {
         notifyExerciseChange()
       }
     }
-    el.addEventListener('scroll', handleScroll, { passive: true })
-    return () => el.removeEventListener('scroll', handleScroll)
+    el.addEventListener("scroll", handleScroll, { passive: true })
+    return () => el.removeEventListener("scroll", handleScroll)
   }, [currentSection.urlPath, notifyExerciseChange, isRoot, isGlossary])
 
   const handleSectionLoaded = useCallback(() => {
