@@ -7,6 +7,7 @@ import { registerMonacoThemes, monacoThemeName } from '../utils/monacoThemes'
 import type { Monaco } from '@monaco-editor/react'
 import s from './CodeExercise.module.css'
 import btn from '../styles/buttons.module.css'
+import { getStorageValue, setStorageValue } from '../storage'
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
@@ -46,8 +47,12 @@ export function CodeExercise({
 }) {
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
-  const [code, setCode] = useState(exercise.starterCode)
-  const [results, setResults] = useState<TestResult[]>([])
+  const [code, setCode] = useState(
+    () => getStorageValue(d => d.exercises?.[exercise.id]?.code) ?? exercise.starterCode
+  )
+  const [results, setResults] = useState<TestResult[]>(
+    () => getStorageValue(d => d.exercises?.[exercise.id]?.results) ?? []
+  )
   const [logs, setLogs] = useState<string[]>([])
   const [running, setRunning] = useState(false)
   const [timedOut, setTimedOut] = useState(false)
@@ -72,6 +77,13 @@ export function CodeExercise({
       editor.layout({ height: editorHeight, width: editor.getLayoutInfo().width })
     }
   }, [editorHeight])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStorageValue(d => { ((d.exercises ??= {})[exercise.id] ??= {}).code = code })
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [code, exercise.id])
 
   useEffect(() => {
     if (results.length > 0) {
@@ -110,6 +122,7 @@ export function CodeExercise({
       setLogs(e.data.logs)
       setError(e.data.error)
       setRunning(false)
+      setStorageValue(d => { ((d.exercises ??= {})[exercise.id] ??= {}).results = e.data.results })
     }
 
     worker.postMessage({

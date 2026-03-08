@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import s from './MultipleChoiceExercise.module.css'
 import btn from '../styles/buttons.module.css'
+import { getStorageValue, setStorageValue } from '../storage'
 
 export type MultipleChoiceExerciseProps = {
   type: 'multiple-choice'
@@ -21,12 +22,21 @@ export function MultipleChoiceExercise({
   onAttempt?: () => void
   onComplete?: () => void
 }) {
-  const [selected, setSelected] = useState<number | null>(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [selected, setSelected] = useState<number | null>(
+    () => getStorageValue(d => d.exercises?.[exercise.id]?.selected) ?? null
+  )
+  const [submitted, setSubmitted] = useState(
+    () => getStorageValue(d => d.exercises?.[exercise.id]?.submitted) ?? false
+  )
 
   const handleSubmit = (selectedIndex: number) => {
     setSelected(selectedIndex)
     setSubmitted(true)
+    setStorageValue(d => {
+      const e = ((d.exercises ??= {})[exercise.id] ??= {})
+      e.selected = selectedIndex
+      e.submitted = true
+    })
     if (selectedIndex === exercise.correct) {
       onComplete?.()
     } else {

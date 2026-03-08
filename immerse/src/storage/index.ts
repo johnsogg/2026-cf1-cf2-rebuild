@@ -14,7 +14,15 @@ export type StorageData = {
   toc?: { expandedUnits?: string[]; expandedChapters?: string[] }
   theme?: string
   sections?: Record<string, { read?: boolean; exercises?: string[] }>
-  exercises?: Record<string, { state?: string }>
+  exercises?: Record<string, {
+    state?: string
+    // CodeExercise
+    code?: string
+    results?: { name: string; passed: boolean; error?: string }[]
+    // MultipleChoiceExercise
+    selected?: number
+    submitted?: boolean
+  }>
 }
 
 function read(): StorageData {
