@@ -49,12 +49,14 @@ export const ImmersApp = ({
               <div className={s.layout}>
                 <Tools />
                 <TableOfContents />
-                <ExerciseNumberProvider>
-                  <div className={s.lesson}>
-                    <CurrentSection />
-                    <NavBar />
-                  </div>
-                </ExerciseNumberProvider>
+                <div className={s.contentArea}>
+                  <ExerciseNumberProvider>
+                    <div className={s.lesson}>
+                      <CurrentSection />
+                      <NavBar />
+                    </div>
+                  </ExerciseNumberProvider>
+                </div>
               </div>
             </NavProvider>
           </MDXProvider>

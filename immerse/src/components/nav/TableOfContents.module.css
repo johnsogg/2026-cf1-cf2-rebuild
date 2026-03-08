@@ -1,6 +1,7 @@
 .toc {
   flex: 432px 0 1;
   color: var(--text);
+  overflow-y: auto;
 }
 
 .spacer {
