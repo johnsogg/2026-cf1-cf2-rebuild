@@ -1,1 +1,19 @@
-{"private":true,"workspaces":["immerse","book"],"scripts":{"lint":"eslint ."},"devDependencies":{"eslint":"^9.39.4","eslint-plugin-react-hooks":"^7.0.1","globals":"^17.4.0","prettier":"^3.8.1","typescript-eslint":"^8.56.1","typescript-plugin-css-modules":"^5.2.0"}}
+{
+  "private": true,
+  "workspaces": [
+    "immerse",
+    "book"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.56.1",
+    "typescript-plugin-css-modules": "^5.2.0"
+  }
+}
