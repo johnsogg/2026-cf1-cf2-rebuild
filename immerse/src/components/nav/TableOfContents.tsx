@@ -5,7 +5,6 @@ import { GlossaryContext } from '../Glossary'
 import { useNav } from '../../nav/NavContext'
 import type { Unit, Section, Chapter } from '../../nav/navTree'
 import type { AttemptState } from '../Exercise'
-import { AttemptedIcon, CompleteIcon, IdleIcon } from '../../img/StatusIcons'
 import { SvgIcon } from '../SvgIcon'
 import s from './TableOfContents.module.css'
 import { useProgress, getSectionStatus } from '../../progress/ProgressContext'
@@ -266,11 +265,11 @@ interface TocSectionProps {
 const getAttemptSymbol = (status: AttemptState) => {
   switch (status) {
     case 'idle':
-      return <IdleIcon />
+      return <SvgIcon name="statusIdle" size={10} intent="muted" />
     case 'attempted':
-      return <AttemptedIcon />
+      return <SvgIcon name="statusAttempted" size={10} intent="danger" />
     case 'complete':
-      return <CompleteIcon />
+      return <SvgIcon name="statusComplete" size={10} intent="success" />
   }
 }
 

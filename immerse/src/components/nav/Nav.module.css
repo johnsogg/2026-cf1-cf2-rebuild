@@ -1,3 +1,9 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .navCurrent {
   font-style: italic;
 }
@@ -10,14 +16,16 @@
   cursor: pointer;
   padding: 16px;
   border-radius: 16px;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--accent-subtle);
   }
 }
 
 .disabled {
   color: var(--text-muted);
-  cursor: not-allowed;
-  pointer-events: none;
 }

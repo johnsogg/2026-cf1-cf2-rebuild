@@ -8,6 +8,7 @@ import type { Monaco } from '@monaco-editor/react'
 import s from './CodeExercise.module.css'
 import btn from '../styles/buttons.module.css'
 import { getStorageValue, setStorageValue } from '../storage'
+import { SvgIcon } from './SvgIcon'
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
@@ -164,7 +165,7 @@ export function CodeExercise({
         <button className={btn.btnPrimary} onClick={handleRun} disabled={running}>
           Run
         </button>
-        {running && <span style={{ color: 'var(--text-muted)' }}>Running...</span>}
+        {running && <span className={s.running}>Running...</span>}
       </div>
 
       {timedOut && (
@@ -181,13 +182,13 @@ export function CodeExercise({
 
       {results.length > 0 && (
         <div className={s.testResults}>
-          <h4 style={{ marginBottom: 8 }}>Results</h4>
+          <h4>Results</h4>
           {results.map((r) => (
             <div
               key={r.name}
               className={`${s.result} ${r.passed ? s.resultPass : s.resultFail}`}
             >
-              <span style={{ marginRight: 8 }}>{r.passed ? '✓' : '✗'}</span>
+              <SvgIcon name={r.passed ? 'statusComplete' : 'statusAttempted'} size={14} intent={r.passed ? 'success' : 'error'} />
               <strong>{r.name}</strong>
               {!r.passed && r.error && (
                 <div className={s.resultError}>{r.error}</div>
@@ -198,8 +199,8 @@ export function CodeExercise({
       )}
 
       {logs.length > 0 && (
-        <div>
-          <h4 style={{ marginBottom: 8 }}>Console output</h4>
+        <div className={s.consoleOutput}>
+          <h4>Console output</h4>
           <pre className={s.console}>{logs.join('\n')}</pre>
         </div>
       )}

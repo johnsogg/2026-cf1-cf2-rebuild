@@ -38,8 +38,20 @@
   cursor: default;
 }
 
+.prompt {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
 .labelText {
   user-select: none;
+}
+
+.optionImage {
+  display: block;
+  margin-top: 8px;
+  max-width: 100%;
 }
 
 .feedback {

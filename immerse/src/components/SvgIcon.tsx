@@ -1,5 +1,5 @@
-export type SvgName = 'gear' | 'next' | 'prev' | 'heart' | 'book' | 'chevronUp' | 'chevronDown'
-export type Intent = 'default' | 'danger' | 'error' | 'success' | 'info'
+export type SvgName = 'gear' | 'next' | 'prev' | 'heart' | 'book' | 'chevronUp' | 'chevronDown' | 'statusIdle' | 'statusAttempted' | 'statusComplete' | 'refresh'
+export type Intent = 'default' | 'muted' | 'danger' | 'error' | 'success' | 'info'
 
 export type SvgIconProps = {
   name: SvgName
@@ -16,10 +16,15 @@ const paths: Record<SvgName, string> = {
   book: 'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z',
   chevronUp: 'M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z',
   chevronDown: 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z',
+  statusIdle: 'M4 4h16v16H4z',
+  statusAttempted: 'M12 2L2 22h20L12 2z',
+  statusComplete: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z',
+  refresh: 'M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z',
 }
 
 const intentColors: Record<Intent, string> = {
   default: 'var(--text)',
+  muted: 'var(--text-muted)',
   danger: 'var(--warning)',
   error: 'var(--error)',
   success: 'var(--success)',

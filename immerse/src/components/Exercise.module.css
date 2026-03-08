@@ -50,38 +50,17 @@
   font-weight: 800;
 }
 
-.attemptIdle,
-.attemptAttempted,
-.attemptComplete {
-  font-size: 18px;
-  line-height: 1;
+.attemptIcon {
   display: flex;
   align-items: center;
 }
 
-.attemptIdle {
-  color: var(--text-muted);
-}
-
-.attemptAttempted {
-  color: var(--error);
-}
-
-.attemptComplete {
-  color: var(--success);
-}
-
 .resetBtn {
-  padding: 0;
-  font-size: 150%;
-  line-height: 1;
-  aspect-ratio: 1;
-  width: 2em;
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;

@@ -43,6 +43,10 @@
   margin-bottom: 16px;
 }
 
+.running {
+  color: var(--text-muted);
+}
+
 /* ── Alerts (timeout, errors) ─────────────────────────────────────────────── */
 
 .alert {
@@ -69,7 +73,14 @@
   margin-bottom: 16px;
 }
 
+.testResults h4 {
+  margin-bottom: 8px;
+}
+
 .result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   margin-bottom: 4px;
   border-radius: 4px;
@@ -93,6 +104,10 @@
 }
 
 /* ── Console output ───────────────────────────────────────────────────────── */
+
+.consoleOutput h4 {
+  margin-bottom: 8px;
+}
 
 .console {
   background: var(--console-bg);

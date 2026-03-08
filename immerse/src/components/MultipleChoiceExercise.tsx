@@ -57,7 +57,7 @@ export function MultipleChoiceExercise({
 
   return (
     <>
-      <p style={{ marginTop: 0, marginBottom: 16, fontWeight: 500 }}>
+      <p className={s.prompt}>
         {exercise.prompt}
       </p>
 
@@ -93,7 +93,7 @@ export function MultipleChoiceExercise({
                   <img
                     src={option.image}
                     alt=""
-                    style={{ display: 'block', marginTop: 8, maxWidth: '100%' }}
+                    className={s.optionImage}
                   />
                 )}
               </span>

@@ -3,6 +3,7 @@ import type { CodeExerciseProps } from './CodeExercise'
 import type { MultipleChoiceExerciseProps } from './MultipleChoiceExercise'
 import { CodeExercise } from './CodeExercise'
 import { MultipleChoiceExercise } from './MultipleChoiceExercise'
+import { SvgIcon } from './SvgIcon'
 import s from './Exercise.module.css'
 import btn from '../styles/buttons.module.css'
 import { useProgress } from '../progress/ProgressContext'
@@ -80,7 +81,6 @@ export function Exercise({
   }, [id, notifyExerciseChange])
 
   const stateClass = { idle: s.exerciseIdle, attempted: s.exerciseAttempted, complete: s.exerciseComplete }[attemptState]
-
   return (
     <div className={`${s.exercise} ${stateClass}`}>
       <ExerciseHeader
@@ -116,12 +116,15 @@ const ExerciseHeader = ({
   attemptState,
   onReset,
 }: ExerciseHeaderProps) => {
-  const stateIcon = { idle: '☐', attempted: '✗', complete: '✓' }[attemptState]
-  const attemptClass = { idle: s.attemptIdle, attempted: s.attemptAttempted, complete: s.attemptComplete }[attemptState]
+  const stateIcon = {
+    idle: <SvgIcon name="statusIdle" size={18} intent="muted" />,
+    attempted: <SvgIcon name="statusAttempted" size={18} intent="error" />,
+    complete: <SvgIcon name="statusComplete" size={18} intent="success" />,
+  }[attemptState]
   return (
     <div className={s.header}>
       <div className={s.questionContainer}>
-        <div className={attemptClass}>
+        <div className={s.attemptIcon}>
           {stateIcon}
         </div>
         <div className={s.question}>{questionNumber}</div>
@@ -131,7 +134,7 @@ const ExerciseHeader = ({
         onClick={onReset}
         aria-label="Reset"
       >
-        ↺
+        <SvgIcon name="refresh" size={18} intent="muted" />
       </button>
     </div>
   )
@@ -188,7 +191,7 @@ const ExerciseHints = ({
   hintsRevealed,
   setHintsRevealed,
 }: ExerciseHintsProps) => {
-  if (hints == null || hints.length == 0) return null
+  if (hints == null || hints.length === 0) return null
   return (
     <div className={s.hints}>
       {hints.slice(0, hintsRevealed).map((hint, i) => (
