@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, type ComponentType, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  type ComponentType,
+  type ReactNode,
+} from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { buildNavTree, type Section, type Unit } from './navTree'
 
@@ -7,6 +14,8 @@ type NavContextValue = {
   currentSection: Section
   hasPrev: boolean
   hasNext: boolean
+  getPrevName: () => string
+  getNextName: () => string
   goPrev: () => void
   goNext: () => void
   goTo: (urlPath: string) => void
@@ -20,9 +29,16 @@ type NavProviderProps = {
   children: ReactNode
 }
 
-export const NavProvider = ({ titles, loaders, children }: NavProviderProps) => {
+export const NavProvider = ({
+  titles,
+  loaders,
+  children,
+}: NavProviderProps) => {
   const tree = useMemo(() => buildNavTree(titles, loaders), [])
-  const flat = useMemo<Section[]>(() => tree.flatMap(u => u.chapters.flatMap(c => c.sections)), [tree])
+  const flat = useMemo<Section[]>(
+    () => tree.flatMap((u) => u.chapters.flatMap((c) => c.sections)),
+    [tree]
+  )
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -33,7 +49,8 @@ export const NavProvider = ({ titles, loaders, children }: NavProviderProps) => 
     }
   }, [])
 
-  const currentSection = flat.find(s => s.urlPath === location.pathname) ?? flat[0]
+  const currentSection =
+    flat.find((s) => s.urlPath === location.pathname) ?? flat[0]
   const currentIndex = flat.indexOf(currentSection)
 
   const value: NavContextValue = {
@@ -41,6 +58,9 @@ export const NavProvider = ({ titles, loaders, children }: NavProviderProps) => 
     currentSection,
     hasPrev: currentIndex > 0,
     hasNext: currentIndex < flat.length - 1,
+    getPrevName: () => (currentIndex > 0 ? flat[currentIndex - 1].title : ''),
+    getNextName: () =>
+      currentIndex < flat.length - 1 ? flat[currentIndex + 1].title : '',
     goPrev: () => navigate(flat[currentIndex - 1].urlPath),
     goNext: () => navigate(flat[currentIndex + 1].urlPath),
     goTo: (urlPath) => navigate(urlPath),

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { IconButton } from './IconButton'
 import { ThemePicker } from './ThemePicker'
 import { UserMenu } from './UserMenu'
 import s from './Tools.module.css'
@@ -26,20 +27,12 @@ export const Tools = () => {
   return (
     <div className={s.tools} ref={ref}>
       <div className={s.buttons}>
-        <button
-          className={`${s.iconButton}${activeTool === 'theme' ? ` ${s.iconButtonActive}` : ''}`}
-          onClick={() => toggle('theme')}
-          aria-label="Theme picker"
-        >
+        <IconButton onClick={() => toggle('theme')} aria-label="Theme picker" active={activeTool === 'theme'}>
           🎨
-        </button>
-        <button
-          className={`${s.iconButton}${activeTool === 'user' ? ` ${s.iconButtonActive}` : ''}`}
-          onClick={() => toggle('user')}
-          aria-label="User menu"
-        >
+        </IconButton>
+        <IconButton onClick={() => toggle('user')} aria-label="User menu" active={activeTool === 'user'}>
           👤
-        </button>
+        </IconButton>
       </div>
       {activeTool !== null && (
         <div className={s.panel}>

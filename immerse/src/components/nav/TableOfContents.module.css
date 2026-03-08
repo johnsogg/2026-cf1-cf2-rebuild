@@ -3,6 +3,10 @@
   color: var(--text);
 }
 
+.spacer {
+  height: 64px;
+}
+
 .unit {
   font-weight: 600;
   font-size: 20px;

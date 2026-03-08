@@ -8,6 +8,7 @@ import { Tools } from './Tools'
 import { NavProvider, useNav } from '../nav/NavContext'
 import s from './ImmerseApp.module.css'
 import { TableOfContents } from './nav/TableOfContents'
+import { NavBar } from './nav/Nav'
 
 export type ImmersAppProps = {
   titles: Record<string, string>
@@ -51,6 +52,7 @@ export const ImmersApp = ({
                 <ExerciseNumberProvider>
                   <div className={s.lesson}>
                     <CurrentSection />
+                    <NavBar />
                   </div>
                 </ExerciseNumberProvider>
               </div>
@@ -61,4 +63,3 @@ export const ImmersApp = ({
     </BrowserRouter>
   )
 }
-

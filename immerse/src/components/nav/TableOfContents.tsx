@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 
-import { NavBar } from './Nav'
 import { useNav } from '../../nav/NavContext'
 import type { Unit, Section, Chapter } from '../../nav/navTree'
 import type { AttemptState } from '../Exercise'
@@ -12,7 +11,6 @@ export const TableOfContents = () => {
 
   return (
     <nav aria-label="Table of contents" className={s.toc}>
-      <NavBar />
       {tree.map((unit) => (
         <TocUnit
           key={unit.slug}

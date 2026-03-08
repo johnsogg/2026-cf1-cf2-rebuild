@@ -1,0 +1,23 @@
+.navCurrent {
+  font-style: italic;
+}
+
+.pageFlipper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 16px;
+
+  &:hover {
+    background: var(--accent-subtle);
+  }
+}
+
+.disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  pointer-events: none;
+}
