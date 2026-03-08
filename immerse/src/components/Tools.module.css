@@ -14,6 +14,32 @@
   gap: 8px;
 }
 
+.progressWrapper {
+  position: relative;
+}
+
+.progressPopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 10px 14px;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.8;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.progressWrapper:hover .progressPopover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .panel {
   background: var(--bg);
   border: 1px solid var(--border);

@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useMemo,
+  useRef,
   type ComponentType,
   type ReactNode,
 } from "react"
@@ -42,8 +43,10 @@ export const NavProvider = ({
   const location = useLocation()
   const navigate = useNavigate()
 
-  const currentSection =
-    flat.find((s) => s.urlPath === location.pathname) ?? flat[0]
+  const matchedSection = flat.find((s) => s.urlPath === location.pathname)
+  const lastRealSectionRef = useRef<Section>(matchedSection ?? flat[0])
+  if (matchedSection) lastRealSectionRef.current = matchedSection
+  const currentSection = lastRealSectionRef.current
   const currentIndex = flat.indexOf(currentSection)
 
   const value: NavContextValue = {

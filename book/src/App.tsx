@@ -2,6 +2,8 @@ import type { ComponentType } from "react"
 import { ImmerseApp } from "immerse/components/ImmerseApp"
 import { glossaryEntries } from "./glossary"
 import { Callout } from "./components/Callout" // book-specific content component
+import Overview from "./overview.mdx"
+import { totalExercises } from "virtual:exercise-totals"
 
 const titles = import.meta.glob<string>("./units/**/*.mdx", {
   import: "title",
@@ -18,5 +20,7 @@ export default () => (
     loaders={loaders}
     glossaryEntries={glossaryEntries}
     components={components}
+    overview={Overview}
+    totalExercises={totalExercises}
   />
 )

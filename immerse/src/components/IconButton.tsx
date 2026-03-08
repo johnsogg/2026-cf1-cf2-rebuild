@@ -6,6 +6,7 @@ type IconButtonProps = {
   children: React.ReactNode
   active?: boolean
   disabled?: boolean
+  title?: string
 }
 
 export const IconButton = ({
@@ -14,12 +15,14 @@ export const IconButton = ({
   children,
   active,
   disabled,
+  title,
 }: IconButtonProps) => (
   <button
     className={`${s.iconButton}${active ? ` ${s.active}` : ""}`}
     onClick={onClick}
     aria-label={ariaLabel}
     disabled={disabled}
+    title={title}
   >
     {children}
   </button>

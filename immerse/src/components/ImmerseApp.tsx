@@ -17,7 +17,7 @@ import {
 import { ThemeProvider } from "../hooks/useTheme"
 import { Tools } from "./Tools"
 import { NavProvider, useNav } from "../nav/NavContext"
-import { ProgressProvider, useProgress } from "../progress/ProgressContext"
+import { ProgressProvider, useProgress, getSectionStatus } from "../progress/ProgressContext"
 import s from "./ImmerseApp.module.css"
 import { TableOfContents } from "./nav/TableOfContents"
 import { NavBar } from "./nav/Nav"
@@ -30,6 +30,8 @@ export type ImmerseAppProps = {
   glossaryEntries: GlossaryEntry[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   components?: Record<string, ComponentType<any>>
+  overview?: ComponentType
+  totalExercises?: number
 }
 
 const CurrentSection = ({ onLoaded }: { onLoaded: () => void }) => {
@@ -49,16 +51,66 @@ const CurrentSection = ({ onLoaded }: { onLoaded: () => void }) => {
   return <Component />
 }
 
-const OrientationView = () => {
+const Overview = ({
+  overview: OverviewContent,
+  totalExercises,
+}: {
+  overview?: ComponentType
+  totalExercises?: number
+}) => {
   const { tree } = useNav()
-  const flat = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
+  const { version } = useProgress() // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  const allSections = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
+  const totalPages = allSections.length
+  const readPages = allSections.filter(
+    (s) => getSectionStatus(s.urlPath) === "complete",
+  ).length
+
+  const exerciseEntries = Object.values(
+    getStorageValue((d) => d.exercises ?? {}),
+  )
+  const attempted = exerciseEntries.filter(
+    (e) => e.state === "attempted" || e.state === "complete",
+  ).length
+  const complete = exerciseEntries.filter((e) => e.state === "complete").length
+
   const lastPath = getStorageValue((d) => d.nav?.lastSection)
-  const found = lastPath ? flat.find((s) => s.urlPath === lastPath) : undefined
-  const section = found ?? flat[0]
+  const found = lastPath
+    ? allSections.find((s) => s.urlPath === lastPath)
+    : undefined
+  const section = found ?? allSections[0]
   const isResume = !!found
+
+  const readPct = totalPages > 0 ? Math.round((readPages / totalPages) * 100) : 0
+  const attemptedPct = totalExercises
+    ? Math.round((attempted / totalExercises) * 100)
+    : null
+  const completePct = totalExercises
+    ? Math.round((complete / totalExercises) * 100)
+    : null
 
   return (
     <div className={s.lesson}>
+      {OverviewContent && <OverviewContent />}
+      <div className={s.progress}>
+        <h2>Your progress</h2>
+        <ul>
+          <li>
+            {readPages} of {totalPages} pages read ({readPct}%)
+          </li>
+          <li>
+            Exercises: {attempted} attempted ({attemptedPct ?? "?"}%),{" "}
+            {complete} complete ({completePct ?? "?"}%)
+            {totalExercises ? ` of ${totalExercises}` : ""}
+          </li>
+          {isResume && (
+            <li>
+              Last visited: <Link to={section.urlPath}>{section.title}</Link>
+            </li>
+          )}
+        </ul>
+      </div>
       <p>
         {isResume ? "Ready to pick up where you left off?" : "Get started:"}{" "}
         <Link to={section.urlPath}>{section.title}</Link>
@@ -69,7 +121,13 @@ const OrientationView = () => {
 
 const defaultComponents = { Exercise, Term }
 
-const AppLayout = () => {
+const AppLayout = ({
+  overview,
+  totalExercises,
+}: {
+  overview?: ComponentType
+  totalExercises?: number
+}) => {
   const { currentSection } = useNav()
   const { notifyExerciseChange } = useProgress()
   const location = useLocation()
@@ -130,11 +188,11 @@ const AppLayout = () => {
 
   return (
     <div className={s.layout}>
-      <Tools />
+      <Tools totalExercises={totalExercises} />
       <TableOfContents />
       <div ref={contentAreaRef} className={s.contentArea}>
         {isRoot ? (
-          <OrientationView />
+          <Overview overview={overview} totalExercises={totalExercises} />
         ) : isGlossary ? (
           <div className={s.lesson}>
             <GlossaryView />
@@ -158,6 +216,8 @@ export const ImmerseApp = ({
   loaders,
   glossaryEntries,
   components,
+  overview,
+  totalExercises,
 }: ImmerseAppProps) => {
   initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
@@ -168,7 +228,7 @@ export const ImmerseApp = ({
           <MDXProvider components={mdxComponents}>
             <NavProvider titles={titles} loaders={loaders}>
               <ProgressProvider>
-                <AppLayout />
+                <AppLayout overview={overview} totalExercises={totalExercises} />
               </ProgressProvider>
             </NavProvider>
           </MDXProvider>
