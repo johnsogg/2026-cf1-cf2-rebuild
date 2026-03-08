@@ -1,8 +1,19 @@
 import { MDXProvider } from '@mdx-js/react'
-import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from 'react'
 import { BrowserRouter, Link, useLocation } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
-import { GlossaryProvider, GlossaryView, Term, type GlossaryEntry } from './Glossary'
+import {
+  GlossaryProvider,
+  GlossaryView,
+  Term,
+  type GlossaryEntry,
+} from './Glossary'
 import { ThemeProvider } from '../hooks/useTheme'
 import { Tools } from './Tools'
 import { NavProvider, useNav } from '../nav/NavContext'
@@ -12,7 +23,7 @@ import { TableOfContents } from './nav/TableOfContents'
 import { NavBar } from './nav/Nav'
 import { initStorage, getStorageValue, setStorageValue } from '../storage'
 
-export type ImmersAppProps = {
+export type ImmerseAppProps = {
   bookSlug: string
   titles: Record<string, string>
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
@@ -87,7 +98,10 @@ const AppLayout = () => {
     const handleScroll = () => {
       scrollPositions.current.set(urlPath, el.scrollTop)
       const scrollDepth = el.scrollTop / (el.scrollHeight - el.clientHeight)
-      if (scrollDepth >= 0.9 && !getStorageValue((d) => d.sections?.[urlPath]?.read)) {
+      if (
+        scrollDepth >= 0.9 &&
+        !getStorageValue((d) => d.sections?.[urlPath]?.read)
+      ) {
         setStorageValue((d) => {
           ;((d.sections ??= {})[urlPath] ??= {}).read = true
         })
@@ -138,13 +152,13 @@ const AppLayout = () => {
   )
 }
 
-export const ImmersApp = ({
+export const ImmerseApp = ({
   bookSlug,
   titles,
   loaders,
   glossaryEntries,
   components,
-}: ImmersAppProps) => {
+}: ImmerseAppProps) => {
   initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
   return (

@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { ImmersApp } from 'immerse/components/ImmerseApp'
+import { ImmerseApp } from 'immerse/components/ImmerseApp'
 import { glossaryEntries } from './glossary'
 import { Callout } from './components/Callout' // book-specific content component
 
@@ -12,7 +12,7 @@ const loaders = import.meta.glob<{ default: ComponentType }>('./units/**/*.mdx')
 const components: Record<string, ComponentType<any>> = { Callout }
 
 export default () => (
-  <ImmersApp
+  <ImmerseApp
     bookSlug="cf1cf2"
     titles={titles}
     loaders={loaders}
