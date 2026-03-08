@@ -1,5 +1,6 @@
 import { createElement, createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { getStorageValue, setStorageValue } from '../storage'
 
 export type Theme = 'light' | 'dark' | 'clouds' | 'disco' | 'neon' | 'cyberpunk' | 'college-dormitory'
 
@@ -8,7 +9,7 @@ type ThemeContextValue = [Theme, (t: Theme) => void]
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function getInitialTheme(): Theme {
-  const saved = localStorage.getItem('theme') as Theme | null
+  const saved = getStorageValue((d) => d.theme) as Theme | undefined
   if (saved) return saved
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
@@ -24,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const handler = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
+      if (!getStorageValue((d) => d.theme)) {
         setThemeState(e.matches ? 'dark' : 'light')
       }
     }
@@ -33,7 +34,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setTheme = (t: Theme) => {
-    localStorage.setItem('theme', t)
+    setStorageValue((d) => { d.theme = t })
     setThemeState(t)
   }
 

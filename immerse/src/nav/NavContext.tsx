@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   type ComponentType,
   type ReactNode,
@@ -42,12 +41,6 @@ export const NavProvider = ({
 
   const location = useLocation()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (location.pathname === '/') {
-      navigate(flat[0].urlPath, { replace: true })
-    }
-  }, [])
 
   const currentSection =
     flat.find((s) => s.urlPath === location.pathname) ?? flat[0]

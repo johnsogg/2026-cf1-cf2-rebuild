@@ -1,16 +1,19 @@
 import { MDXProvider } from '@mdx-js/react'
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Link, useLocation } from 'react-router-dom'
 import { Exercise, ExerciseNumberProvider } from './Exercise'
 import { GlossaryProvider, Term, type GlossaryEntry } from './Glossary'
 import { ThemeProvider } from '../hooks/useTheme'
 import { Tools } from './Tools'
 import { NavProvider, useNav } from '../nav/NavContext'
+import { ProgressProvider, useProgress } from '../progress/ProgressContext'
 import s from './ImmerseApp.module.css'
 import { TableOfContents } from './nav/TableOfContents'
 import { NavBar } from './nav/Nav'
+import { initStorage, getStorageValue, setStorageValue } from '../storage'
 
 export type ImmersAppProps = {
+  bookSlug: string
   titles: Record<string, string>
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
   glossaryEntries: GlossaryEntry[]
@@ -35,53 +38,109 @@ const CurrentSection = ({ onLoaded }: { onLoaded: () => void }) => {
   return <Component />
 }
 
+const OrientationView = () => {
+  const { tree } = useNav()
+  const flat = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
+  const lastPath = getStorageValue((d) => d.nav?.lastSection)
+  const found = lastPath ? flat.find((s) => s.urlPath === lastPath) : undefined
+  const section = found ?? flat[0]
+  const isResume = !!found
+
+  return (
+    <div className={s.lesson}>
+      <p>
+        {isResume ? 'Ready to pick up where you left off?' : 'Get started:'}{' '}
+        <Link to={section.urlPath}>{section.title}</Link>
+      </p>
+    </div>
+  )
+}
+
 const defaultComponents = { Exercise, Term }
 
 const AppLayout = () => {
   const { currentSection } = useNav()
+  const { notifyExerciseChange } = useProgress()
+  const location = useLocation()
   const contentAreaRef = useRef<HTMLDivElement>(null)
   const scrollPositions = useRef<Map<string, number>>(new Map())
   const currentPathRef = useRef(currentSection.urlPath)
   currentPathRef.current = currentSection.urlPath
 
+  const isRoot = location.pathname === '/'
+
+  // Persist last visited section (not when at root)
   useEffect(() => {
+    if (!isRoot) {
+      setStorageValue((d) => {
+        ;(d.nav ??= {}).lastSection = currentSection.urlPath
+      })
+    }
+  }, [currentSection.urlPath, isRoot])
+
+  useEffect(() => {
+    if (isRoot) return
     const el = contentAreaRef.current
     if (!el) return
+    const urlPath = currentSection.urlPath
     const handleScroll = () => {
-      scrollPositions.current.set(currentSection.urlPath, el.scrollTop)
+      scrollPositions.current.set(urlPath, el.scrollTop)
+      const scrollDepth = el.scrollTop / (el.scrollHeight - el.clientHeight)
+      if (scrollDepth >= 0.9 && !getStorageValue((d) => d.sections?.[urlPath]?.read)) {
+        setStorageValue((d) => {
+          ;((d.sections ??= {})[urlPath] ??= {}).read = true
+        })
+        notifyExerciseChange()
+      }
     }
     el.addEventListener('scroll', handleScroll, { passive: true })
     return () => el.removeEventListener('scroll', handleScroll)
-  }, [currentSection.urlPath])
+  }, [currentSection.urlPath, notifyExerciseChange, isRoot])
 
   const handleSectionLoaded = useCallback(() => {
     const el = contentAreaRef.current
     if (!el) return
     el.scrollTop = scrollPositions.current.get(currentPathRef.current) ?? 0
-  }, [])
+    // Auto-mark short sections (no scrollable content) as read
+    if (el.scrollHeight <= el.clientHeight) {
+      const urlPath = currentPathRef.current
+      if (!getStorageValue((d) => d.sections?.[urlPath]?.read)) {
+        setStorageValue((d) => {
+          ;((d.sections ??= {})[urlPath] ??= {}).read = true
+        })
+        notifyExerciseChange()
+      }
+    }
+  }, [notifyExerciseChange])
 
   return (
     <div className={s.layout}>
       <Tools />
       <TableOfContents />
       <div ref={contentAreaRef} className={s.contentArea}>
-        <ExerciseNumberProvider>
-          <div className={s.lesson}>
-            <CurrentSection onLoaded={handleSectionLoaded} />
-            <NavBar />
-          </div>
-        </ExerciseNumberProvider>
+        {isRoot ? (
+          <OrientationView />
+        ) : (
+          <ExerciseNumberProvider>
+            <div className={s.lesson}>
+              <CurrentSection onLoaded={handleSectionLoaded} />
+              <NavBar />
+            </div>
+          </ExerciseNumberProvider>
+        )}
       </div>
     </div>
   )
 }
 
 export const ImmersApp = ({
+  bookSlug,
   titles,
   loaders,
   glossaryEntries,
   components,
 }: ImmersAppProps) => {
+  initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
   return (
     <BrowserRouter>
@@ -89,7 +148,9 @@ export const ImmersApp = ({
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
             <NavProvider titles={titles} loaders={loaders}>
-              <AppLayout />
+              <ProgressProvider>
+                <AppLayout />
+              </ProgressProvider>
             </NavProvider>
           </MDXProvider>
         </GlossaryProvider>

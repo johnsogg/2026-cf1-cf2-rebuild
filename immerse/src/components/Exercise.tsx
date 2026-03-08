@@ -1,10 +1,13 @@
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { CodeExerciseProps } from './CodeExercise'
 import type { MultipleChoiceExerciseProps } from './MultipleChoiceExercise'
 import { CodeExercise } from './CodeExercise'
 import { MultipleChoiceExercise } from './MultipleChoiceExercise'
 import s from './Exercise.module.css'
 import btn from '../styles/buttons.module.css'
+import { useProgress } from '../progress/ProgressContext'
+import { useNav } from '../nav/NavContext'
+import { getStorageValue, setStorageValue } from '../storage'
 
 export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
 
@@ -43,30 +46,38 @@ export function Exercise({
   const resolvedNumber = questionNumber ?? getNumber(exercise.id)
 
   const { id, hints } = exercise
+  const { registerExerciseInSection, notifyExerciseChange } = useProgress()
+  const { currentSection } = useNav()
+
+  useEffect(() => {
+    registerExerciseInSection(id, currentSection.urlPath)
+  }, [id, currentSection.urlPath]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [resetKey, setResetKey] = useState(0)
   const [attemptState, setAttemptState] = useState<AttemptState>(
-    () =>
-      (localStorage.getItem(`exercise:${id}:state`) as AttemptState) ?? 'idle'
+    () => (getStorageValue((d) => d.exercises?.[id]?.state) as AttemptState) ?? 'idle'
   )
   const [hintsRevealed, setHintsRevealed] = useState(0)
 
-  const handleAttempt = () => {
+  const handleAttempt = useCallback(() => {
     setAttemptState('attempted')
-    localStorage.setItem(`exercise:${id}:state`, 'attempted')
-  }
+    setStorageValue((d) => { ((d.exercises ??= {})[id] ??= {}).state = 'attempted' })
+    notifyExerciseChange()
+  }, [id, notifyExerciseChange])
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
     setAttemptState('complete')
-    localStorage.setItem(`exercise:${id}:state`, 'complete')
-  }
+    setStorageValue((d) => { ((d.exercises ??= {})[id] ??= {}).state = 'complete' })
+    notifyExerciseChange()
+  }, [id, notifyExerciseChange])
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setResetKey((k) => k + 1)
     setAttemptState('idle')
     setHintsRevealed(0)
-    localStorage.removeItem(`exercise:${id}:state`)
-  }
+    setStorageValue((d) => { delete (d.exercises ??= {})[id] })
+    notifyExerciseChange()
+  }, [id, notifyExerciseChange])
 
   const stateClass = { idle: s.exerciseIdle, attempted: s.exerciseAttempted, complete: s.exerciseComplete }[attemptState]
 

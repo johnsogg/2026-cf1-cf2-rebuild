@@ -7,6 +7,8 @@ import type { AttemptState } from '../Exercise'
 import { AttemptedIcon, CompleteIcon, IdleIcon } from '../../img/StatusIcons'
 import { SvgIcon } from '../SvgIcon'
 import s from './TableOfContents.module.css'
+import { useProgress, getSectionStatus } from '../../progress/ProgressContext'
+import { getStorageValue, setStorageValue } from '../../storage'
 
 function findContaining(
   tree: Unit[],
@@ -25,20 +27,35 @@ function findContaining(
 
 export const TableOfContents = () => {
   const { tree, currentSection } = useNav()
+  useProgress() // subscribe to version changes for re-renders
 
-  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(() =>
-    findContaining(tree, currentSection, 'unit')
-  )
-  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() =>
-    findContaining(tree, currentSection, 'chapter')
-  )
+  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(() => {
+    const stored = getStorageValue((d) => d.toc?.expandedUnits)
+    return stored && stored.length > 0
+      ? new Set(stored)
+      : findContaining(tree, currentSection, 'unit')
+  })
+  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => {
+    const stored = getStorageValue((d) => d.toc?.expandedChapters)
+    return stored && stored.length > 0
+      ? new Set(stored)
+      : findContaining(tree, currentSection, 'chapter')
+  })
 
   useEffect(() => {
     for (const unit of tree) {
       for (const chapter of unit.chapters) {
         if (chapter.sections.includes(currentSection)) {
-          setExpandedUnits((prev) => new Set([...prev, unit.slug]))
-          setExpandedChapters((prev) => new Set([...prev, chapter.slug]))
+          setExpandedUnits((prev) => {
+            const next = new Set([...prev, unit.slug])
+            setStorageValue((d) => { (d.toc ??= {}).expandedUnits = [...next] })
+            return next
+          })
+          setExpandedChapters((prev) => {
+            const next = new Set([...prev, chapter.slug])
+            setStorageValue((d) => { (d.toc ??= {}).expandedChapters = [...next] })
+            return next
+          })
           return
         }
       }
@@ -49,6 +66,7 @@ export const TableOfContents = () => {
     setExpandedUnits((prev) => {
       const next = new Set(prev)
       next.has(slug) ? next.delete(slug) : next.add(slug)
+      setStorageValue((d) => { (d.toc ??= {}).expandedUnits = [...next] })
       return next
     })
 
@@ -56,22 +74,39 @@ export const TableOfContents = () => {
     setExpandedChapters((prev) => {
       const next = new Set(prev)
       next.has(slug) ? next.delete(slug) : next.add(slug)
+      setStorageValue((d) => { (d.toc ??= {}).expandedChapters = [...next] })
       return next
     })
 
   const revealAll = () => {
-    setExpandedUnits(new Set(tree.map((u) => u.slug)))
-    setExpandedChapters(new Set(tree.flatMap((u) => u.chapters.map((c) => c.slug))))
+    const nextUnits = new Set(tree.map((u) => u.slug))
+    const nextChapters = new Set(tree.flatMap((u) => u.chapters.map((c) => c.slug)))
+    setExpandedUnits(nextUnits)
+    setExpandedChapters(nextChapters)
+    setStorageValue((d) => {
+      (d.toc ??= {}).expandedUnits = [...nextUnits]
+      d.toc.expandedChapters = [...nextChapters]
+    })
   }
 
   const revealNone = () => {
     setExpandedUnits(new Set())
     setExpandedChapters(new Set())
+    setStorageValue((d) => {
+      (d.toc ??= {}).expandedUnits = []
+      d.toc.expandedChapters = []
+    })
   }
 
   const revealCurrent = () => {
-    setExpandedUnits(findContaining(tree, currentSection, 'unit'))
-    setExpandedChapters(findContaining(tree, currentSection, 'chapter'))
+    const nextUnits = findContaining(tree, currentSection, 'unit')
+    const nextChapters = findContaining(tree, currentSection, 'chapter')
+    setExpandedUnits(nextUnits)
+    setExpandedChapters(nextChapters)
+    setStorageValue((d) => {
+      (d.toc ??= {}).expandedUnits = [...nextUnits]
+      d.toc.expandedChapters = [...nextChapters]
+    })
   }
 
   return (
@@ -190,7 +225,7 @@ const TocChapter = ({
             <TocSection
               key={section.path}
               path={[num, idx + 1]}
-              status="idle"
+              status={getSectionStatus(section.urlPath)}
               section={section}
               isCurrentSection={currentSection === section}
             />

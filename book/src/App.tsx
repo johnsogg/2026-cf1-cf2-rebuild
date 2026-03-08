@@ -13,6 +13,7 @@ const components: Record<string, ComponentType<any>> = { Callout }
 
 export default () => (
   <ImmersApp
+    bookSlug="cf1cf2"
     titles={titles}
     loaders={loaders}
     glossaryEntries={glossaryEntries}
