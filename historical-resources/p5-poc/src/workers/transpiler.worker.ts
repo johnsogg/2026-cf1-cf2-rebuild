@@ -1,6 +1,17 @@
 import * as ts from "typescript"
 
-const LOOP_LIMIT = 1_000_000
+const LOOP_LIMIT = 100_000
+
+// Prepended to transpiled student code.
+// Uses break instead of throw so DevTools doesn't pause on exceptions.
+// The __killed flag propagates the stop signal up through nested loops.
+const GUARD_PREAMBLE = `var __killed = false;
+function __onLoop(msg) {
+  __killed = true;
+  console.error(msg);
+  try { parent.postMessage({ type: "sketch-error", message: msg }, "*"); } catch (_) {}
+}
+`
 
 type WorkerRequest = {
   code: string
@@ -24,7 +35,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       transformers: { before: [loopGuardTransformer] },
     })
 
-    const response: WorkerResponse = { js: result.outputText }
+    const response: WorkerResponse = { js: GUARD_PREAMBLE + result.outputText }
     self.postMessage(response)
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
@@ -33,8 +44,6 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
   }
 }
 
-// Injects a per-loop iteration counter into every loop body.
-// When the counter exceeds LOOP_LIMIT, throws — terminating the loop.
 function loopGuardTransformer(ctx: ts.TransformationContext): ts.Transformer<ts.SourceFile> {
   const { factory } = ctx
   let id = 0
@@ -58,26 +67,35 @@ function loopGuardTransformer(ctx: ts.TransformationContext): ts.Transformer<ts.
         ),
       )
 
-      // if (++__lcN > LOOP_LIMIT) throw new Error(...)
-      const guard = factory.createIfStatement(
+      // if (__killed) break;  — propagates kill signal from an inner loop
+      const killedBreak = factory.createIfStatement(
+        factory.createIdentifier("__killed"),
+        factory.createBreakStatement(),
+      )
+
+      // if (++__lcN > LOOP_LIMIT) { __onLoop("..."); break; }
+      const limitBreak = factory.createIfStatement(
         factory.createBinaryExpression(
           factory.createPrefixUnaryExpression(ts.SyntaxKind.PlusPlusToken, factory.createIdentifier(counter)),
           ts.SyntaxKind.GreaterThanToken,
           factory.createNumericLiteral(LOOP_LIMIT),
         ),
-        factory.createThrowStatement(
-          factory.createNewExpression(factory.createIdentifier("Error"), undefined, [
-            factory.createStringLiteral(`Infinite loop: exceeded ${LOOP_LIMIT.toLocaleString()} iterations`),
-          ]),
-        ),
+        factory.createBlock([
+          factory.createExpressionStatement(
+            factory.createCallExpression(factory.createIdentifier("__onLoop"), undefined, [
+              factory.createStringLiteral(`Infinite loop: exceeded ${LOOP_LIMIT.toLocaleString()} iterations`),
+            ]),
+          ),
+          factory.createBreakStatement(),
+        ]),
       )
 
       const rawBody = (node as ts.IterationStatement).statement
       const visitedBody = ts.visitNode(rawBody, visit) as ts.Statement
 
       const newBody = ts.isBlock(visitedBody)
-        ? factory.updateBlock(visitedBody, [guard, ...visitedBody.statements])
-        : factory.createBlock([guard, visitedBody])
+        ? factory.updateBlock(visitedBody, [killedBreak, limitBreak, ...visitedBody.statements])
+        : factory.createBlock([killedBreak, limitBreak, visitedBody])
 
       let newLoop: ts.Statement
       if (ts.isWhileStatement(node)) {
@@ -92,7 +110,6 @@ function loopGuardTransformer(ctx: ts.TransformationContext): ts.Transformer<ts.
         newLoop = factory.updateDoStatement(node, newBody, (node as ts.DoStatement).expression)
       }
 
-      // Wrap in a block so the counter decl is scoped to this loop
       return factory.createBlock([counterDecl, newLoop])
     }
 
