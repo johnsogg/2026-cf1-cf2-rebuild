@@ -1,8 +1,10 @@
+import { Exercise } from "immerse/components/Exercise"
+import { orangeBallExercise } from "./exercises/orange-ball"
+
 export const title = "What Computers Actually Do"
 
-_This section is a placeholder._
+Computers follow instructions precisely and literally. They do exactly what you tell them — no more, no less. This makes them incredibly powerful and incredibly frustrating in equal measure.
 
-<Callout type="info">
-  Computers follow instructions precisely and literally. They do exactly what
-  you tell them — no more, no less.
-</Callout>
+The sketch below is a simple example: the computer draws an orange circle at wherever the cursor happens to be. Every time `draw()` runs, it checks `mouseX` and `mouseY`, and puts the circle there. That's it. No guessing, no interpretation — just following instructions.
+
+<Exercise exercise={orangeBallExercise} />

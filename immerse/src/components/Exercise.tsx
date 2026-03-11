@@ -8,8 +8,10 @@ import {
 } from "react"
 import type { CodeExerciseProps } from "./CodeExercise"
 import type { MultipleChoiceExerciseProps } from "./MultipleChoiceExercise"
+import type { P5ExerciseProps } from "./P5Exercise"
 import { CodeExercise } from "./CodeExercise"
 import { MultipleChoiceExercise } from "./MultipleChoiceExercise"
+import { P5Exercise } from "./P5Exercise"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./Exercise.module.css"
@@ -18,7 +20,7 @@ import { useProgress } from "../progress/ProgressContext"
 import { useNav } from "../nav/NavContext"
 import { getStorageValue, setStorageValue } from "../storage"
 
-export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps
+export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps | P5ExerciseProps
 
 const ExerciseNumberContext = createContext<(id: string) => number>(() => 0)
 
@@ -191,6 +193,13 @@ const ExerciseContent = ({
           exercise={exercise}
           onAttempt={onAttempt}
           onComplete={onComplete}
+        />
+      )
+    case "p5":
+      return (
+        <P5Exercise
+          key={resetKey}
+          exercise={exercise}
         />
       )
   }

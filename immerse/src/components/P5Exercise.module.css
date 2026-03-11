@@ -1,0 +1,61 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 900px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editorPane {
+  flex: 1;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.outputPane {
+  flex: 1;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--code-bg, #f5f5f5);
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #999);
+  font-size: 14px;
+}
+
+.infiniteLoop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-text-muted, #666);
+}
+
+
+.bombEmoji {
+  font-size: 48px;
+}
+
+.errorPre {
+  color: red;
+  background: #fee;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0;
+}
