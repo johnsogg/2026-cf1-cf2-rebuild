@@ -7,6 +7,58 @@ import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./P5Exercise.module.css"
 
+const AUTOSTOP_SECONDS = 120
+
+function AutoStopSvg({
+  autoStop,
+  timeLeft,
+  running,
+}: {
+  autoStop: boolean
+  timeLeft: number
+  running: boolean
+}) {
+  const r = 9
+  const C = 2 * Math.PI * r
+  const progress = autoStop && running ? timeLeft / AUTOSTOP_SECONDS : 1
+  const dashOffset = C * (1 - progress)
+
+  return (
+    <svg width={20} height={20} viewBox="0 0 24 24" aria-hidden="true">
+      {/* Track ring */}
+      <circle cx={12} cy={12} r={r} fill="none" stroke="var(--border, #ccc)" strokeWidth={2} />
+      {/* Progress arc */}
+      <circle
+        cx={12}
+        cy={12}
+        r={r}
+        fill="none"
+        stroke={autoStop ? "var(--success, #4caf50)" : "var(--text-muted, #999)"}
+        strokeWidth={2}
+        strokeDasharray={String(C)}
+        strokeDashoffset={String(dashOffset)}
+        strokeLinecap="round"
+        transform="rotate(-90 12 12)"
+        style={{ transition: running && autoStop ? "stroke-dashoffset 1s linear" : "none" }}
+      />
+      {/* Clock face */}
+      <circle cx={12} cy={12} r={7} fill="var(--bg, white)" />
+      {autoStop ? (
+        // Leaf
+        <path d="M12 15.5 Q9 12 12 9 Q15 12 12 15.5Z" fill="var(--success, #4caf50)" />
+      ) : (
+        // Infinity symbol
+        <path
+          d="M12 12C10.5 9.5 7.5 9.5 7.5 12C7.5 14.5 10.5 14.5 12 12C13.5 9.5 16.5 9.5 16.5 12C16.5 14.5 13.5 14.5 12 12Z"
+          fill="none"
+          stroke="var(--text-muted, #999)"
+          strokeWidth={1.5}
+        />
+      )}
+    </svg>
+  )
+}
+
 // Eagerly load all @types/p5 declaration files so Monaco gets p5 global types.
 // Path goes up from immerse/src/components/ to the monorepo root node_modules.
 const p5TypeFiles = import.meta.glob<string>(
@@ -80,6 +132,8 @@ export function P5Exercise({
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
+  const [autoStop, setAutoStop] = useState(true)
+  const [timeLeft, setTimeLeft] = useState(AUTOSTOP_SECONDS)
   const workerRef = useRef<Worker | null>(null)
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
@@ -140,6 +194,24 @@ export function P5Exercise({
     worker.postMessage({ code })
   }, [code, stopSketch])
 
+  // Countdown timer: starts fresh whenever sketch starts in eco mode
+  useEffect(() => {
+    if (!running || !autoStop) {
+      setTimeLeft(AUTOSTOP_SECONDS)
+      return
+    }
+    setTimeLeft(AUTOSTOP_SECONDS)
+    const id = setInterval(() => {
+      setTimeLeft((prev) => prev - 1)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [running, autoStop])
+
+  // Stop sketch when countdown expires
+  useEffect(() => {
+    if (timeLeft <= 0) stopSketch()
+  }, [timeLeft, stopSketch])
+
   const runSketchRef = useRef(runSketch)
   const stopSketchRef = useRef(stopSketch)
   useEffect(() => { runSketchRef.current = runSketch }, [runSketch])
@@ -163,6 +235,13 @@ export function P5Exercise({
         </IconButton>
         <IconButton onClick={stopSketch} aria-label="Stop sketch" title="Stop (⌘⇧↵)" disabled={!running}>
           <SvgIcon name="stop" size={20} intent={!running ? "muted" : "danger"} />
+        </IconButton>
+        <IconButton
+          onClick={() => setAutoStop((a) => !a)}
+          aria-label={autoStop ? "Auto-stop after 2 minutes — click for infinite run" : "Infinite run — click for auto-stop after 2 minutes"}
+          title={autoStop ? "Auto-stop after 2 min (click for infinite)" : "Infinite run (click for auto-stop)"}
+        >
+          <AutoStopSvg autoStop={autoStop} timeLeft={timeLeft} running={running} />
         </IconButton>
       </div>
 
