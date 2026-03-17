@@ -1,8 +1,10 @@
 import { useRef, useState, useCallback, useEffect } from "react"
-import Editor, { type BeforeMount } from "@monaco-editor/react"
+import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react"
 import p5Source from "p5/lib/p5.min.js?raw"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
+import { IconButton } from "./IconButton"
+import { SvgIcon } from "./SvgIcon"
 import s from "./P5Exercise.module.css"
 
 // Eagerly load all @types/p5 declaration files so Monaco gets p5 global types.
@@ -138,11 +140,30 @@ export function P5Exercise({
     worker.postMessage({ code })
   }, [code, stopSketch])
 
+  const runSketchRef = useRef(runSketch)
+  const stopSketchRef = useRef(stopSketch)
+  useEffect(() => { runSketchRef.current = runSketch }, [runSketch])
+  useEffect(() => { stopSketchRef.current = stopSketch }, [stopSketch])
+
+  const handleMount = useCallback<OnMount>((editor, monaco) => {
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      runSketchRef.current()
+    })
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      () => { stopSketchRef.current() },
+    )
+  }, [])
+
   return (
     <div className={s.wrap}>
       <div className={s.toolbar}>
-        <button onClick={runSketch} disabled={running}>Run</button>
-        <button onClick={stopSketch} disabled={!running}>Stop</button>
+        <IconButton onClick={runSketch} aria-label="Run sketch" title="Run (⌘↵)" disabled={running}>
+          <SvgIcon name="play" size={20} intent={running ? "muted" : "success"} />
+        </IconButton>
+        <IconButton onClick={stopSketch} aria-label="Stop sketch" title="Stop (⌘⇧↵)" disabled={!running}>
+          <SvgIcon name="stop" size={20} intent={!running ? "muted" : "danger"} />
+        </IconButton>
       </div>
 
       <div className={s.row}>
@@ -153,6 +174,7 @@ export function P5Exercise({
             value={code}
             onChange={(val) => { setCode(val ?? "") }}
             beforeMount={beforeMount}
+            onMount={handleMount}
             theme={monacoTheme}
             options={{
               minimap: { enabled: false },
