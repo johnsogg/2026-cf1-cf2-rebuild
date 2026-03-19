@@ -29,5 +29,6 @@
     },
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*code.ts"]
 }

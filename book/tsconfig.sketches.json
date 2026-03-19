@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "strict": true,
+    "noEmit": true,
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+  },
+  "files": ["../node_modules/@types/p5/global.d.ts"],
+  "include": ["src/**/*code.ts"]
+}

@@ -92,6 +92,7 @@ type TranspilerResponse = {
   error?: string
 }
 
+// NOTE: buildSrcdoc is duplicated in P5Sketch.tsx — keep both in sync.
 // The iframe srcdoc: inlines p5, runs student JS, and reports runtime errors to the parent.
 function buildSrcdoc(studentJS: string): string {
   return `<!doctype html>
