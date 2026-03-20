@@ -28,6 +28,13 @@ function findContaining(
 export const TableOfContents = () => {
   const { tree, currentSection } = useNav()
   useProgress() // subscribe to version changes for re-renders
+  const location = useLocation()
+
+  const [tabletOpen, setTabletOpen] = useState(false)
+
+  useEffect(() => {
+    setTabletOpen(false)
+  }, [location.pathname])
 
   const [expandedUnits, setExpandedUnits] = useState<Set<string>>(() => {
     const stored = getStorageValue((d) => d.toc?.expandedUnits)
@@ -120,7 +127,13 @@ export const TableOfContents = () => {
   }
 
   return (
-    <nav aria-label="Table of contents" className={s.toc}>
+    <div className={s.tocWrapper}>
+      <button className={s.tabletTrigger} onClick={() => setTabletOpen(true)}>
+        <SvgIcon name="book" size={20} />
+        <span>Table of Contents</span>
+      </button>
+      {tabletOpen && <div className={s.backdrop} onClick={() => setTabletOpen(false)} />}
+      <nav aria-label="Table of contents" className={`${s.toc} ${tabletOpen ? s.tocTabletOpen : ""}`}>
       <div className={s.tocHeader}>
         <span className={s.tocTitle}>Table of Contents</span>
         <span className={s.revealControls}>
@@ -149,7 +162,8 @@ export const TableOfContents = () => {
         />
       ))}
       <TocGlossary />
-    </nav>
+      </nav>
+    </div>
   )
 }
 

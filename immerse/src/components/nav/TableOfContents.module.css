@@ -1,7 +1,70 @@
+.tocWrapper {
+  flex: 375px 0 1;
+}
+
 .toc {
-  flex: 432px 0 1;
   color: var(--text);
   overflow-y: auto;
+  height: 100%;
+}
+
+.tabletTrigger {
+  display: none;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 900px) {
+  .tocWrapper {
+    flex: none;
+    width: 0;
+    overflow: visible;
+  }
+
+  .toc {
+    display: none;
+  }
+
+  .tocTabletOpen {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 100vh;
+    z-index: 100;
+    overflow-y: auto;
+    background: var(--bg);
+    padding: 24px 16px;
+    border-right: 1px solid
+      var(--border, color-mix(in srgb, var(--text) 15%, transparent));
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .tabletTrigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 50;
+    background: var(--bg);
+    border: 1px solid
+      var(--border, color-mix(in srgb, var(--text) 15%, transparent));
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .tocHeader {

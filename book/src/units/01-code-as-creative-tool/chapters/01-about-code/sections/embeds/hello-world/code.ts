@@ -1,8 +1,9 @@
 function setup() {
-  createCanvas(400, 400)
-  background(220)
+  createCanvas(windowWidth, 400)
+  background(0, 255, 250)
 }
 
 function draw() {
-  circle(50, 50, 100)
+  fill(255, 0, 0)
+  circle(mouseX, mouseY, 100)
 }
