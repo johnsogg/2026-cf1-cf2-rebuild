@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
 import { fileURLToPath } from "node:url"
 import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
+import { remarkWordCount } from "../immerse/src/plugins/remarkWordCount"
 
 export default defineConfig(({ command }) => ({
   base: command === "build" ? "/2026-cf1-cf2-rebuild/" : "/",
@@ -21,7 +22,7 @@ export default defineConfig(({ command }) => ({
     {
       enforce: "pre",
       ...mdx({
-        remarkPlugins: [remarkGfm],
+        remarkPlugins: [remarkGfm, remarkWordCount],
         rehypePlugins: [rehypeHighlight],
         providerImportSource: "@mdx-js/react",
       }),

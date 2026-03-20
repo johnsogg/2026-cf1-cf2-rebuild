@@ -1,0 +1,9 @@
+.readTime {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 10;
+}
