@@ -5,9 +5,14 @@ type Star = { x: number; y: number; d: number; color: Color }
 const groundHeight = 150
 const numStars = 30
 const starSpeed = 80
-const skyTime = 2400 // 3600 is one minute
+const animTime = 2400 // 3600 is one minute
 const stars: Array<Star> = []
+
+let sunColorA: Color
+let sunColorB: Color
 let sun: Star
+
+let groundGradient: Array<Color>
 
 function setup() {
   createCanvas(windowWidth, 400)
@@ -19,12 +24,21 @@ function setup() {
       color: color(200 + random(-10, 10), random(0, 255)),
     }
   }
+  sunColorA = color(255, 69, 0)
+  sunColorB = color(255, 255, 196)
   sun = {
     x: width / 2,
     y: height,
     d: 140,
-    color: color(255, 148, 77),
+    color: sunColorA,
   }
+
+  groundGradient = [
+    color(13, 13, 33),
+    color(13, 33, 25),
+    color(24, 54, 34),
+    color(108, 148, 85),
+  ]
 }
 
 function draw() {
@@ -32,8 +46,7 @@ function draw() {
   drawStars()
   drawSky()
   drawSun()
-  fill(20, 12, 32)
-  rect(0, height - groundHeight, width, groundHeight)
+  drawGround()
 
   // move sun
   const mod = height / starSpeed
@@ -42,14 +55,28 @@ function draw() {
   }
 }
 
+// What fraction of the way to 'done' are we? 0..1
+function getTimeParam() {
+  return min(1, frameCount / animTime)
+}
+
 function colorWithAlpha(c: Color, a: number) {
   return color(red(c), green(c), blue(c), a)
+}
+
+// support interpolating along a multi-color gradient
+function multiLerp(colors: Array<Color>, p: number) {
+  const segments = colors.length - 1
+  const scaled = p * segments
+  const i = constrain(floor(scaled), 0, segments - 1)
+  const t = scaled - i
+  return lerpColor(colors[i], colors[i + 1], t)
 }
 
 function drawSky() {
   // blue, but opacity varies by time. start transparent, go to full after N frames
   push()
-  const a = Math.min(255 * (frameCount / skyTime), 255)
+  const a = Math.min(255 * (frameCount / animTime), 255)
   fill(0, 153, 255, a)
   rect(0, 0, width, height)
   pop()
@@ -68,15 +95,29 @@ function drawStars() {
 }
 
 function drawSun() {
-  // three layered ellipses
+  // three layered ellipses. They change along with getTimeParam. Orange and
+  // dawn-like to start, then progressively more noon-day yellow.
   // dimmest one in back, actual sunball in front
   push()
   noStroke()
-  fill(colorWithAlpha(sun.color, 20))
+  const tp = getTimeParam()
+  const timeLeft = 0.5 - tp // makes for full transparency mid-morning
+  const currentColor = lerpColor(sunColorA, sunColorB, tp)
+  fill(colorWithAlpha(currentColor, lerp(0, 20, timeLeft)))
   ellipse(sun.x, sun.y, width * 2, height)
-  fill(colorWithAlpha(sun.color, 40))
+  fill(colorWithAlpha(currentColor, lerp(0, 40, timeLeft)))
   ellipse(sun.x, sun.y, width * 1.5, height * 0.8)
-  fill(sun.color)
+  fill(currentColor)
   ellipse(sun.x, sun.y, sun.d, sun.d)
+  pop()
+}
+
+function drawGround() {
+  push()
+  noStroke()
+  const tp = getTimeParam()
+  const currentColor = multiLerp(groundGradient, tp)
+  fill(currentColor)
+  rect(0, height - groundHeight, width, groundHeight)
   pop()
 }
