@@ -9,6 +9,13 @@ type TranspilerResponse = {
   error?: string
 }
 
+type SketchError = {
+  message: string
+  line?: number
+  col?: number
+  stack?: string
+}
+
 // NOTE: buildSrcdoc is duplicated in P5Exercise.tsx — keep both in sync.
 function buildSrcdoc(studentJS: string): string {
   return `<!doctype html>
@@ -23,13 +30,13 @@ function buildSrcdoc(studentJS: string): string {
   <body>
     <script>${p5Source}<\/script>
     <script>
-      window.onerror = function(msg, _src, _line, _col, err) {
-        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg) }, '*');
+      window.onerror = function(msg, _src, line, col, err) {
+        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg), line: line, col: col, stack: err ? err.stack : null }, '*');
       };
       try {
         ${studentJS}
       } catch (e) {
-        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e) }, '*');
+        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e), stack: e instanceof Error ? e.stack : null }, '*');
       }
     <\/script>
   </body>
@@ -53,14 +60,14 @@ export function P5Sketch({
 }: P5SketchProps) {
   const height = { small: "200px", medium: "400px", large: "80vh" }[size]
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<SketchError | null>(null)
   const [running, setRunning] = useState(false)
   const workerRef = useRef<Worker | null>(null)
 
   useEffect(() => {
-    const handler = (e: MessageEvent<{ type: string; message: string }>) => {
+    const handler = (e: MessageEvent<SketchError & { type: string }>) => {
       if (e.data?.type === "sketch-error") {
-        setError(e.data.message)
+        setError({ message: e.data.message, line: e.data.line, col: e.data.col, stack: e.data.stack })
         setRunning(false)
         setSrcdoc(null)
       }
@@ -98,7 +105,7 @@ export function P5Sketch({
       workerRef.current = null
       const { js, error: transpileError } = e.data
       if (transpileError) {
-        setError(transpileError)
+        setError({ message: transpileError })
         setRunning(false)
         return
       }
@@ -107,7 +114,7 @@ export function P5Sketch({
     }
 
     worker.onerror = (e) => {
-      setError(e.message)
+      setError({ message: e.message })
       setRunning(false)
       worker.terminate()
       workerRef.current = null
@@ -170,7 +177,13 @@ export function P5Sketch({
         )}
       </div>
 
-      {error && <pre className={s.errorPre}>{error}</pre>}
+      {error && (
+        <pre className={s.errorPre}>
+          {error.message}
+          {error.line != null ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})` : ""}
+          {error.stack ? `\n\n${error.stack}` : ""}
+        </pre>
+      )}
     </div>
   )
 }

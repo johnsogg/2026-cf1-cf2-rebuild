@@ -35,7 +35,10 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       transformers: { before: [loopGuardTransformer] },
     })
 
-    const response: WorkerResponse = { js: GUARD_PREAMBLE + result.outputText }
+    const js = result.outputText
+      .replace(/^"use strict";\s*/m, "")
+      .replace(/^Object\.defineProperty\(exports,\s*"__esModule",\s*\{\s*value:\s*true\s*\}\);\s*/m, "")
+    const response: WorkerResponse = { js: GUARD_PREAMBLE + js }
     self.postMessage(response)
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)

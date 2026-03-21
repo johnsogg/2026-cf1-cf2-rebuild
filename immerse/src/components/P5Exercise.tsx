@@ -92,6 +92,13 @@ type TranspilerResponse = {
   error?: string
 }
 
+type SketchError = {
+  message: string
+  line?: number
+  col?: number
+  stack?: string
+}
+
 // NOTE: buildSrcdoc is duplicated in P5Sketch.tsx — keep both in sync.
 // The iframe srcdoc: inlines p5, runs student JS, and reports runtime errors to the parent.
 function buildSrcdoc(studentJS: string): string {
@@ -107,13 +114,13 @@ function buildSrcdoc(studentJS: string): string {
   <body>
     <script>${p5Source}<\/script>
     <script>
-      window.onerror = function(msg, _src, _line, _col, err) {
-        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg) }, '*');
+      window.onerror = function(msg, _src, line, col, err) {
+        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg), line: line, col: col, stack: err ? err.stack : null }, '*');
       };
       try {
         ${studentJS}
       } catch (e) {
-        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e) }, '*');
+        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e), stack: e instanceof Error ? e.stack : null }, '*');
       }
     <\/script>
   </body>
@@ -131,7 +138,7 @@ export function P5Exercise({
   const height = { small: "200px", medium: "400px", large: "80vh" }[exercise.size ?? "medium"]
   const [code, setCode] = useState(initialCode)
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<SketchError | null>(null)
   const [running, setRunning] = useState(false)
   const [autoStop, setAutoStop] = useState(true)
   const [timeLeft, setTimeLeft] = useState(AUTOSTOP_SECONDS)
@@ -140,9 +147,9 @@ export function P5Exercise({
   const monacoTheme = monacoThemeName(appTheme)
 
   useEffect(() => {
-    const handler = (e: MessageEvent<{ type: string; message: string }>) => {
+    const handler = (e: MessageEvent<SketchError & { type: string }>) => {
       if (e.data?.type === "sketch-error") {
-        setError(e.data.message)
+        setError({ message: e.data.message, line: e.data.line, col: e.data.col, stack: e.data.stack })
         setRunning(false)
         setSrcdoc(null)
       }
@@ -176,7 +183,7 @@ export function P5Exercise({
 
       const { js, error: transpileError } = e.data
       if (transpileError) {
-        setError(transpileError)
+        setError({ message: transpileError })
         setRunning(false)
         return
       }
@@ -186,7 +193,7 @@ export function P5Exercise({
     }
 
     worker.onerror = (e) => {
-      setError(e.message)
+      setError({ message: e.message })
       setRunning(false)
       worker.terminate()
       workerRef.current = null
@@ -274,7 +281,7 @@ export function P5Exercise({
               style={{ display: "block", width: "100%", height, border: "none" }}
               title="p5 sketch"
             />
-          ) : error?.startsWith("Infinite loop") ? (
+          ) : error?.message.startsWith("Infinite loop") ? (
             <div className={s.infiniteLoop} style={{ height }}>
               <span className={s.bombEmoji}>💣</span>
               <span style={{ fontSize: 14 }}>Your code likely has an infinite loop</span>
@@ -287,8 +294,12 @@ export function P5Exercise({
         </div>
       </div>
 
-      {error && !error.startsWith("Infinite loop") && (
-        <pre className={s.errorPre}>{error}</pre>
+      {error && !error.message.startsWith("Infinite loop") && (
+        <pre className={s.errorPre}>
+          {error.message}
+          {error.line != null ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})` : ""}
+          {error.stack ? `\n\n${error.stack}` : ""}
+        </pre>
       )}
     </div>
   )
