@@ -49,6 +49,7 @@ export type P5SketchProps = {
   allowStop?: boolean
   size?: "small" | "medium" | "large"
   title?: string
+  dimensions?: { width: number; height: number }
 }
 
 export function P5Sketch({
@@ -57,8 +58,12 @@ export function P5Sketch({
   allowStop = false,
   size = "medium",
   title = "p5 sketch",
+  dimensions = undefined,
 }: P5SketchProps) {
-  const height = { small: "200px", medium: "400px", large: "80vh" }[size]
+  const height =
+    dimensions?.height ||
+    { small: "200px", medium: "400px", large: "80vh" }[size]
+  const width = dimensions?.width ? `${dimensions.width}px` : "100%"
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
   const [error, setError] = useState<SketchError | null>(null)
   const [running, setRunning] = useState(false)
@@ -67,7 +72,12 @@ export function P5Sketch({
   useEffect(() => {
     const handler = (e: MessageEvent<SketchError & { type: string }>) => {
       if (e.data?.type === "sketch-error") {
-        setError({ message: e.data.message, line: e.data.line, col: e.data.col, stack: e.data.stack })
+        setError({
+          message: e.data.message,
+          line: e.data.line,
+          col: e.data.col,
+          stack: e.data.stack,
+        })
         setRunning(false)
         setSrcdoc(null)
       }
@@ -125,11 +135,15 @@ export function P5Sketch({
 
   // Keep a ref so the autoplay effect doesn't capture a stale runSketch
   const runSketchRef = useRef(runSketch)
-  useEffect(() => { runSketchRef.current = runSketch }, [runSketch])
+  useEffect(() => {
+    runSketchRef.current = runSketch
+  }, [runSketch])
 
   // Autoplay on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (autoplay) runSketchRef.current() }, [])
+
+  useEffect(() => {
+    if (autoplay) runSketchRef.current()
+  }, [])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -150,7 +164,12 @@ export function P5Sketch({
               key={srcdoc}
               srcDoc={srcdoc}
               sandbox="allow-scripts allow-same-origin"
-              style={{ display: "block", width: "100%", height, border: "none" }}
+              style={{
+                display: "block",
+                width,
+                height,
+                border: "none",
+              }}
               title={title}
             />
           ) : (
@@ -160,7 +179,9 @@ export function P5Sketch({
               onClick={runSketch}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") runSketch() }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") runSketch()
+              }}
               aria-label="Start sketch"
             >
               Click to start
@@ -170,7 +191,11 @@ export function P5Sketch({
 
         {running && allowStop && (
           <div className={s.stopCol}>
-            <IconButton onClick={stopSketch} aria-label="Stop sketch" title="Stop">
+            <IconButton
+              onClick={stopSketch}
+              aria-label="Stop sketch"
+              title="Stop"
+            >
               <SvgIcon name="stop" size={20} intent="danger" />
             </IconButton>
           </div>
@@ -180,7 +205,9 @@ export function P5Sketch({
       {error && (
         <pre className={s.errorPre}>
           {error.message}
-          {error.line != null ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})` : ""}
+          {error.line != null
+            ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})`
+            : ""}
           {error.stack ? `\n\n${error.stack}` : ""}
         </pre>
       )}
