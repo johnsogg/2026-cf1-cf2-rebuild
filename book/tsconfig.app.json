@@ -25,10 +25,11 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "immerse/*": ["../immerse/src/*"]
+      "immerse/*": ["../immerse/src/*"],
+      "@/*": ["./src/*"]
     },
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
   "include": ["src"],
-  "exclude": ["src/**/*code.ts"]
+  "exclude": ["src/**/*code.ts", "src/lib/**/*.ts"]
 }

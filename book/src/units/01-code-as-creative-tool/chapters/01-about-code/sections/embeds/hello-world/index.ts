@@ -1,3 +1,3 @@
-import code from "./code.ts?raw"
+import code from "./code.ts?bundle"
 
 export default code

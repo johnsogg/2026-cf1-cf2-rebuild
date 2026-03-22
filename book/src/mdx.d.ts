@@ -10,6 +10,11 @@ declare module "*?raw" {
   export default content
 }
 
+declare module "*?bundle" {
+  const content: string
+  export default content
+}
+
 declare module "virtual:exercise-totals" {
   export const totalExercises: number
   export const exercisesPerSection: Record<string, number>

@@ -6,7 +6,10 @@
     "noEmit": true,
     "moduleResolution": "bundler",
     "moduleDetection": "force",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "files": ["../node_modules/@types/p5/global.d.ts"],
-  "include": ["src/**/*code.ts"]
+  "include": ["src/**/*code.ts", "src/lib/**/*.ts"]
 }

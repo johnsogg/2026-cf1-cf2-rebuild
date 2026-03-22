@@ -6,6 +6,7 @@ import rehypeHighlight from "rehype-highlight"
 import { fileURLToPath } from "node:url"
 import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
 import { remarkWordCount } from "../immerse/src/plugins/remarkWordCount"
+import { rawBundlePlugin } from "../immerse/src/plugins/rawBundlePlugin"
 
 export default defineConfig(({ command }) => ({
   base: command === "build" ? "/2026-cf1-cf2-rebuild/" : "/",
@@ -16,9 +17,11 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: {
       immerse: fileURLToPath(new URL("../immerse/src", import.meta.url)),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   plugins: [
+    rawBundlePlugin(),
     {
       enforce: "pre",
       ...mdx({

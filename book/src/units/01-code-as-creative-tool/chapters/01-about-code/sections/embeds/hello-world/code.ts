@@ -1,4 +1,5 @@
 import type { Color } from "p5"
+import { colorWithAlpha, multiLerpColors } from "@/lib/colors"
 
 type Star = { x: number; y: number; d: number; color: Color }
 
@@ -60,19 +61,6 @@ function getTimeParam() {
   return min(1, frameCount / animTime)
 }
 
-function colorWithAlpha(c: Color, a: number) {
-  return color(red(c), green(c), blue(c), a)
-}
-
-// support interpolating along a multi-color gradient
-function multiLerp(colors: Array<Color>, p: number) {
-  const segments = colors.length - 1
-  const scaled = p * segments
-  const i = constrain(floor(scaled), 0, segments - 1)
-  const t = scaled - i
-  return lerpColor(colors[i], colors[i + 1], t)
-}
-
 function drawSky() {
   // blue, but opacity varies by time. start transparent, go to full after N frames
   push()
@@ -116,7 +104,7 @@ function drawGround() {
   push()
   noStroke()
   const tp = getTimeParam()
-  const currentColor = multiLerp(groundGradient, tp)
+  const currentColor = multiLerpColors(groundGradient, tp)
   fill(currentColor)
   rect(0, height - groundHeight, width, groundHeight)
   pop()
