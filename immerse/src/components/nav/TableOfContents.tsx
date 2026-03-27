@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom"
 
 import { GlossaryContext } from "../Glossary"
 import { useNav } from "../../nav/NavContext"
-import type { Unit, Section, Chapter } from "../../nav/navTree"
+import type { Unit, Section, Chapter, MiscPage } from "../../nav/navTree"
 import type { AttemptState } from "../Exercise"
 import { SvgIcon } from "../SvgIcon"
 import s from "./TableOfContents.module.css"
@@ -26,7 +26,7 @@ function findContaining(
 }
 
 export const TableOfContents = () => {
-  const { tree, currentSection } = useNav()
+  const { tree, misc, currentSection } = useNav()
   useProgress() // subscribe to version changes for re-renders
   const location = useLocation()
 
@@ -162,6 +162,9 @@ export const TableOfContents = () => {
         />
       ))}
       <TocGlossary />
+      {misc.map((page) => (
+        <TocMiscPage key={page.urlPath} page={page} />
+      ))}
       </nav>
     </div>
   )
@@ -181,6 +184,19 @@ const TocGlossary = () => {
       className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ""}`}
     >
       Glossary
+    </Link>
+  )
+}
+
+const TocMiscPage = ({ page }: { page: MiscPage }) => {
+  const location = useLocation()
+  const isActive = location.pathname === page.urlPath
+  return (
+    <Link
+      to={page.urlPath}
+      className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ""}`}
+    >
+      {page.title}
     </Link>
   )
 }

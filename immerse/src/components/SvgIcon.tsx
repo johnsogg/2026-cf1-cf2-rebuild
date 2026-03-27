@@ -12,6 +12,7 @@ export type SvgName =
   | "refresh"
   | "play"
   | "stop"
+
 export type Intent =
   | "default"
   | "muted"

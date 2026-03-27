@@ -1,5 +1,6 @@
 import type { ComponentType } from "react"
 import { ImmerseApp } from "immerse/components/ImmerseApp"
+import type { MiscPage } from "immerse/nav/navTree"
 import { glossaryEntries } from "./glossary"
 import { Callout } from "./components/Callout" // book-specific content component
 import Overview from "./overview.mdx"
@@ -13,6 +14,17 @@ const loaders = import.meta.glob<{ default: ComponentType }>("./units/**/*.mdx")
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const components: Record<string, ComponentType<any>> = { Callout }
 
+const miscTitles = import.meta.glob<string>("./misc/**/*.mdx", {
+  import: "title",
+  eager: true,
+})
+const miscLoaders = import.meta.glob<{ default: ComponentType }>("./misc/**/*.mdx")
+const misc: MiscPage[] = Object.entries(miscTitles).map(([path, title]) => ({
+  title,
+  urlPath: "/misc/" + path.replace("./misc/", "").replace(/\.mdx$/, ""),
+  load: miscLoaders[path],
+}))
+
 export default () => (
   <ImmerseApp
     bookSlug="cf1cf2"
@@ -22,5 +34,6 @@ export default () => (
     components={components}
     overview={Overview}
     totalExercises={totalExercises}
+    misc={misc}
   />
 )

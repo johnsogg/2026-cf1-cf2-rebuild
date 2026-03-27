@@ -1,0 +1,35 @@
+.calloutContainer {
+  border-left: 4px solid;
+  display: flex;
+  flex-direction: row;
+  margin: 32px 0;
+  padding: 16px;
+  border-radius: 0 999px 999px 0;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+.intentDanger {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+.intentQuestion {
+  background-color: var(--accent-text);
+  color: var(--accent);
+}
+
+.intentFun {
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+
+.intentNote {
+  background-color: var(--code-bg);
+  color: var(--text);
+}
+
+.iconContainer {
+  flex: 0 0 80px;
+  align-items: center;
+  justify-content: center;
+}

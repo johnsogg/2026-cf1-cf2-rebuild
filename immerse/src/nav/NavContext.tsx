@@ -7,10 +7,11 @@ import {
   type ReactNode,
 } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { buildNavTree, type Section, type Unit } from "./navTree"
+import { buildNavTree, type MiscPage, type Section, type Unit } from "./navTree"
 
 type NavContextValue = {
   tree: Unit[]
+  misc: MiscPage[]
   currentSection: Section
   hasPrev: boolean
   hasNext: boolean
@@ -26,12 +27,14 @@ const NavContext = createContext<NavContextValue | null>(null)
 type NavProviderProps = {
   titles: Record<string, string>
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
+  misc: MiscPage[]
   children: ReactNode
 }
 
 export const NavProvider = ({
   titles,
   loaders,
+  misc,
   children,
 }: NavProviderProps) => {
   const tree = useMemo(() => buildNavTree(titles, loaders), [loaders, titles])
@@ -51,6 +54,7 @@ export const NavProvider = ({
 
   const value: NavContextValue = {
     tree,
+    misc,
     currentSection,
     hasPrev: currentIndex > 0,
     hasNext: currentIndex < flat.length - 1,

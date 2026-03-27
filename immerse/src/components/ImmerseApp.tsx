@@ -17,6 +17,7 @@ import {
 import { ThemeProvider } from "../hooks/useTheme"
 import { Tools } from "./Tools"
 import { NavProvider, useNav } from "../nav/NavContext"
+import type { MiscPage } from "../nav/navTree"
 import { ProgressProvider, useProgress, getSectionStatus } from "../progress/ProgressContext"
 import s from "./ImmerseApp.module.css"
 import { TableOfContents } from "./nav/TableOfContents"
@@ -32,6 +33,17 @@ export type ImmerseAppProps = {
   components?: Record<string, ComponentType<any>>
   overview?: ComponentType
   totalExercises?: number
+  misc?: MiscPage[]
+}
+
+const MiscPageView = ({ page }: { page: MiscPage }) => {
+  const [Component, setComponent] = useState<ComponentType | null>(null)
+  useEffect(() => {
+    setComponent(null)
+    page.load().then((mod) => setComponent(() => mod.default))
+  }, [page])
+  if (!Component) return <p>Loading…</p>
+  return <Component />
 }
 
 const CurrentSection = ({ onLoaded }: { onLoaded: () => void }) => {
@@ -124,9 +136,11 @@ const defaultComponents = { Exercise, Term }
 const AppLayout = ({
   overview,
   totalExercises,
+  misc,
 }: {
   overview?: ComponentType
   totalExercises?: number
+  misc?: MiscPage[]
 }) => {
   const { currentSection } = useNav()
   const { notifyExerciseChange } = useProgress()
@@ -138,10 +152,12 @@ const AppLayout = ({
 
   const isRoot = location.pathname === "/"
   const isGlossary = location.pathname === "/glossary"
+  const currentMiscPage = misc?.find((m) => m.urlPath === location.pathname)
+  const isMisc = !!currentMiscPage
 
-  // Persist last visited section (not when at root or glossary)
+  // Persist last visited section (not when at root, glossary, or misc)
   useEffect(() => {
-    if (!isRoot && !isGlossary) {
+    if (!isRoot && !isGlossary && !isMisc) {
       setStorageValue((d) => {
         ;(d.nav ??= {}).lastSection = currentSection.urlPath
       })
@@ -149,7 +165,7 @@ const AppLayout = ({
   }, [currentSection.urlPath, isRoot, isGlossary])
 
   useEffect(() => {
-    if (isRoot || isGlossary) return
+    if (isRoot || isGlossary || isMisc) return
     const el = contentAreaRef.current
     if (!el) return
     const urlPath = currentSection.urlPath
@@ -197,6 +213,10 @@ const AppLayout = ({
           <div className={s.lesson}>
             <GlossaryView />
           </div>
+        ) : isMisc ? (
+          <div className={s.lesson}>
+            <MiscPageView page={currentMiscPage!} />
+          </div>
         ) : (
           <ExerciseNumberProvider>
             <div className={s.lesson}>
@@ -218,6 +238,7 @@ export const ImmerseApp = ({
   components,
   overview,
   totalExercises,
+  misc = [],
 }: ImmerseAppProps) => {
   initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
@@ -226,9 +247,9 @@ export const ImmerseApp = ({
       <ThemeProvider>
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
-            <NavProvider titles={titles} loaders={loaders}>
+            <NavProvider titles={titles} loaders={loaders} misc={misc}>
               <ProgressProvider>
-                <AppLayout overview={overview} totalExercises={totalExercises} />
+                <AppLayout overview={overview} totalExercises={totalExercises} misc={misc} />
               </ProgressProvider>
             </NavProvider>
           </MDXProvider>

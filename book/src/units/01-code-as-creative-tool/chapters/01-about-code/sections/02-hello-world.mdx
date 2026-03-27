@@ -1,0 +1,64 @@
+import { P5Sketch } from "immerse/components/P5Sketch"
+
+import helloCircle from "./embeds/hello-circle/index.ts"
+import helloCircleInteractive from "./embeds/hello-circle-interactive/index.ts"
+import helloCircleRando from "./embeds/hello-circle-rando/index.ts"
+
+export const title = "Hello World"
+
+# Hello World
+
+Here:
+
+<P5Sketch code={helloCircle} dimensions={{ width: 50, height: 50 }} autoplay />
+
+That's the output a program. It looks like it is an image, and you're not wrong!
+But there is no image file, no png or jpg. That gray dot on a black background
+is the result of a little program running in your browser.
+
+Here's another program that changes if you move your mouse over it:
+
+<P5Sketch
+  code={helloCircleInteractive}
+  dimensions={{ width: 50, height: 50 }}
+  autoplay
+/>
+
+It is just a little more complex than the first one. It checks to see if your
+mouse pointer is near the circle, and changes its color if is. Obviously, these
+are both super simple, and you've seen mouse hover effects a zillion times. But
+how often have you stopped to think about how that might actually work?
+
+Throughout this book, we're going to work towards answering that question.
+You'll have the chance to build little hacks like this, and my hope is that
+you'll start to build an intuition of what is possible with code, how to write
+it, and how to think of it as a creative tool.
+
+By tradition, the very first program a new coder writes should spell out "Hello,
+World" to the screen. We're not doing that here, since this book is all about
+building your sense of code with visuals. And of course, you didn't write
+anything yet. The first image, the one that doesn't respond to your input, is
+our equivalent of hello world. The second one adds to the first by adding
+interactivity.
+
+Here's another one. Before reading on, get a feel for what it is doing. Try to
+explain to yourself what you _think_ it is doing before reading on.
+
+_What do you see?_
+
+<P5Sketch
+  code={helloCircleRando}
+  dimensions={{ width: 50, height: 50 }}
+  autoplay
+/>
+
+Did you figure out what it is doing? Maybe you don't know _how_ it does it, not
+yet at least. Throughout this book, I'll ask you to observe and externalize what
+you experience. This is an important skill! Learning to create demands that you
+not simply be a passive consumer of the flashy pixels, but to be able to
+translate ideas and observations into a workable format. In this book, that
+format is code.
+
+My description: whenever the mouse moves near the circle, it changes color and
+stays that color until the mouse moves away and back again. It rotates through a
+list of six colors.

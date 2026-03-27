@@ -1,5 +1,11 @@
 import type { ComponentType } from "react"
 
+export type MiscPage = {
+  title: string
+  urlPath: string
+  load: () => Promise<{ default: ComponentType }>
+}
+
 export type Section = {
   path: string
   title: string
