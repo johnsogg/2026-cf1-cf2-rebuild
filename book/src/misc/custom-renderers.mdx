@@ -1,8 +1,65 @@
 import { Callout } from "immerse/components/Callout"
+import helloWorld from "./embeds/hello-world"
+import greetAndSquare from "./exercises/greet-and-square/index.ts"
+import typeAnnotationQuestion from "./exercises/type-annotation-question.ts"
 
 export const title = "Custom Renderers"
 
 # Compendium of custom components
+
+Look at this in an editor. You'll only see the output in the browser.
+
+## Inline p5 Sketches
+
+This 'component' is actually a kinda complex Vite + Remark exploit that lets me
+write a p5.js sketch directly in the `.mdx` file. This is convenient because it
+has zero dependencies. But it is limited for the same reason. This is good for
+short examples but maxes out quickly.
+
+```p5sketch autoplay width=300 height=100
+function setup() {
+  createCanvas(300, 100);
+}
+
+function draw() {
+  background(192);
+  stroke("#111")
+  line(20, 20, 280, 80)
+  fill("#444")
+  circle(width/2, height/2, 80)
+}
+```
+
+## File-based p5 Sketches
+
+The `<P5Sketch>` component lets you refer to proper source files that can refer
+to other source files.
+
+<P5Sketch code={helloWorld} autoplay />
+
+## Exercises
+
+One of the main ways to gain skill is via practice. There are several
+`<Exercise>` component types. They all take an `exercise` prop that configures
+it.
+
+These are persistent - responses are recorded to local storage. It lets you know
+if it is not started, attempted but not completed, or completed. This info rolls
+up to the overall student progress in the book.
+
+### Code Exercises
+
+This is a powerful coding exercise type with a Monaco editor. There can be unit
+tests, which the student can read to better understand the objective. There are
+also progressive hints available. Users can restart it.
+
+<Exercise exercise={greetAndSquare} />
+
+## Multiple Choice Question
+
+<Exercise exercise={typeAnnotationQuestion} />
+
+## Callouts
 
 <Callout>Unadorned Callout</Callout>
 <Callout intent="default">Intent: default</Callout>
