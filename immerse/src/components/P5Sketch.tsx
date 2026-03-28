@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react"
-import p5Source from "p5/lib/p5.min.js?raw"
+import { buildSrcdoc } from "../utils/p5Srcdoc"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./P5Sketch.module.css"
@@ -16,32 +16,6 @@ type SketchError = {
   stack?: string
 }
 
-// NOTE: buildSrcdoc is duplicated in P5Exercise.tsx — keep both in sync.
-function buildSrcdoc(studentJS: string): string {
-  return `<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      body { margin: 0; overflow: hidden; }
-      canvas { display: block; }
-    </style>
-  </head>
-  <body>
-    <script>${p5Source}<\/script>
-    <script>
-      window.onerror = function(msg, _src, line, col, err) {
-        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg), line: line, col: col, stack: err ? err.stack : null }, '*');
-      };
-      try {
-        ${studentJS}
-      } catch (e) {
-        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e), stack: e instanceof Error ? e.stack : null }, '*');
-      }
-    <\/script>
-  </body>
-</html>`
-}
 
 export type P5SketchProps = {
   code: string
@@ -51,7 +25,11 @@ export type P5SketchProps = {
   title?: string
   dimensions?: { width: number; height: number }
 }
-
+/**
+ * Display-only, no editing. You give it code (usually imported
+ * from a .ts file), it runs the sketch in an iframe. Used to show pre-written
+ * examples inline in the text.
+ **/
 export function P5Sketch({
   code,
   autoplay = false,

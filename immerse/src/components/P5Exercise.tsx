@@ -1,10 +1,11 @@
 import { useRef, useState, useCallback, useEffect } from "react"
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react"
-import p5Source from "p5/lib/p5.min.js?raw"
+import { buildSrcdoc } from "../utils/p5Srcdoc"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
+import type { AttemptState } from "./Exercise"
 import s from "./P5Exercise.module.css"
 
 const AUTOSTOP_SECONDS = 120
@@ -26,26 +27,41 @@ function AutoStopSvg({
   return (
     <svg width={20} height={20} viewBox="0 0 24 24" aria-hidden="true">
       {/* Track ring */}
-      <circle cx={12} cy={12} r={r} fill="none" stroke="var(--border, #ccc)" strokeWidth={2} />
+      <circle
+        cx={12}
+        cy={12}
+        r={r}
+        fill="none"
+        stroke="var(--border, #ccc)"
+        strokeWidth={2}
+      />
       {/* Progress arc */}
       <circle
         cx={12}
         cy={12}
         r={r}
         fill="none"
-        stroke={autoStop ? "var(--success, #4caf50)" : "var(--text-muted, #999)"}
+        stroke={
+          autoStop ? "var(--success, #4caf50)" : "var(--text-muted, #999)"
+        }
         strokeWidth={2}
         strokeDasharray={String(C)}
         strokeDashoffset={String(dashOffset)}
         strokeLinecap="round"
         transform="rotate(-90 12 12)"
-        style={{ transition: running && autoStop ? "stroke-dashoffset 1s linear" : "none" }}
+        style={{
+          transition:
+            running && autoStop ? "stroke-dashoffset 1s linear" : "none",
+        }}
       />
       {/* Clock face */}
       <circle cx={12} cy={12} r={7} fill="var(--bg, white)" />
       {autoStop ? (
         // Leaf
-        <path d="M12 15.5 Q9 12 12 9 Q15 12 12 15.5Z" fill="var(--success, #4caf50)" />
+        <path
+          d="M12 15.5 Q9 12 12 9 Q15 12 12 15.5Z"
+          fill="var(--success, #4caf50)"
+        />
       ) : (
         // Infinity symbol
         <path
@@ -85,6 +101,7 @@ export type P5ExerciseProps = {
   initialCode: string
   hints?: string[]
   size?: "small" | "medium" | "large"
+  autorun?: boolean
 }
 
 type TranspilerResponse = {
@@ -99,43 +116,27 @@ type SketchError = {
   stack?: string
 }
 
-// NOTE: buildSrcdoc is duplicated in P5Sketch.tsx — keep both in sync.
-// The iframe srcdoc: inlines p5, runs student JS, and reports runtime errors to the parent.
-function buildSrcdoc(studentJS: string): string {
-  return `<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      body { margin: 0; overflow: hidden; }
-      canvas { display: block; }
-    </style>
-  </head>
-  <body>
-    <script>${p5Source}<\/script>
-    <script>
-      window.onerror = function(msg, _src, line, col, err) {
-        parent.postMessage({ type: 'sketch-error', message: err ? err.message : String(msg), line: line, col: col, stack: err ? err.stack : null }, '*');
-      };
-      try {
-        ${studentJS}
-      } catch (e) {
-        parent.postMessage({ type: 'sketch-error', message: e instanceof Error ? e.message : String(e), stack: e instanceof Error ? e.stack : null }, '*');
-      }
-    <\/script>
-  </body>
-</html>`
-}
 
+/**
+ * Editable p5 sketchpad. Student writes/modifies p5 code in a Monaco editor
+ * and sees the result rendered live. No automated grading — success is visual
+ * ("make the ball follow the cursor").
+ **/
 export function P5Exercise({
   exercise,
+  questionNumber,
+  attemptState,
+  onReset,
 }: {
   exercise: P5ExerciseProps
-  onAttempt?: () => void
-  onComplete?: () => void
+  questionNumber: number
+  attemptState: AttemptState
+  onReset: () => void
 }) {
   const { initialCode } = exercise
-  const height = { small: "200px", medium: "400px", large: "80vh" }[exercise.size ?? "medium"]
+  const height = { small: "200px", medium: "400px", large: "80vh" }[
+    exercise.size ?? "medium"
+  ]
   const [code, setCode] = useState(initialCode)
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
   const [error, setError] = useState<SketchError | null>(null)
@@ -149,7 +150,12 @@ export function P5Exercise({
   useEffect(() => {
     const handler = (e: MessageEvent<SketchError & { type: string }>) => {
       if (e.data?.type === "sketch-error") {
-        setError({ message: e.data.message, line: e.data.line, col: e.data.col, stack: e.data.stack })
+        setError({
+          message: e.data.message,
+          line: e.data.line,
+          col: e.data.col,
+          stack: e.data.stack,
+        })
         setRunning(false)
         setSrcdoc(null)
       }
@@ -222,8 +228,16 @@ export function P5Exercise({
 
   const runSketchRef = useRef(runSketch)
   const stopSketchRef = useRef(stopSketch)
-  useEffect(() => { runSketchRef.current = runSketch }, [runSketch])
-  useEffect(() => { stopSketchRef.current = stopSketch }, [stopSketch])
+  useEffect(() => {
+    runSketchRef.current = runSketch
+  }, [runSketch])
+  useEffect(() => {
+    stopSketchRef.current = stopSketch
+  }, [stopSketch])
+
+  useEffect(() => {
+    if (exercise.autorun) runSketchRef.current()
+  }, [exercise.autorun])
 
   const handleMount = useCallback<OnMount>((editor, monaco) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
@@ -231,26 +245,73 @@ export function P5Exercise({
     })
     editor.addCommand(
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-      () => { stopSketchRef.current() },
+      () => {
+        stopSketchRef.current()
+      },
     )
   }, [])
 
+  const stateIcon = {
+    idle: <SvgIcon name="statusIdle" size={18} intent="muted" />,
+    attempted: <SvgIcon name="statusAttempted" size={18} intent="error" />,
+    complete: <SvgIcon name="statusComplete" size={18} intent="success" />,
+  }[attemptState]
+
   return (
     <div className={s.wrap}>
-      <div className={s.toolbar}>
-        <IconButton onClick={runSketch} aria-label="Run sketch" title="Run (⌘↵)" disabled={running}>
-          <SvgIcon name="play" size={20} intent={running ? "muted" : "success"} />
-        </IconButton>
-        <IconButton onClick={stopSketch} aria-label="Stop sketch" title="Stop (⌘⇧↵)" disabled={!running}>
-          <SvgIcon name="stop" size={20} intent={!running ? "muted" : "danger"} />
-        </IconButton>
-        <IconButton
-          onClick={() => setAutoStop((a) => !a)}
-          aria-label={autoStop ? "Auto-stop after 2 minutes — click for infinite run" : "Infinite run — click for auto-stop after 2 minutes"}
-          title={autoStop ? "Auto-stop after 2 min (click for infinite)" : "Infinite run (click for auto-stop)"}
-        >
-          <AutoStopSvg autoStop={autoStop} timeLeft={timeLeft} running={running} />
-        </IconButton>
+      <div className={s.header}>
+        <div className={s.questionContainer}>
+          <div className={s.attemptIcon}>{stateIcon}</div>
+          <div className={s.question}>{questionNumber}</div>
+        </div>
+        <div className={s.toolbar}>
+          <IconButton
+            onClick={runSketch}
+            aria-label="Run sketch"
+            title="Run (⌘↵)"
+            disabled={running}
+          >
+            <SvgIcon
+              name="play"
+              size={20}
+              intent={running ? "muted" : "success"}
+            />
+          </IconButton>
+          <IconButton
+            onClick={stopSketch}
+            aria-label="Stop sketch"
+            title="Stop (⌘⇧↵)"
+            disabled={!running}
+          >
+            <SvgIcon
+              name="stop"
+              size={20}
+              intent={!running ? "muted" : "danger"}
+            />
+          </IconButton>
+          <IconButton
+            onClick={() => setAutoStop((a) => !a)}
+            aria-label={
+              autoStop
+                ? "Auto-stop after 2 minutes — click for infinite run"
+                : "Infinite run — click for auto-stop after 2 minutes"
+            }
+            title={
+              autoStop
+                ? "Auto-stop after 2 min (click for infinite)"
+                : "Infinite run (click for auto-stop)"
+            }
+          >
+            <AutoStopSvg
+              autoStop={autoStop}
+              timeLeft={timeLeft}
+              running={running}
+            />
+          </IconButton>
+          <IconButton onClick={onReset} aria-label="Reset">
+            <SvgIcon name="refresh" size={18} intent="muted" />
+          </IconButton>
+        </div>
       </div>
 
       <div className={s.row}>
@@ -259,7 +320,9 @@ export function P5Exercise({
             height={height}
             defaultLanguage="typescript"
             value={code}
-            onChange={(val) => { setCode(val ?? "") }}
+            onChange={(val) => {
+              setCode(val ?? "")
+            }}
             beforeMount={beforeMount}
             onMount={handleMount}
             theme={monacoTheme}
@@ -278,13 +341,20 @@ export function P5Exercise({
               key={srcdoc}
               srcDoc={srcdoc}
               sandbox="allow-scripts allow-same-origin"
-              style={{ display: "block", width: "100%", height, border: "none" }}
+              style={{
+                display: "block",
+                width: "100%",
+                height,
+                border: "none",
+              }}
               title="p5 sketch"
             />
           ) : error?.message.startsWith("Infinite loop") ? (
             <div className={s.infiniteLoop} style={{ height }}>
               <span className={s.bombEmoji}>💣</span>
-              <span style={{ fontSize: 14 }}>Your code likely has an infinite loop</span>
+              <span style={{ fontSize: 14 }}>
+                Your code likely has an infinite loop
+              </span>
             </div>
           ) : (
             <div className={s.placeholder} style={{ height }}>
@@ -297,7 +367,9 @@ export function P5Exercise({
       {error && !error.message.startsWith("Infinite loop") && (
         <pre className={s.errorPre}>
           {error.message}
-          {error.line != null ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})` : ""}
+          {error.line != null
+            ? ` (line ${error.line}${error.col != null ? `, col ${error.col}` : ""})`
+            : ""}
           {error.stack ? `\n\n${error.stack}` : ""}
         </pre>
       )}

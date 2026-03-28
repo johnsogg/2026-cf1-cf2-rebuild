@@ -37,6 +37,11 @@ type WorkerResponse = {
   error?: string
 }
 
+/**
+ * Editable code exercise with unit tests. Student writes TypeScript functions,
+ * clicks Run, and automated tests report pass/fail. Intended for pure
+ * logic/computation exercises, not visual output.
+ */
 export function CodeExercise({
   exercise,
   onAttempt,

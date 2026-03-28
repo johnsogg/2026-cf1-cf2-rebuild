@@ -4,6 +4,7 @@ import type { MiscPage } from "immerse/nav/navTree"
 import { glossaryEntries } from "./glossary"
 import { Callout } from "./components/Callout" // book-specific content component
 import { P5Sketch } from "immerse/components/P5Sketch"
+import { Exercise } from "immerse/components/Exercise"
 import Overview from "./overview.mdx"
 import { totalExercises } from "virtual:exercise-totals"
 
@@ -13,7 +14,7 @@ const titles = import.meta.glob<string>("./units/**/*.mdx", {
 })
 const loaders = import.meta.glob<{ default: ComponentType }>("./units/**/*.mdx")
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const components: Record<string, ComponentType<any>> = { Callout, P5Sketch }
+const components: Record<string, ComponentType<any>> = { Callout, P5Sketch, Exercise }
 
 const miscTitles = import.meta.glob<string>("./misc/**/*.mdx", {
   import: "title",

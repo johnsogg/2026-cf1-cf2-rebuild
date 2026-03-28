@@ -2,9 +2,9 @@ export const title = "Hello World"
 
 # Hello World
 
-Here is a plain gray dot like we saw in the last section:
+Remember this little gray dot? We saw it on the previous page.
 
-```p5sketch autoplay width=150 height=150
+```p5exercise id="gray-dot" autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -15,3 +15,28 @@ function draw() {
   circle(75, 75, 45)
 }
 ```
+
+Here you're seeing the code that produced it. The code is fully editable, so you
+can play around. If you make a big mess, just use the reset button to get back
+to where you started.
+
+If this is the first time you're seeing code, this might look strange. You're
+looking at Javascript, specifically Javascript that is written to work with the
+p5.js library. There's a lot to unpack, so I'll do it one step at a time.
+
+The `function setup()` and `function draw()` lines are function definitions
+named `setup` and `draw`. We'll go into details on what _that_ means later on,
+but for now, you can think of these as command names.
+
+There are four function calls. The first one, `createCanvas`, is used once to
+grab a spot on the screen for drawing. This canvas will be 150x150 pixels. The
+other three are inside our `draw` command, and they are:
+
+- `background` - sets the background color of our canvas.
+- `fill` - sets the paint color for filling the inside of shapes.
+- `circle` - draws a circle centered at (75, 75), with a diameter of 45 pixels.
+
+Those parts read vaguely like English. But it looks funky: parenthesis and curly
+braces, indentation, and what's up with the quotes? Those symbols are part of
+the language's **syntax** and they are needed to make the code precisely convey
+meaning that the browser understands. Try messing it up. Remove a parenthesis.

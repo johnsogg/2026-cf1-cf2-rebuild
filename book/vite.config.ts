@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url"
 import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
 import { remarkWordCount } from "../immerse/src/plugins/remarkWordCount"
 import { remarkP5Sketch } from "../immerse/src/plugins/remarkP5Sketch"
+import { remarkP5Exercise } from "../immerse/src/plugins/remarkP5Exercise"
 import { rawBundlePlugin } from "../immerse/src/plugins/rawBundlePlugin"
 
 export default defineConfig(({ command }) => ({
@@ -26,7 +27,7 @@ export default defineConfig(({ command }) => ({
     {
       enforce: "pre",
       ...mdx({
-        remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch],
+        remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch, remarkP5Exercise],
         rehypePlugins: [rehypeHighlight],
         providerImportSource: "@mdx-js/react",
       }),

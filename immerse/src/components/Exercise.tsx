@@ -20,7 +20,10 @@ import { useProgress } from "../progress/ProgressContext"
 import { useNav } from "../nav/NavContext"
 import { getStorageValue, setStorageValue } from "../storage"
 
-export type Exercise = CodeExerciseProps | MultipleChoiceExerciseProps | P5ExerciseProps
+export type Exercise =
+  | CodeExerciseProps
+  | MultipleChoiceExerciseProps
+  | P5ExerciseProps
 
 const ExerciseNumberContext = createContext<(id: string) => number>(() => 0)
 
@@ -56,7 +59,7 @@ export function Exercise({
   const getNumber = useContext(ExerciseNumberContext)
   const resolvedNumber = questionNumber ?? getNumber(exercise.id)
 
-  const { id, hints } = exercise
+  const { id, hints, type } = exercise
   const { registerExerciseInSection, notifyExerciseChange } = useProgress()
   const { currentSection } = useNav()
   const sectionPath = useRef(currentSection.urlPath)
@@ -104,17 +107,25 @@ export function Exercise({
     attempted: s.exerciseAttempted,
     complete: s.exerciseComplete,
   }[attemptState]
+
+  const extraClass = type === "p5" ? s.exerciseP5 : undefined
+
   return (
-    <div className={`${s.exercise} ${stateClass}`}>
-      <ExerciseHeader
-        questionNumber={resolvedNumber}
-        attemptState={attemptState}
-        onReset={handleReset}
-      />
+    <div className={`${s.exercise} ${stateClass} ${extraClass}`}>
+      {exercise.type !== "p5" && (
+        <ExerciseHeader
+          questionNumber={resolvedNumber}
+          attemptState={attemptState}
+          onReset={handleReset}
+        />
+      )}
       <ExerciseTitle title={exercise.title ?? ""} />
       <ExerciseContent
         exercise={exercise}
         resetKey={resetKey}
+        questionNumber={resolvedNumber}
+        attemptState={attemptState}
+        onReset={handleReset}
         onAttempt={handleAttempt}
         onComplete={handleComplete}
       />
@@ -167,12 +178,18 @@ const ExerciseTitle = ({ title }: ExerciseTitleProps) => {
 type ExerciseContentProps = {
   exercise: Exercise
   resetKey: number
+  questionNumber: number
+  attemptState: AttemptState
+  onReset: VoidFunction
   onAttempt: VoidFunction
   onComplete: VoidFunction
 }
 const ExerciseContent = ({
   exercise,
   resetKey,
+  questionNumber,
+  attemptState,
+  onReset,
   onAttempt,
   onComplete,
 }: ExerciseContentProps) => {
@@ -200,6 +217,9 @@ const ExerciseContent = ({
         <P5Exercise
           key={resetKey}
           exercise={exercise}
+          questionNumber={questionNumber}
+          attemptState={attemptState}
+          onReset={onReset}
         />
       )
   }
