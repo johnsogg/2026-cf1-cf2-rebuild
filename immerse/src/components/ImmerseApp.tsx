@@ -18,11 +18,16 @@ import { ThemeProvider } from "../hooks/useTheme"
 import { Tools } from "./Tools"
 import { NavProvider, useNav } from "../nav/NavContext"
 import type { MiscPage } from "../nav/navTree"
-import { ProgressProvider, useProgress, getSectionStatus } from "../progress/ProgressContext"
+import {
+  ProgressProvider,
+  useProgress,
+  getSectionStatus,
+} from "../progress/ProgressContext"
 import s from "./ImmerseApp.module.css"
 import { TableOfContents } from "./nav/TableOfContents"
 import { NavBar } from "./nav/Nav"
 import { initStorage, getStorageValue, setStorageValue } from "../storage"
+import { ExpectedReadTime } from "./ExpectedReadTime"
 
 export type ImmerseAppProps = {
   bookSlug: string
@@ -71,7 +76,7 @@ const Overview = ({
   totalExercises?: number
 }) => {
   const { tree } = useNav()
-  const { version } = useProgress() // eslint-disable-line @typescript-eslint/no-unused-vars
+  const { version } = useProgress()
 
   const allSections = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
   const totalPages = allSections.length
@@ -94,7 +99,8 @@ const Overview = ({
   const section = found ?? allSections[0]
   const isResume = !!found
 
-  const readPct = totalPages > 0 ? Math.round((readPages / totalPages) * 100) : 0
+  const readPct =
+    totalPages > 0 ? Math.round((readPages / totalPages) * 100) : 0
   const attemptedPct = totalExercises
     ? Math.round((attempted / totalExercises) * 100)
     : null
@@ -131,7 +137,7 @@ const Overview = ({
   )
 }
 
-const defaultComponents = { Exercise, Term }
+const defaultComponents = { Exercise, Term, ExpectedReadTime }
 
 const AppLayout = ({
   overview,
@@ -249,7 +255,11 @@ export const ImmerseApp = ({
           <MDXProvider components={mdxComponents}>
             <NavProvider titles={titles} loaders={loaders} misc={misc}>
               <ProgressProvider>
-                <AppLayout overview={overview} totalExercises={totalExercises} misc={misc} />
+                <AppLayout
+                  overview={overview}
+                  totalExercises={totalExercises}
+                  misc={misc}
+                />
               </ProgressProvider>
             </NavProvider>
           </MDXProvider>

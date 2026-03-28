@@ -9,6 +9,12 @@ export const title = "Custom Renderers"
 
 Look at this in an editor. You'll only see the output in the browser.
 
+## Glossary Terms
+
+You can use `<Term>xyz</Term>` to add a word like <Term>recursion</Term> to the
+glossary. If it is not present, it renders with a dumb style to make it obvious
+that you should add it, like <Term>garbanzo</Term>.
+
 ## Inline p5 Sketches
 
 This 'component' is actually a kinda complex Vite + Remark exploit that lets me
@@ -71,3 +77,13 @@ the prop, the other omits it. The rest of these are the colorful ones:
 <Callout intent="question">Intent: question</Callout>
 <Callout intent="fun">Intent: fun</Callout>
 <Callout intent="note">Intent: note</Callout>
+
+## Expected Read Time indicator
+
+There's an `<ExpectedReadTime wordCount={wordCount}>` component that tells you
+roughly how long it will take to read. It has to be written exactly like this
+because (I think) the Vite transformation inserts the variable `wordCount` into
+the page, so it is a just-in-time resolved symbol. That's what puts the `3 min`
+or whatever into the bottom right corner.
+
+<ExpectedReadTime wordCount={wordCount} />
