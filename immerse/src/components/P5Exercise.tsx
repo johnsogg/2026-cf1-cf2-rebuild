@@ -102,6 +102,7 @@ export type P5ExerciseProps = {
   hints?: string[]
   size?: "small" | "medium" | "large"
   autorun?: boolean
+  hoverInfo?: boolean
 }
 
 type TranspilerResponse = {
@@ -133,7 +134,7 @@ export function P5Exercise({
   attemptState: AttemptState
   onReset: () => void
 }) {
-  const { initialCode } = exercise
+  const { initialCode, hoverInfo = true } = exercise
   const height = { small: "200px", medium: "400px", large: "80vh" }[
     exercise.size ?? "medium"
   ]
@@ -328,7 +329,7 @@ export function P5Exercise({
             theme={monacoTheme}
             options={{
               minimap: { enabled: false },
-              hover: { enabled: false },
+              hover: { enabled: hoverInfo },
               fontSize: 14,
               scrollBeyondLastLine: false,
             }}

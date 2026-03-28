@@ -108,7 +108,8 @@ export function Exercise({
     complete: s.exerciseComplete,
   }[attemptState]
 
-  const extraClass = type === "p5" ? s.exerciseP5 : undefined
+  const extraClass =
+    type === "p5" ? s.exerciseP5 : type === "code" ? s.exerciseCode : undefined
 
   return (
     <div className={`${s.exercise} ${stateClass} ${extraClass}`}>

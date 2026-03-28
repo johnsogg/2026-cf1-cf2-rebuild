@@ -10,6 +10,11 @@
 .exerciseP5 {
   border-left: 0;
   padding-left: 0;
+  grid-column: full;
+}
+
+.exerciseCode {
+  grid-column: full;
 }
 
 .exerciseIdle {
