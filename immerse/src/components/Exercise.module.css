@@ -9,7 +9,7 @@
 
 .exerciseP5 {
   border-left: 0;
-  padding-left: 0;
+  padding-left: 24px;
   grid-column: full;
 }
 

@@ -12,6 +12,9 @@
 .buttons {
   display: flex;
   gap: 8px;
+  background: var(--bg);
+  padding: 8px;
+  border-radius: 10px;
 }
 
 .progressWrapper {
