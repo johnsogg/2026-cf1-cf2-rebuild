@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 0.5rem;
   grid-column: full;
+  padding: 0 40px;
 }
 
 .row {
