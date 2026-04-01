@@ -4,10 +4,12 @@ import type { Root, Code, Parent } from "mdast"
 function parseMeta(meta: string | null | undefined) {
   const str = meta ?? ""
   const autoplay = /\bautoplay\b/.test(str)
+  const wide = /\bwide\b/.test(str)
   const widthMatch = str.match(/\bwidth=(\d+)\b/)
   const heightMatch = str.match(/\bheight=(\d+)\b/)
   return {
     autoplay,
+    wide,
     width: widthMatch ? parseInt(widthMatch[1], 10) : undefined,
     height: heightMatch ? parseInt(heightMatch[1], 10) : undefined,
   }
@@ -63,11 +65,12 @@ export function remarkP5Sketch() {
     visit(tree, "code", (node: Code, index: number | undefined, parent: Parent | undefined) => {
       if (node.lang !== "p5sketch" || !parent || index == null) return
 
-      const { autoplay, width, height } = parseMeta(node.meta)
+      const { autoplay, wide, width, height } = parseMeta(node.meta)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const attributes: any[] = [
         { type: "mdxJsxAttribute", name: "code", value: node.value },
+        { type: "mdxJsxAttribute", name: "layout", value: wide ? "wide" : "content" },
       ]
 
       if (autoplay) {

@@ -24,6 +24,7 @@ export type P5SketchProps = {
   size?: "small" | "medium" | "large"
   title?: string
   dimensions?: { width: number; height: number }
+  layout?: "wide" | "content"
 }
 /**
  * Display-only, no editing. You give it code (usually imported
@@ -37,6 +38,7 @@ export function P5Sketch({
   size = "medium",
   title = "p5 sketch",
   dimensions = undefined,
+  layout = "wide",
 }: P5SketchProps) {
   const height =
     dimensions?.height ||
@@ -133,8 +135,10 @@ export function P5Sketch({
     }
   }, [])
 
+  const gridColumn = layout === "content" ? "content" : "full"
+
   return (
-    <div className={s.wrap}>
+    <div className={s.wrap} style={{ gridColumn }}>
       <div className={s.row}>
         <div className={s.canvas}>
           {srcdoc ? (
