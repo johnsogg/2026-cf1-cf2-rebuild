@@ -1,0 +1,28 @@
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.8em;
+  font-weight: 500;
+  background: var(--code-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.15em 0.45em;
+  white-space: nowrap;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.ssrBoth {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2em;
+  white-space: nowrap;
+}
+
+.ssrLabel {
+  font-size: 0.75em;
+  color: var(--text-muted);
+}

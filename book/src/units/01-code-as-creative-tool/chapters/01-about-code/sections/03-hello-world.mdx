@@ -16,28 +16,53 @@ function draw() {
 }
 ```
 
-Here you're seeing the code that produced it. The code is fully editable, so you
-can play around. If you make a big mess, just use the reset button to get back
-to where you started.
+Now you're also seeing the code that produced it. It is fully editable, so you
+can play around. It doesn't automatically re-run when you change it, so either
+use the stop/play buttons, or use <Kbd mod>Enter</Kbd> with the keyboard. If you
+make a mess, use the reset button to get back to where you started.
 
 If this is the first time you're seeing code, this might look strange. You're
 looking at Javascript, specifically Javascript that is written to work with the
-p5.js library. There's a lot to unpack, so I'll do it one step at a time.
+**p5.js library**. There's a lot to unpack, so I'll do it one step at a time.
 
-The `function setup()` and `function draw()` lines are function definitions
-named `setup` and `draw`. We'll go into details on what _that_ means later on,
-but for now, you can think of these as command names.
+The `function setup()` and `function draw()` lines are function definitions.
+We'll go into details on what _that_ means later on, but for now, you can think
+of these as command names.
 
-There are four function calls. The first one, `createCanvas`, is used once to
-grab a spot on the screen for drawing. This canvas will be 150x150 pixels. The
-other three are inside our `draw` command, and they are:
+Inside those function definitions, there are four function calls where we invoke
+previously defined commands . The first one, `createCanvas(...)`, is used once
+to grab a spot on the screen for drawing. This canvas will be 150x150 pixels.
+The other three are inside our `draw` definition, and they are:
 
-- `background` - sets the background color of our canvas.
-- `fill` - sets the paint color for filling the inside of shapes.
-- `circle` - draws a circle centered at (75, 75), with a diameter of 45 pixels.
+- `background(...)` - sets the background color of our canvas.
+- `fill(...)` - sets the paint color for filling the inside of shapes.
+- `circle(...)` - draws a circle centered at (75, 75), with a diameter of 45
+  pixels.
 
 Those parts read vaguely like English. But it looks funky: parenthesis and curly
 braces, indentation, and what's up with the quotes? Those symbols are part of
 the language's **syntax** and they are needed to make the code precisely convey
-meaning that the browser understands. Try messing it up. Remove a parenthesis.
-Or a comma. Or a curly. You can always recover by resetting the editor.
+meaning that the browser understands.
+
+## Exercises
+
+Even though we haven't covered hardly anything at all, I want you to try editing
+this code, just to see what happens. Use the little editor above. You can always
+recover from a bad situation by resetting the editor. When you make a change,
+re-run the program with <Kbd mod>Enter</Kbd>.
+
+Here's some things to try:
+
+1. Try changing the background color to red.
+2. Come up with other colors, and see if they work. Most of the typical color
+   names ("red", "yellow", "blue") work as expected. But rare colors like "puce"
+   don't. Why do you suppose that is? Why do you suppose "papapawhip" works?
+3. Experiment with different fill values. `#888` is a medium gray. What other
+   values work? What do you think that "pound sign - number - number - number"
+   means?
+4. Intentionally mess it up: Remove a parenthesis. Or a comma. Or a curly.
+5. Instead of making a circle, try making a square? Can you get it to work? At
+   this point, probably not because the syntax has to be exactly right, and we
+   haven't covered it yet.
+6. See if you can put the circle in a different spot. Hint: the 75, 75 sets the
+   circle center.

@@ -27,6 +27,7 @@ import s from "./ImmerseApp.module.css"
 import { TableOfContents } from "./nav/TableOfContents"
 import { NavBar } from "./nav/Nav"
 import { initStorage, getStorageValue, setStorageValue } from "../storage"
+import { Kbd, KbdProvider } from "./Kbd"
 import { ExpectedReadTime } from "./ExpectedReadTime"
 
 export type ImmerseAppProps = {
@@ -137,7 +138,7 @@ const Overview = ({
   )
 }
 
-const defaultComponents = { Exercise, Term, ExpectedReadTime }
+const defaultComponents = { Exercise, Term, ExpectedReadTime, Kbd, KbdProvider }
 
 const AppLayout = ({
   overview,
