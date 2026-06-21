@@ -36,7 +36,7 @@ export const Tools = ({ totalExercises }: { totalExercises?: number }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { tree } = useNav()
-  const { version } = useProgress() // eslint-disable-line @typescript-eslint/no-unused-vars
+  const { version: _version } = useProgress()
 
   const allSections = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
   const totalPages = allSections.length

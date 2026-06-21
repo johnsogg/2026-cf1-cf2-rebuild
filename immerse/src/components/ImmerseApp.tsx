@@ -77,7 +77,7 @@ const Overview = ({
   totalExercises?: number
 }) => {
   const { tree } = useNav()
-  const { version } = useProgress()
+  const { version: _version } = useProgress()
 
   const allSections = tree.flatMap((u) => u.chapters.flatMap((c) => c.sections))
   const totalPages = allSections.length
