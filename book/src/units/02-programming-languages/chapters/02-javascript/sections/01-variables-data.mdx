@@ -1,0 +1,190 @@
+export const title = "Data and Variables"
+
+> - static graphic — shapes, colors, composition — with no moving parts yet.
+> - Coordinate system (origin top-left, y increases downward)
+> - Use basic drawing commands: background, fill, stroke, ellipse, rect, line,
+>   point, triangle
+> - Use color (named, grayscale, RGB)
+> - Understand that setup() runs once; draw() runs in a loop (but nothing moves
+>   yet because nothing changes)
+
+> The assignment framing is a "self portrait" — an image made entirely from
+> geometric primitives that represents the student in some way.
+
+# Data and Variables
+
+## Hello World
+
+We've already seen Hello World back in the first section. By tradition, the
+[first example program](https://en.wikipedia.org/wiki/Hello%2C_world) in any
+language prints some variation of `Hello World` to the screen. Here it is in
+JavaScript:
+
+```js
+console.log("Hello, World!")
+```
+
+This is not exactly satisfying to start with, though, because if we were to run
+this program, you wouldn't see anything! JavaScript is meant to work with web
+pages - like the text and graphics you see here. The `console` mentioned above
+is meant for the web page developer to see, not the end user. I promise you'll
+see that soon enough.
+
+## Graphical Hello World
+
+But for now, let's try a non-traditional but arguably more apt example of Hello
+World:
+
+```p5exercise id="hello-world" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  text("Hello, World!", 10, 75)
+}
+```
+
+Throughout this book, the code blocks like that are fully editable. Try changing
+it to greet you by name.
+
+If you add too much text you'll notice that the words are cut off at some point:
+
+```p5exercise id="hello-world-cut-off" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  text("This is pretty long text that doesn't fit in the box", 10, 75)
+}
+```
+
+These little graphical programs are just JavaScript, using the p5.js library.
+
+<Callout intent="note">
+  <p>What is a library?</p>
+
+  <p>
+    p5.js is a _library_ that provides tools for helping your work faster.
+    Reading the example code above, `setup`, `draw`, `text`, and `createCanvas`
+    are four utilities that work together and give you shortcuts so you don't
+    have to reinvent the wheel. A library can do anything the code that you
+    write does, because libraries themselves are just code. You can write your
+    own libraries, or depend on the work of others. p5.js is an open source
+    library [written by groovy people](https://p5js.org/about/) to support you
+    to learn to code and make fun art along the way.
+  </p>
+</Callout>
+
+The p5 library lets you configure a _canvas_ - a rectangular area where you can
+draw graphics and text, play sounds, capture interaction, and make animations.
+
+## Data
+
+If you happen to run these code examples in a dark theme, you might notice that
+the text is barely visible because it is dark on dark. That's because p5's
+canvas is clear, so you see the background through it. We can give the canvas a
+background color, and while we're at it, let's also change the text color:
+
+```p5exercise id="hello-world-colors" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("papayawhip") // this is one of the special color names
+  fill("cyan") // so is this
+  text("This is pretty long text that doesn't fit in the box", 10, 75)
+}
+```
+
+The `background` and `fill` symbols are _function calls_. You can think of these
+as commands that do something like change the canvas's background color, or set
+the pen's fill color. We've used functions in every example on this page, all
+the way back to the first boring Hello World example. When you _call_ a
+function, you can send in _arguments_. In this case, I want the background to be
+that creamy color, `"papayawhip"`, and the text color will be `"cyan"`.
+
+`"papayawhip"` and `"cyan"` are _data values_. Try changing those colors and
+re-running the program. Not every value will work. `"red"` and `"green"` and the
+usual suspects will work, but `"puce"` and `"avocado"` won't. Strangely, `200`
+will work, but `300` won't. (I'll mysteriously leave that unexplained for a
+bit.)
+
+We also used data in other function calls. `createCanvas(150, 150)` means
+"create a drawing canvas that is 150 pixels wide and 150 pixels high."
+
+## Variables
+
+What if we want to use the _same_ value in more than one place, but only need to
+set it once? We can do this by using _variables_. Here I'll make variables to
+record all the data we'll need, in one convenient place at the top of the file:
+
+```p5exercise id="hello-world-variables" autorun size="medium"
+// try changing these values and re-running
+const size = 300
+const bgColor = "darkGreen"
+const textColor = "pink"
+const message = "This is vertically centered text"
+const messageX = 10
+const messageY = 150
+
+function setup() {
+  createCanvas(size, size)
+}
+
+function draw() {
+  background(bgColor)
+  fill(textColor)
+  text(message, messageX, messageY)
+}
+```
+
+In this code above, there are six variables. When you use variables, you have to
+first _declare_ them. That's what the `const` keyword is doing. It's saying "I
+do declare there is a variable called _size_, and once I've set its value, it
+will not change!"
+
+If you need a variable that changes, use the `let` keyword instead of `const`.
+
+It is common to both declare and assign an initial value to a variable at the
+same time. That's what the equals sign is doing. This is called _initializing_ a
+variable. If you change the value of a variable, that is called _assigning_ to
+it. That only works on constants once, at the time you declare it. But if you
+use `let` to declare a variable you can change its value later, as below:
+
+```js
+const size = 300 // since this is const, it can't change
+size = 42 // Error! can't reassign to a constant
+let eyes = "blue" // declared with let means it can change
+eyes = "brown" // no problem
+```
+
+This code wouldn't run (you can paste it into any editor above and prove it to
+yourself) because of the second line where we try to reassign a `const`
+variable.
+
+<Callout intent="fun">
+  <p><b>Variables that can't change?</b></p>
+
+  <p>You might object to calling it a _variable_ if it can't _change_. Agreed 
+  that it is weird, but that's the convention in most programming languages - 
+  if you give a name to data, we call it a variable, even if it isn't able to 
+  vary.</p>
+</Callout>
+
+<Callout>
+  By the way, when code is shown like this, the different words are
+  automatically colored differently. This is called _syntax highlighting_ and
+  can really help give you subtle clues about what is going on. In the color
+  theme I happen to be using right now, all the numbers are blue; the `const`
+  and `let` keywords for declaring variables are reddish, and the `"blue"` and
+  `"brown"` text strings are green. Color gives you another added layer of
+  information to help you make sense of what you're seeing.
+</Callout>
+
+## Syntax
+
+do anatomy lessons. start with declaration and assignment. then functions, since
+we see them already.
