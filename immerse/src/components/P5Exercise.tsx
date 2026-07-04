@@ -3,6 +3,7 @@ import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react"
 import { buildSrcdoc } from "../utils/p5Srcdoc"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
+import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import type { AttemptState } from "./Exercise"
@@ -84,6 +85,7 @@ const p5TypeFiles = import.meta.glob<string>(
 
 const beforeMount: BeforeMount = (monaco) => {
   registerMonacoThemes(monaco)
+  isolateMonacoTypescriptFiles(monaco)
   for (const [path, content] of Object.entries(p5TypeFiles)) {
     // Normalize relative key to a virtual absolute path Monaco can cross-reference
     const virtualPath = path.replace("../../../node_modules", "/node_modules")

@@ -2,6 +2,7 @@ import { useRef, useState, useCallback, useEffect } from "react"
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
+import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import type { AttemptState } from "./Exercise"
@@ -9,6 +10,7 @@ import s from "./ConsoleExercise.module.css"
 
 const beforeMount: BeforeMount = (monaco) => {
   registerMonacoThemes(monaco)
+  isolateMonacoTypescriptFiles(monaco)
 }
 
 export type ConsoleExerciseProps = {

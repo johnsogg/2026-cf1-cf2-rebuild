@@ -4,6 +4,7 @@ import type { OnMount } from "@monaco-editor/react"
 import ExecutorWorker from "../workers/executor.worker?worker"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
+import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import type { Monaco } from "@monaco-editor/react"
 import s from "./CodeExercise.module.css"
 import btn from "../styles/buttons.module.css"
@@ -12,6 +13,7 @@ import { SvgIcon } from "./SvgIcon"
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
+  isolateMonacoTypescriptFiles(monaco)
 }
 
 export type CodeExerciseProps = {
