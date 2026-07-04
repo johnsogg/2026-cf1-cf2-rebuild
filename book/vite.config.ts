@@ -9,6 +9,7 @@ import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
 import { remarkWordCount } from "../immerse/src/plugins/remarkWordCount"
 import { remarkP5Sketch } from "../immerse/src/plugins/remarkP5Sketch"
 import { remarkP5Exercise } from "../immerse/src/plugins/remarkP5Exercise"
+import { remarkJsConsole } from "../immerse/src/plugins/remarkJsConsole"
 import { rawBundlePlugin } from "../immerse/src/plugins/rawBundlePlugin"
 
 const copy404Plugin = {
@@ -35,7 +36,7 @@ export default defineConfig(({ command }) => ({
     {
       enforce: "pre",
       ...mdx({
-        remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch, remarkP5Exercise],
+        remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch, remarkP5Exercise, remarkJsConsole],
         rehypePlugins: [rehypeHighlight],
         providerImportSource: "@mdx-js/react",
       }),

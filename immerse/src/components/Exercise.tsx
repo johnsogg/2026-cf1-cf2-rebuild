@@ -9,9 +9,11 @@ import {
 import type { CodeExerciseProps } from "./CodeExercise"
 import type { MultipleChoiceExerciseProps } from "./MultipleChoiceExercise"
 import type { P5ExerciseProps } from "./P5Exercise"
+import type { ConsoleExerciseProps } from "./ConsoleExercise"
 import { CodeExercise } from "./CodeExercise"
 import { MultipleChoiceExercise } from "./MultipleChoiceExercise"
 import { P5Exercise } from "./P5Exercise"
+import { ConsoleExercise } from "./ConsoleExercise"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./Exercise.module.css"
@@ -24,6 +26,7 @@ export type Exercise =
   | CodeExerciseProps
   | MultipleChoiceExerciseProps
   | P5ExerciseProps
+  | ConsoleExerciseProps
 
 const ExerciseNumberContext = createContext<(id: string) => number>(() => 0)
 
@@ -109,11 +112,15 @@ export function Exercise({
   }[attemptState]
 
   const extraClass =
-    type === "p5" ? s.exerciseP5 : type === "code" ? s.exerciseCode : undefined
+    type === "p5" || type === "console"
+      ? s.exerciseP5
+      : type === "code"
+        ? s.exerciseCode
+        : undefined
 
   return (
     <div className={`${s.exercise} ${stateClass} ${extraClass}`}>
-      {exercise.type !== "p5" && (
+      {exercise.type !== "p5" && exercise.type !== "console" && (
         <ExerciseHeader
           questionNumber={resolvedNumber}
           attemptState={attemptState}
@@ -216,6 +223,16 @@ const ExerciseContent = ({
     case "p5":
       return (
         <P5Exercise
+          key={resetKey}
+          exercise={exercise}
+          questionNumber={questionNumber}
+          attemptState={attemptState}
+          onReset={onReset}
+        />
+      )
+    case "console":
+      return (
+        <ConsoleExercise
           key={resetKey}
           exercise={exercise}
           questionNumber={questionNumber}
