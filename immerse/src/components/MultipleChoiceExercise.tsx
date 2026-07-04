@@ -13,6 +13,10 @@ export type MultipleChoiceExerciseProps = {
   hints?: string[]
 }
 
+/**
+ * Single-answer multiple-choice question. Click an option to select it,
+ * double-click to submit. Options can carry an optional `image`.
+ */
 export function MultipleChoiceExercise({
   exercise,
   onAttempt,

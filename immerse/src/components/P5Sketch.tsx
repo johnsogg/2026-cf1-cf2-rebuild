@@ -29,7 +29,10 @@ export type P5SketchProps = {
 /**
  * Display-only, no editing. You give it code (usually imported
  * from a .ts file), it runs the sketch in an iframe. Used to show pre-written
- * examples inline in the text.
+ * examples inline in the text. Globally available in book `.mdx` sections,
+ * no import needed. For short throwaway snippets with no source file, use a
+ * ` ```p5sketch autoplay width=300 height=100 ` fenced code block instead —
+ * it expands to this component at build time.
  **/
 export function P5Sketch({
   code,

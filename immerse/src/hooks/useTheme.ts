@@ -32,9 +32,10 @@ function getInitialTheme(): Theme {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme)
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-  }, [theme])
+  // Set synchronously during render (not in an effect) so the DOM attribute
+  // - and the CSS custom properties it selects - are already updated by the
+  // time any descendant's useLayoutEffect runs in this same commit.
+  document.documentElement.dataset.theme = theme
 
   // Follow system preference when user hasn't explicitly chosen a theme
   useEffect(() => {

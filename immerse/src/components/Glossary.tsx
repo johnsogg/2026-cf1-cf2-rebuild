@@ -79,6 +79,13 @@ export function GlossaryView() {
   )
 }
 
+/**
+ * Marks an inline term, e.g. `<Term>recursion</Term>`, that pops up its
+ * glossary definition on click. Globally available in book `.mdx` sections,
+ * no import needed. Looks up `children` (case-insensitively) against
+ * `glossaryEntries` passed to `ImmerseApp`; renders with an obvious "missing"
+ * style if no entry matches, as a signal to add one.
+ */
 export function Term({ children }: { children: string }) {
   const ctx = useContext(GlossaryContext)
   const entry = ctx?.lookup(children)

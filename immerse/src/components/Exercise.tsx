@@ -22,6 +22,16 @@ import { useProgress } from "../progress/ProgressContext"
 import { useNav } from "../nav/NavContext"
 import { getStorageValue, setStorageValue } from "../storage"
 
+/**
+ * Dispatches to the right exercise widget based on `exercise.type`
+ * ("code" | "multiple-choice" | "p5" | "console"), e.g.
+ * `<Exercise exercise={someExerciseData} />`. Globally available in book
+ * `.mdx` sections, no import needed. Handles the shared chrome (question
+ * number, attempt/complete state persisted to local storage, hints, reset).
+ * `p5exercise` and `jsconsole` fenced code blocks are shorthand that expand
+ * to `<Exercise exercise={{ type: "p5" | "console", ... }} />` at build
+ * time — see root CLAUDE.md for their required `id=` attribute.
+ */
 export type Exercise =
   | CodeExerciseProps
   | MultipleChoiceExerciseProps

@@ -1,6 +1,11 @@
 import { assertNever } from "../utils/assertNever"
 import s from "./Callout.module.css"
 
+/**
+ * Colored aside box, e.g. `<Callout intent="note">...</Callout>`. Import as
+ * `import { Callout } from "immerse/components/Callout"`. `intent` picks the
+ * color/icon; omit it (or pass "default") for an unstyled box.
+ */
 interface CalloutProps {
   children?: React.ReactNode
   intent: "danger" | "default" | "question" | "fun" | "note"

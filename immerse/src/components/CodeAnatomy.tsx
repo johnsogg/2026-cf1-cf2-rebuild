@@ -6,6 +6,40 @@ import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./CodeAnatomy.module.css"
 
+/**
+ * Usage (in a book `.mdx` section):
+ *
+ * ```mdx
+ * import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+ *
+ * <CodeAnatomy
+ *   code={{ value: "foo = 'hello'", pos: { x: 218, y: 270 }, fontSize: 48 }}
+ *   width={800}
+ *   height={380}
+ *   progressive
+ *   labels={[
+ *     {
+ *       name: "Equals sign",
+ *       text: "Special character indicating we are assigning a value into a variable.",
+ *       pos: { x: 290, y: 10 },
+ *       target: { x: 344, y: 270 },
+ *       maxWidth: 230,
+ *     },
+ *   ]}
+ * />
+ * ```
+ *
+ * `code.pos`, `label.pos`, and `label.target` are all manual pixel
+ * coordinates on the canvas (`width` x `height`) - there is no parsing of
+ * `code.value` to find character positions. Estimate them, render, and
+ * nudge based on what you see (a pasted screenshot of the rendered page is
+ * the fastest way to iterate). A common layout: labels in a row above the
+ * code line, each `target` pointing down into the token it describes.
+ *
+ * Order `labels` in the sequence they should be explained - with
+ * `progressive` on, that's also the reveal order (plus a final "all
+ * revealed" stage).
+ */
 export interface CodeAnatomyPoint {
   x: number
   y: number
@@ -215,7 +249,6 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
   const isAllStage = clampedStep === lastStep
   const visibleLabels =
     progressive && !isAllStage ? labels.slice(0, clampedStep + 1) : labels
-  const isComplete = isAllStage
 
   // Forward/back cycle: stepping past the last ("All") stage wraps to the
   // first, and back at the first wraps to the last.
@@ -223,7 +256,7 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
   const goBack = () => setStep((s) => (s - 1 + totalSteps) % totalSteps)
   const goForward = () => setStep((s) => (s + 1) % totalSteps)
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLCanvasElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowRight" || e.key === " ") {
       e.preventDefault()
       goForward()
@@ -350,27 +383,32 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
   return (
     <div
       className={s.wrapper}
-      style={{ maxWidth: width, aspectRatio: `${width} / ${height}` }}
+      style={{ maxWidth: width }}
+      onKeyDown={progressive ? handleKeyDown : undefined}
     >
       <canvas
         ref={canvasRef}
         className={s.canvas}
+        style={{ aspectRatio: `${width} / ${height}` }}
         tabIndex={progressive ? 0 : undefined}
-        onKeyDown={progressive ? handleKeyDown : undefined}
       />
-      {progressive && !isComplete && (
-        <>
-          <div className={s.navLeft}>
-            <IconButton aria-label="Previous label" title="Previous" onClick={goBack}>
-              <SvgIcon name="prev" />
-            </IconButton>
-          </div>
-          <div className={s.navRight}>
-            <IconButton aria-label="Next label" title="Next" onClick={goForward}>
-              <SvgIcon name="next" />
-            </IconButton>
-          </div>
-        </>
+      {progressive && (
+        <div className={s.nav}>
+          <IconButton
+            aria-label="Previous label"
+            title="Previous (keyboard left/right also navigates)"
+            onClick={goBack}
+          >
+            <SvgIcon name="prev" />
+          </IconButton>
+          <IconButton
+            aria-label="Next label"
+            title="Next (keyboard left/right also navigates)"
+            onClick={goForward}
+          >
+            <SvgIcon name="next" />
+          </IconButton>
+        </div>
       )}
     </div>
   )

@@ -6,6 +6,25 @@
   color: var(--text);
   overflow-y: auto;
   height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  &:hover {
+    scrollbar-color: color-mix(in srgb, var(--text) 35%, transparent) transparent;
+  }
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 8px;
+    transition: background-color 0.15s;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--text) 35%, transparent);
+  }
 }
 
 .tabletTrigger {
@@ -44,6 +63,25 @@
     border-right: 1px solid
       var(--border, color-mix(in srgb, var(--text) 15%, transparent));
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover {
+      scrollbar-color: color-mix(in srgb, var(--text) 35%, transparent) transparent;
+    }
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 8px;
+      transition: background-color 0.15s;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--text) 35%, transparent);
+    }
   }
 
   .tabletTrigger {

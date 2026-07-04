@@ -133,6 +133,15 @@ function usePlatform(): Platform {
 
 // ---- Component ----
 
+/**
+ * Renders a keyboard shortcut, e.g. `<Kbd mod>Enter</Kbd>` or
+ * `<Kbd op="save" />`. Globally available in book `.mdx` sections, no import
+ * needed. Detects Mac vs. Windows client-side and shows the matching
+ * glyphs/modifier order; SSR shows both. `mod` maps to Cmd on Mac / Ctrl on
+ * Windows. `op` looks up a named shortcut (e.g. "save", "undo",
+ * "command-palette") from the active `KbdProvider` map ("vscode" | "monaco"
+ * | custom), falling back to a small built-in default map.
+ */
 export interface KbdProps {
   cmd?: boolean
   shift?: boolean
