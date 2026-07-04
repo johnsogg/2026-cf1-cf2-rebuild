@@ -1,0 +1,122 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+
+export const title = "Syntax"
+
+> Go into detail about syntax in general, and give some 'anatomy' examples of
+> what has been covered so far:
+>
+> 1. Variable declaration, initialization
+> 2. Variable assignment
+> 3. Function call - name, parens, arguments with commas
+> 4. Function definitions
+>
+> This should set us up for future anatomy lessons, and give a strong awareness
+> of just how exacting a programming language is.
+
+# Syntax
+
+You've encountered syntax your whole life, but might not have stopped to think
+about it. In written natural languages like English, we build up words from
+letters - lines, dots, curves, all put together in just the right way so you can
+tell 'd' and 'b' and 'i' and 'j' apart. Further, those words are put together
+into sentences, and the order you write them can be grammatically correct (or
+not).
+
+> This sentence is grammatically correct.
+
+versus:
+
+> Sentence correct this grammatically is.
+
+The first one fits the language's grammatical conventions but the second one
+doesn't. And if you've ever played
+[Mad Libs](https://en.wikipedia.org/wiki/Mad_Libs) you know that even a
+grammatically correct sentence can still be nonsense.
+
+> The NOUN hit the NOUN.
+
+If you pick any two arbitrary nouns (telescope, banana), the results are usually
+silly and fun, and since it is understood that you're not trying to communicate,
+there's no problem. It is just a game.
+
+> _The banana hit the telescope._ Or, _The telescope hit the banana._
+
+But if what you're trying to do is convey meaning, grammar gives you a framework
+for conveying very different information.
+
+> _The ball hit the boy._ Or, _The boy hit the ball._
+
+In the first case, the boy is possibly injured; in the second, the ball is now
+flying through the air. Same syntactic structure, very different semantics.
+
+## Syntax in Code
+
+This syntax discussion is super important when it comes to code, so I wanted to
+ground it in something readers already understand. If a person misspeaks and
+says something grammatically incorrect ("Ow! Hammer... finger!") we can still
+engage our brains and understand what the speaker is trying to convey. Grammar
+helps us out, but doesn't guarantee anything, and often gets in the way.
+
+Programming languages have their own grammars, just like natural languages. But
+unlike natural languages, coding language must make unambiguous sense to a
+computer, so programs must follow the grammar, or the computer won't be able to
+proceed.
+
+So, it is crucially important that programs fit into the language's grammar.
+We've already seen some Javascript from the previous chapter, maybe we can start
+our sytax discussion with what we've already seen.
+
+### Anatomy: Assignment
+
+Here is the syntax of an **assignment operation**. Use the nav buttons to
+progress through the panes.
+
+<CodeAnatomy
+  code={{ value: "foo = 'hello'", pos: { x: 218, y: 270 }, fontSize: 48 }}
+  width={800}
+  height={380}
+  progressive
+  labels={[
+    {
+      name: "Equals sign",
+      text: "Special character indicating we are assigning a value into a variable.",
+      pos: { x: 290, y: 10 },
+      target: { x: 344, y: 260 },
+      maxWidth: 230,
+    },
+    {
+      name: "Expression",
+      text: "Evaluate the right side of the equals sign to find a value. Here it's a string literal.",
+      pos: { x: 560, y: 10 },
+      target: { x: 484, y: 260 },
+      maxWidth: 230,
+    },
+    {
+      name: "Variable name",
+      text: "Take the value evaluated from the right-hand expression and set this variable's value to it.",
+      pos: { x: 20, y: 10 },
+      target: { x: 260, y: 260 },
+      maxWidth: 230,
+    },
+  ]}
+/>
+
+This is an example of an _expression_. There are lots of different kinds of
+expressions - there are expressions for doing arithmetic, calling functions
+(we'll see this soon), and just about everything else the language lets you say.
+An expression is just a passage of code that can evaluate to something. In this
+case, the expression `foo = 'hello'` evaluates to the value `'hello'`.
+
+Many expressions have a certain order for doing things, and the above sequence
+follows that order. When you write a line of code, Javascript scans it for clues
+about what it should do with it. In this case, it sees
+`<thing on left> <equals sign> <thing on right>`, which matches the syntax for
+an assignment expression.
+
+So the `=` character is doing a lot of work here. Now that JS knows this is an
+assignment, it has to do something with the left and right sides.
+
+The next step is to _evaluate_ the right hand side. It always does this before
+it does anything with the left hand side. In this case, the right hand side is
+simply `'hello'`, which is also known as a
+<Term>string</Term>&nbsp;<Term>literal</Term>.

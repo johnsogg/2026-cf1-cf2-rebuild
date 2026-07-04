@@ -17,22 +17,21 @@ export const title = "Data and Variables"
 
 We've already seen Hello World back in the first section. By tradition, the
 [first example program](https://en.wikipedia.org/wiki/Hello%2C_world) in any
-language prints some variation of `Hello World` to the screen. Here it is in
-JavaScript:
+language prints some variation of `Hello World` to a log somewhere. Here it is
+in JavaScript:
 
-```js
+```jsconsole id="hello-world-console" size="small"
 console.log("Hello, World!")
 ```
 
-This is not exactly satisfying to start with, though, because if we were to run
-this program, you wouldn't see anything! JavaScript is meant to work with web
-pages - like the text and graphics you see here. The `console` mentioned above
-is meant for the web page developer to see, not the end user. I promise you'll
-see that soon enough.
+JavaScript is meant to work with web pages - like the text and graphics you see
+here. The console output mentioned above is meant for the web page developer to
+see, not the end user. I've put this little program in a sandbox so you _do_ see
+the output.
 
 ## Graphical Hello World
 
-But for now, let's try a non-traditional but arguably more apt example of Hello
+Let's try a non-traditional but arguably more interesting example of Hello
 World:
 
 ```p5exercise id="hello-world" autorun size="small"
@@ -46,7 +45,8 @@ function draw() {
 ```
 
 Throughout this book, the code blocks like that are fully editable. Try changing
-it to greet you by name.
+it to greet you by name. You can do the same for the text-only example above
+also.
 
 If you add too much text you'll notice that the words are cut off at some point:
 
@@ -154,7 +154,7 @@ variable. If you change the value of a variable, that is called _assigning_ to
 it. That only works on constants once, at the time you declare it. But if you
 use `let` to declare a variable you can change its value later, as below:
 
-```js
+```jsconsole id="cant-reassign-const"
 const size = 300 // since this is const, it can't change
 size = 42 // Error! can't reassign to a constant
 let eyes = "blue" // declared with let means it can change
