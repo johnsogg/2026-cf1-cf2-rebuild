@@ -2,7 +2,7 @@ import type { ComponentType } from "react"
 import { ImmerseApp } from "immerse/components/ImmerseApp"
 import type { MiscPage } from "immerse/nav/navTree"
 import { glossaryEntries } from "./glossary"
-import { Callout } from "./components/Callout" // book-specific content component
+import { Callout } from "immerse/components/Callout"
 import { P5Sketch } from "immerse/components/P5Sketch"
 import { Exercise } from "immerse/components/Exercise"
 import Overview from "./overview.mdx"
