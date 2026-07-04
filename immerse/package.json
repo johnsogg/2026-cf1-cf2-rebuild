@@ -5,6 +5,7 @@
   "peerDependencies": {
     "@mdx-js/react": "^3",
     "@monaco-editor/react": "^4",
+    "highlight.js": "^11",
     "react": "^19",
     "react-dom": "^19",
     "react-router-dom": "^7"
