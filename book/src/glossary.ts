@@ -13,4 +13,12 @@ export const glossaryEntries: GlossaryEntry[] = [
     term: ["variable", "variables"],
     definition: `A named container that holds a value. Despite the name, not all variables are allowed to change. Variables declared with "let" can be re-assigned; variables declared with "const" can not.`,
   },
+  {
+    term: ["string"],
+    definition: `A sequence of characters (letters, numbers, symbols, emoji). Example: "I love pie!!1! 🥰 🥧`,
+  },
+  {
+    term: ["literal"],
+    definition: `A directly evaluable passage of code such as a number, a string, or an object. Examples: 42, "Jack Johnson", { name: "Jack Johnson", age: 42 }`,
+  },
 ]
