@@ -213,7 +213,7 @@ const AppLayout = ({
     <div className={s.layout}>
       <Tools totalExercises={totalExercises} />
       <TableOfContents />
-      <div ref={contentAreaRef} className={s.contentArea}>
+      <div ref={contentAreaRef} className={s.contentArea} data-content-area>
         {isRoot ? (
           <Overview overview={overview} totalExercises={totalExercises} />
         ) : isGlossary ? (

@@ -81,38 +81,58 @@ export function GlossaryView() {
 
 /**
  * Marks an inline term, e.g. `<Term>recursion</Term>`, that pops up its
- * glossary definition on click. Globally available in book `.mdx` sections,
- * no import needed. Looks up `children` (case-insensitively) against
- * `glossaryEntries` passed to `ImmerseApp`; renders with an obvious "missing"
- * style if no entry matches, as a signal to add one.
+ * glossary definition. Opens transiently on hover (for mouse users) and
+ * pins open on click (for touch devices, and anyone who wants it to stay
+ * put). Globally available in book `.mdx` sections, no import needed.
+ * Looks up `children` (case-insensitively) against `glossaryEntries` passed
+ * to `ImmerseApp`; renders with an obvious "missing" style if no entry
+ * matches, as a signal to add one.
  */
 export function Term({ children }: { children: string }) {
   const ctx = useContext(GlossaryContext)
   const entry = ctx?.lookup(children)
-  const [open, setOpen] = useState(false)
+  const [hovering, setHovering] = useState(false)
+  const [pinned, setPinned] = useState(false)
+  const open = hovering || pinned
   const [placement, setPlacement] = useState<"top" | "bottom">("top")
+  const [offsetX, setOffsetX] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
   const popoverRef = useRef<HTMLSpanElement>(null)
 
   useLayoutEffect(() => {
     if (!open || !popoverRef.current) return
-    const { top } = popoverRef.current.getBoundingClientRect()
-    if (top < 0) setPlacement("bottom")
+    const rect = popoverRef.current.getBoundingClientRect()
+
+    if (rect.top < 0) setPlacement("bottom")
+
+    const bounds =
+      ref.current?.closest<HTMLElement>("[data-content-area]")?.getBoundingClientRect() ??
+      { left: 0, right: window.innerWidth }
+    const PADDING = 8
+    if (rect.left < bounds.left + PADDING) {
+      setOffsetX(bounds.left + PADDING - rect.left)
+    } else if (rect.right > bounds.right - PADDING) {
+      setOffsetX(bounds.right - PADDING - rect.right)
+    }
   }, [open, placement])
 
   useEffect(() => {
     if (!open) {
       setPlacement("top")
-      return
+      setOffsetX(0)
     }
+  }, [open])
+
+  useEffect(() => {
+    if (!pinned) return
 
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
+        setPinned(false)
       }
     }
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false)
+      if (e.key === "Escape") setPinned(false)
     }
     document.addEventListener("click", handleClick)
     document.addEventListener("keydown", handleKey)
@@ -120,15 +140,23 @@ export function Term({ children }: { children: string }) {
       document.removeEventListener("click", handleClick)
       document.removeEventListener("keydown", handleKey)
     }
-  }, [open])
+  }, [pinned])
 
   if (!ctx || !entry) {
     return <span className={s.termMissing}>{children}</span>
   }
 
   return (
-    <span ref={ref} className={s.termAnchor}>
-      <span className={s.termTrigger} onClick={() => setOpen((o) => !o)}>
+    <span
+      ref={ref}
+      className={s.termAnchor}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
+      <span
+        className={s.termTrigger}
+        onClick={() => setPinned((p) => !p)}
+      >
         {children}
       </span>
       {open && (
@@ -137,6 +165,7 @@ export function Term({ children }: { children: string }) {
           className={
             placement === "top" ? s.termPopoverTop : s.termPopoverBottom
           }
+          style={{ transform: `translateX(calc(-50% + ${offsetX}px))` }}
         >
           <strong className={s.termPopoverTitle}>{entry.term[0]}</strong>
           {entry.definition}
