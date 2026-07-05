@@ -35,6 +35,8 @@ import s from "./CodeAnatomy.module.css"
  * nudge based on what you see (a pasted screenshot of the rendered page is
  * the fastest way to iterate). A common layout: labels in a row above the
  * code line, each `target` pointing down into the token it describes.
+ * `target` may also be an array of points (e.g. both parens of a pair, or
+ * both curly braces) to fan out multiple arrows from one label.
  *
  * Order `labels` in the sequence they should be explained - with
  * `progressive` on, that's also the reveal order (plus a final "all
@@ -52,8 +54,12 @@ export interface CodeAnatomyLabel {
   text: string
   /** Corner of the label block that align hangs off of */
   pos: CodeAnatomyPoint
-  /** Point on the canvas the arrow points to, e.g. a spot inside the code */
-  target: CodeAnatomyPoint
+  /**
+   * Point(s) on the canvas the arrow points to, e.g. a spot inside the code.
+   * Pass an array (e.g. for a pair of parentheses or curly braces) to draw
+   * one arrow per point, all from the same label box.
+   */
+  target: CodeAnatomyPoint | CodeAnatomyPoint[]
   /** Which side of `pos` the text block grows from. Default "left". */
   align?: "left" | "right"
   /** Max width in px before text wraps. Default 240. */
@@ -365,8 +371,13 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
       ctx.strokeStyle = arrowColor
       ctx.fillStyle = arrowColor
       ctx.globalAlpha = current ? 1 : PAST_OPACITY
-      const anchor = anchorTowards(labelBoxes[i], label.target, ARROW_GAP)
-      drawArrow(ctx, anchor, label.target)
+      const targets = Array.isArray(label.target)
+        ? label.target
+        : [label.target]
+      for (const target of targets) {
+        const anchor = anchorTowards(labelBoxes[i], target, ARROW_GAP)
+        drawArrow(ctx, anchor, target)
+      }
     })
     ctx.globalAlpha = 1
   }, [

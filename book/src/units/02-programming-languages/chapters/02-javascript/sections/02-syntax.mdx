@@ -266,4 +266,190 @@ console.log(nickName)
 
 </details>
 
-## Anatomy - Function Declarations
+## Anatomy - Function Definition
+
+We've just covered the anatomy of declaring and setting variables, but we've
+also seen _functions_ so I thought it would be good to take a look at how those
+are defined and used as well.
+
+A function is like a request. It has a name, and you can give detailed
+instructions on what is to be done. It might have side effects. And when it is
+done, it can hand you back some data.
+
+Recall this from earlier:
+
+```p5exercise id="gray-dot" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  fill("#888")
+  circle(75, 75, 45)
+}
+```
+
+The `function setup` and `function draw` parts are involved with defining
+functions (called `setup` and `draw` respectively). We're also _using_ functions
+by _invoking_ them: `createCanvas(150, 150)` is one example.
+
+First, here's the anatomy of a function definition for code that greets somebody
+by name, and says something different based on the time of day. I'm leaving out
+the function body, which would be between the curly braces.
+
+<CodeAnatomy
+  code={{
+    value: "function greet(name, timeOfDay) { }",
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={460}
+  progressive
+  labels={[
+    {
+      name: "function",
+      text: "Keyword starts function definition.",
+      pos: { x: 10, y: 10 },
+      target: { x: 113, y: 250 },
+      maxWidth: 160,
+    },
+    {
+      name: "greet",
+      text: "Function name - your choice, subject to rules.",
+      pos: { x: 190, y: 10 },
+      target: { x: 288, y: 250 },
+      maxWidth: 160,
+    },
+    {
+      name: "Parentheses",
+      text: "Encloses param list. Required even if empty.",
+      pos: { x: 310, y: 340 },
+      target: [
+        { x: 358, y: 310 },
+        { x: 732, y: 310 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: "name",
+      text: "First parameter.",
+      pos: { x: 370, y: 10 },
+      target: { x: 417, y: 250 },
+      maxWidth: 160,
+    },
+    {
+      name: "timeOfDay",
+      text: "Second parameter.",
+      pos: { x: 550, y: 10 },
+      target: { x: 615, y: 250 },
+      maxWidth: 160,
+    },
+    {
+      name: "Curly braces",
+      text: "Encloses code to run when function is used.",
+      pos: { x: 730, y: 10 },
+      target: [
+        { x: 800, y: 250 },
+        { x: 846, y: 250 },
+      ],
+      maxWidth: 160,
+    },
+  ]}
+/>
+
+There's a whole chapter on functions coming up, and we'll get a lot of practice
+in with these things. My point here is that function definitions (and everything
+else you'll code) follow syntactic rules that you have to follow for your code
+to run. But I'm not done with functions yet!
+
+## Anatomy - Function Calls
+
+Now that we've defined a function, how can we use it? You can say we _call_ the
+function, _use_ the function, _invoke_ the function, _execute_ the function, ...
+I am probably forgetting other words as well. We have a lot of synonyms for this
+because we do it all the time, probably because we talk about it so much.
+
+Calling a function just involves naming it, and then putting the arguments
+inside parentheses. That's it:
+
+<CodeAnatomy
+  code={{
+    value: 'greet("Louis", "morning")',
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={460}
+  progressive
+  labels={[
+    {
+      name: "greet",
+      text: "Name of the function to invoke.",
+      pos: { x: 10, y: 10 },
+      target: { x: 78, y: 250 },
+      maxWidth: 260,
+    },
+    {
+      name: "Parentheses",
+      text: "Encloses the arguments. Required, just like in a function definition.",
+      pos: { x: 300, y: 340 },
+      target: [
+        { x: 178, y: 310 },
+        { x: 592, y: 310 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: '"Louis"',
+      text: "Value for the first argument, name.",
+      pos: { x: 330, y: 10 },
+      target: { x: 242, y: 250 },
+      maxWidth: 260,
+    },
+    {
+      name: '"morning"',
+      text: "Value for the second argument, timeOfDay.",
+      pos: { x: 640, y: 10 },
+      target: { x: 475, y: 250 },
+      maxWidth: 260,
+    },
+  ]}
+/>
+
+One thing that sometimes surprises people who are new to this is that the
+parentheses really are needed, even if there's nothing insde them. There's a
+meaningful difference between `sayHello()` and `sayHello` (without parens). The
+version with parentheses will actually call the function; the second version
+without parens simply references the `sayHello` function, without invoking it.
+
+This comes back to the language's dependence on grammar to help it understand
+what your code should do. Unlike other humans or an AI, the Javascript
+environment won't try to make sense of statements that aren't grammatically
+correct.
+
+## Try It - Functions
+
+Speaking of `sayHello`, here's an exercise for you to write that function and
+then call it.
+
+```jsconsole id="syntax-functions"
+// define a function called sayHello with a parameter called name. Make the
+// function body have this: console.log("Hello,", name)
+
+// now invoke that function and pass your name in as the argument
+```
+
+<details>
+<summary>Click to show one possible solution</summary>
+
+```jsconsole id="syntax-functions-sln" solutionTo="syntax-functions"
+function sayHello(name) {
+    console.log("Hello,", name)
+}
+
+sayHello("Gibreel")
+```
+
+</details>
