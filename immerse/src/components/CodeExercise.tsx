@@ -25,6 +25,7 @@ export type CodeExerciseProps = {
   testCode: string
   moduleName: string
   hints?: string[]
+  solutionTo?: string
 }
 
 type TestResult = {

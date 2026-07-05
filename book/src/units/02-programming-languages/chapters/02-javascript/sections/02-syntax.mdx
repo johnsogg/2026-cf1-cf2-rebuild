@@ -31,7 +31,7 @@ versus:
 The first one fits the language's grammatical conventions but the second one
 doesn't. And if you've ever played
 [Mad Libs](https://en.wikipedia.org/wiki/Mad_Libs) you know that even a
-grammatically correct sentence can still be nonsense.
+grammatically correct sentence can still be nonsense. Here's one:
 
 > The NOUN hit the NOUN.
 
@@ -66,7 +66,7 @@ So, it is crucially important that programs fit into the language's grammar.
 We've already seen some Javascript from the previous chapter, maybe we can start
 our sytax discussion with what we've already seen.
 
-### Anatomy: Assignment
+## Anatomy: Assignment
 
 Here is the syntax of an **assignment operation**. Use the nav buttons to
 progress through the panes.
@@ -108,15 +108,162 @@ An expression is just a passage of code that can evaluate to something. In this
 case, the expression `foo = 'hello'` evaluates to the value `'hello'`.
 
 Many expressions have a certain order for doing things, and the above sequence
-follows that order. When you write a line of code, Javascript scans it for clues
+follows that order. When you write a line of code, JavaScript scans it for clues
 about what it should do with it. In this case, it sees
-`<thing on left> <equals sign> <thing on right>`, which matches the syntax for
-an assignment expression.
 
-So the `=` character is doing a lot of work here. Now that JS knows this is an
-assignment, it has to do something with the left and right sides.
+```
+<thing-on-left> <equals-sign> <thing-on-right>
+```
 
-The next step is to _evaluate_ the right hand side. It always does this before
-it does anything with the left hand side. In this case, the right hand side is
-simply `'hello'`, which is also known as a
-<Term>string</Term>&nbsp;<Term>literal</Term>.
+... which matches the syntax for an assignment expression.
+
+**Equals sign.** The `=` character is doing a lot of work here. Now that JS
+knows this is an assignment, it has to do something with the left and right
+sides.
+
+{/* prettier-ignore-start */}
+
+**Expression.** The next step is to _evaluate_ the right hand side. It always
+does this before it does anything with the left hand side. In this case, the
+right hand side is simply `'hello'`, which is also known as a 
+<Term>string</Term>&nbsp;<Term>literal</Term>. We'll soon see that the
+right-hand side can be complicated, but it always resolves down to a single value.
+
+{/* prettier-ignore-end */}
+
+**Variable.** The last step in an assignment is to identify the variable that
+the value will be assigned into. In this case, it is a variable named `foo`. We
+haven't looked at any other kinds of landing spots yet, but they exist (e.g.
+object properties, list elements). After this assignment operation, the variable
+`foo` contains the value `"hello"`.
+
+## Anatomy: Mutable Variable Declaration
+
+We just saw how we can assign to an existing variable. But where do they come
+from? You need to _declare_ them first with a name. If you want to make a
+variable that can change over time, you don't need to give it an initial value.
+Here's how you'd do that.
+
+<CodeAnatomy
+  code={{ value: "let nickName", pos: { x: 231, y: 270 }, fontSize: 48 }}
+  width={800}
+  height={380}
+  progressive
+  labels={[
+    {
+      name: "let",
+      text: "Keyword that means we're introducing a variable name, and it can be changed over time.",
+      pos: { x: 20, y: 10 },
+      target: { x: 273, y: 260 },
+      maxWidth: 230,
+    },
+    {
+      name: "nickName",
+      text: "The name of this variable — the programmer chooses the name, but it must follow rules.",
+      pos: { x: 490, y: 10 },
+      target: { x: 456, y: 260 },
+      maxWidth: 230,
+    },
+  ]}
+/>
+
+After this line of code runs, you have a variable, `nickName`, and it is allowed
+to change.
+
+## Anatomy: Constant Declaration & Initialization
+
+Alternately, if you want to create a variable that _doesn't_ change, use `const`
+instead of `let`, like this:
+
+<CodeAnatomy
+  code={{
+    value: 'const realName = "Margaret"',
+    pos: { x: 22, y: 310 },
+    fontSize: 48,
+  }}
+  width={800}
+  height={380}
+  progressive
+  labels={[
+    {
+      name: "Equals sign",
+      text: "Indicates an assignment operation.",
+      pos: { x: 450, y: 10 },
+      target: { x: 456, y: 300 },
+      maxWidth: 140,
+    },
+    {
+      name: '"Margaret"',
+      text: "String literal to be used as the constant's value.",
+      pos: { x: 610, y: 10 },
+      target: { x: 638, y: 300 },
+      maxWidth: 170,
+    },
+    {
+      name: "const",
+      text: "Keyword that means we're introducing a variable that can't change values afterwards.",
+      pos: { x: 20, y: 10 },
+      target: { x: 92, y: 300 },
+      maxWidth: 260,
+    },
+    {
+      name: "realName",
+      text: "The variable name we've chosen.",
+      pos: { x: 300, y: 10 },
+      target: { x: 302, y: 300 },
+      maxWidth: 130,
+    },
+  ]}
+/>
+
+This combines the ideas from the assignment operation from earlier and the
+variable declaration for `nickName`. But in this case we're both _declaring_ and
+_assigning_ in a single line of code. This is called an _initialzer_. If you're
+making a constant like `realName`, you have to give your variable a value now
+because the language won't let you change it later.
+
+## Try It - Variable Declaration & Assignment
+
+OK, that was a lot. Let's try it out now. Here's an editor that will print out
+values for our variables. But the starter code is broken as it is. You'll need
+to declare and assign the variables for it to work. Try running it without
+changing anything to see what happens. And then see if you can add variable
+declarations using `const` and `let` so it runs. Stretch goal: change the
+nickname between the first time it is printed and the second.
+
+```jsconsole id="syntax-let-const"
+// add declarations here to make the
+// following code work.
+
+console.log("The real name is:")
+console.log(realName)
+console.log("The nickname is:")
+console.log(nickName)
+
+// Change the nickname to something else here
+
+console.log("Now the nickname is:")
+console.log(nickName)
+```
+
+<details>
+<summary>Show one possible solution</summary>
+
+```jsconsole id="syntax-let-const-sln" solutionTo="syntax-let-const"
+const realName = "Richard"
+let nickName = "Rick"
+
+console.log("The real name is:")
+console.log(realName)
+console.log("The nickname is:")
+console.log(nickName)
+
+nickName = "Bogey"
+
+console.log("Now the nickname is:")
+console.log(nickName)
+```
+
+</details>
+
+## Anatomy - Function Declarations

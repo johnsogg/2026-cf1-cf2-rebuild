@@ -11,6 +11,7 @@ export type MultipleChoiceExerciseProps = {
   options: Array<{ text: string; image?: string }>
   correct: number
   hints?: string[]
+  solutionTo?: string
 }
 
 /**

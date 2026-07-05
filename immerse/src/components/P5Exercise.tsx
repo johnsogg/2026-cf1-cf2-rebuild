@@ -105,6 +105,7 @@ export type P5ExerciseProps = {
   size?: "small" | "medium" | "large"
   autorun?: boolean
   hoverInfo?: boolean
+  solutionTo?: string
 }
 
 type TranspilerResponse = {
@@ -128,11 +129,13 @@ type SketchError = {
 export function P5Exercise({
   exercise,
   questionNumber,
+  isSolution,
   attemptState,
   onReset,
 }: {
   exercise: P5ExerciseProps
   questionNumber: number
+  isSolution?: boolean
   attemptState: AttemptState
   onReset: () => void
 }) {
@@ -265,7 +268,11 @@ export function P5Exercise({
       <div className={s.header}>
         <div className={s.questionContainer}>
           <div className={s.attemptIcon}>{stateIcon}</div>
-          <div className={s.question}>{questionNumber}</div>
+          {isSolution ? (
+            <div className={s.solutionLabel}>Solution to {questionNumber}</div>
+          ) : (
+            <div className={s.question}>{questionNumber}</div>
+          )}
         </div>
         <div className={s.toolbar}>
           <IconButton

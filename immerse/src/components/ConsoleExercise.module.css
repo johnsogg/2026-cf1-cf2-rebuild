@@ -23,6 +23,13 @@
   font-weight: 800;
 }
 
+.solutionLabel {
+  font-size: 90%;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
 .attemptIcon {
   display: flex;
   align-items: center;

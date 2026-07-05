@@ -19,6 +19,6 @@ export const glossaryEntries: GlossaryEntry[] = [
   },
   {
     term: ["literal"],
-    definition: `A directly evaluable passage of code such as a number, a string, or an object. Examples: 42, "Rick Blaine", { name: "Richard Blaine", age: 37 }`,
+    definition: `A directly evaluable passage of code such as a number, a string, or an object. Examples: 37, "Rick Blaine", { name: "Richard Blaine", age: 37 }`,
   },
 ]

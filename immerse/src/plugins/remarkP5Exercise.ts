@@ -7,12 +7,14 @@ function parseMeta(meta: string | null | undefined) {
   const titleMatch = str.match(/\btitle="([^"]*)"/)
   const sizeMatch = str.match(/\bsize="([^"]*)"/)
   const hoverInfoMatch = str.match(/\bhoverInfo="([^"]*)"/)
+  const solutionToMatch = str.match(/\bsolutionTo="([^"]*)"/)
   return {
     id: idMatch?.[1],
     title: titleMatch?.[1],
     size: sizeMatch?.[1] as "small" | "medium" | "large" | undefined,
     autorun: /\bautorun\b/.test(str),
     hoverInfo: hoverInfoMatch ? hoverInfoMatch[1] !== "false" : undefined,
+    solutionTo: solutionToMatch?.[1],
   }
 }
 
@@ -40,7 +42,7 @@ function makeBoolProp(name: string, value = true) {
   }
 }
 
-function makeExerciseAttr(id: string, initialCode: string, title?: string, size?: string, autorun?: boolean, hoverInfo?: boolean) {
+function makeExerciseAttr(id: string, initialCode: string, title?: string, size?: string, autorun?: boolean, hoverInfo?: boolean, solutionTo?: string) {
   const properties = [
     makeStringProp("type", "p5"),
     makeStringProp("id", id),
@@ -48,6 +50,7 @@ function makeExerciseAttr(id: string, initialCode: string, title?: string, size?
     ...(size != null ? [makeStringProp("size", size)] : []),
     ...(autorun ? [makeBoolProp("autorun")] : []),
     ...(hoverInfo != null ? [makeBoolProp("hoverInfo", hoverInfo)] : []),
+    ...(solutionTo != null ? [makeStringProp("solutionTo", solutionTo)] : []),
     makeStringProp("initialCode", initialCode),
   ]
 
@@ -81,14 +84,14 @@ export function remarkP5Exercise() {
     visit(tree, "code", (node: Code, index: number | undefined, parent: Parent | undefined) => {
       if (node.lang !== "p5exercise" || !parent || index == null) return
 
-      const { id, title, size, autorun, hoverInfo } = parseMeta(node.meta)
+      const { id, title, size, autorun, hoverInfo, solutionTo } = parseMeta(node.meta)
       if (!id) {
         console.warn("[remarkP5Exercise] missing required id= attribute, skipping fence")
         return
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const attributes: any[] = [makeExerciseAttr(id, node.value, title, size, autorun, hoverInfo)]
+      const attributes: any[] = [makeExerciseAttr(id, node.value, title, size, autorun, hoverInfo, solutionTo)]
 
       parent.children.splice(index, 1, {
         type: "mdxJsxFlowElement",

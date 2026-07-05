@@ -70,16 +70,19 @@ export function Exercise({
   questionNumber?: number
 }) {
   const getNumber = useContext(ExerciseNumberContext)
-  const resolvedNumber = questionNumber ?? getNumber(exercise.id)
+  const { id, hints, type, solutionTo } = exercise
+  const isSolution = solutionTo != null
+  const resolvedNumber =
+    questionNumber ?? getNumber(isSolution ? solutionTo : id)
 
-  const { id, hints, type } = exercise
   const { registerExerciseInSection, notifyExerciseChange } = useProgress()
   const { currentSection } = useNav()
   const sectionPath = useRef(currentSection.urlPath)
 
   useEffect(() => {
+    if (isSolution) return
     registerExerciseInSection(id, sectionPath.current)
-  }, [id, registerExerciseInSection])
+  }, [id, registerExerciseInSection, isSolution])
 
   const [resetKey, setResetKey] = useState(0)
   const [attemptState, setAttemptState] = useState<AttemptState>(
@@ -133,6 +136,7 @@ export function Exercise({
       {exercise.type !== "p5" && exercise.type !== "console" && (
         <ExerciseHeader
           questionNumber={resolvedNumber}
+          isSolution={isSolution}
           attemptState={attemptState}
           onReset={handleReset}
         />
@@ -142,6 +146,7 @@ export function Exercise({
         exercise={exercise}
         resetKey={resetKey}
         questionNumber={resolvedNumber}
+        isSolution={isSolution}
         attemptState={attemptState}
         onReset={handleReset}
         onAttempt={handleAttempt}
@@ -160,11 +165,13 @@ export type AttemptState = "idle" | "attempted" | "complete"
 
 type ExerciseHeaderProps = {
   questionNumber: number
+  isSolution?: boolean
   attemptState: AttemptState
   onReset: VoidFunction
 }
 const ExerciseHeader = ({
   questionNumber,
+  isSolution,
   attemptState,
   onReset,
 }: ExerciseHeaderProps) => {
@@ -177,7 +184,11 @@ const ExerciseHeader = ({
     <div className={s.header}>
       <div className={s.questionContainer}>
         <div className={s.attemptIcon}>{stateIcon}</div>
-        <div className={s.question}>{questionNumber}</div>
+        {isSolution ? (
+          <div className={s.solutionLabel}>Solution to {questionNumber}</div>
+        ) : (
+          <div className={s.question}>{questionNumber}</div>
+        )}
       </div>
       <IconButton onClick={onReset} aria-label="Reset">
         <SvgIcon name="refresh" size={18} intent="muted" />
@@ -197,6 +208,7 @@ type ExerciseContentProps = {
   exercise: Exercise
   resetKey: number
   questionNumber: number
+  isSolution?: boolean
   attemptState: AttemptState
   onReset: VoidFunction
   onAttempt: VoidFunction
@@ -206,6 +218,7 @@ const ExerciseContent = ({
   exercise,
   resetKey,
   questionNumber,
+  isSolution,
   attemptState,
   onReset,
   onAttempt,
@@ -236,6 +249,7 @@ const ExerciseContent = ({
           key={resetKey}
           exercise={exercise}
           questionNumber={questionNumber}
+          isSolution={isSolution}
           attemptState={attemptState}
           onReset={onReset}
         />
@@ -246,6 +260,7 @@ const ExerciseContent = ({
           key={resetKey}
           exercise={exercise}
           questionNumber={questionNumber}
+          isSolution={isSolution}
           attemptState={attemptState}
           onReset={onReset}
         />

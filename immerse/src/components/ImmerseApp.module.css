@@ -1,7 +1,8 @@
 .lesson {
+  --gutter: 4rem;
   display: grid;
   grid-template-columns:
-    [full-start] 4rem
+    [full-start] var(--gutter)
     [content-start] min(832px, calc(100% - 8rem))
     [content-end] 1fr
     [full-end];
@@ -9,6 +10,23 @@
 
 :where(.lesson) > * {
   grid-column: content;
+}
+
+/*
+ * <details> (e.g. a collapsed solution) gets the full grid column as an
+ * ordinary block box — its children (summary, exercise) then get full
+ * width for free via normal block flow, so nested exercises can still
+ * match a top-level exercise's width. We can't rely on CSS tricks like
+ * `display: contents` to "unwrap" <details> for grid placement purposes:
+ * Chrome renders <details>/<summary> through an internal UA shadow root,
+ * which doesn't reliably participate as flattened grid items.
+ */
+:where(.lesson) > details {
+  grid-column: full;
+}
+
+:where(.lesson) > details > summary {
+  padding-left: var(--gutter);
 }
 
 .lesson h1 {
@@ -80,9 +98,10 @@
   }
 
   .lesson {
+    --gutter: 1rem;
     padding-top: 56px;
     grid-template-columns:
-      [full-start] 1rem
+      [full-start] var(--gutter)
       [content-start] 1fr
       [content-end] 1rem
       [full-end];

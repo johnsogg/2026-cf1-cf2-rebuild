@@ -22,6 +22,7 @@ export type ConsoleExerciseProps = {
   size?: "small" | "medium" | "large"
   autorun?: boolean
   hoverInfo?: boolean
+  solutionTo?: string
 }
 
 type WorkerResponse =
@@ -41,11 +42,13 @@ type RunError = {
 export function ConsoleExercise({
   exercise,
   questionNumber,
+  isSolution,
   attemptState,
   onReset,
 }: {
   exercise: ConsoleExerciseProps
   questionNumber: number
+  isSolution?: boolean
   attemptState: AttemptState
   onReset: () => void
 }) {
@@ -148,7 +151,11 @@ export function ConsoleExercise({
       <div className={s.header}>
         <div className={s.questionContainer}>
           <div className={s.attemptIcon}>{stateIcon}</div>
-          <div className={s.question}>{questionNumber}</div>
+          {isSolution ? (
+            <div className={s.solutionLabel}>Solution to {questionNumber}</div>
+          ) : (
+            <div className={s.question}>{questionNumber}</div>
+          )}
         </div>
         <div className={s.toolbar}>
           <IconButton
