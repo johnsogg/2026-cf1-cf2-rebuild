@@ -156,6 +156,7 @@ const AppLayout = ({
   const scrollPositions = useRef<Map<string, number>>(new Map())
   const currentPathRef = useRef(currentSection.urlPath)
   currentPathRef.current = currentSection.urlPath
+  const lastHashRef = useRef<string | null>(null)
 
   const isRoot = location.pathname === "/"
   const isGlossary = location.pathname === "/glossary"
@@ -176,6 +177,7 @@ const AppLayout = ({
     const el = contentAreaRef.current
     if (!el) return
     const urlPath = currentSection.urlPath
+    lastHashRef.current = window.location.hash.slice(1) || null
     const handleScroll = () => {
       scrollPositions.current.set(urlPath, el.scrollTop)
       const scrollDepth = el.scrollTop / (el.scrollHeight - el.clientHeight)
@@ -188,6 +190,27 @@ const AppLayout = ({
         })
         notifyExerciseChange()
       }
+
+      // Scrollspy: keep the URL fragment pointed at whichever heading is
+      // currently at the top of the content area. This uses raw history
+      // (not react-router navigation) so it doesn't trigger a re-render or
+      // add history entries — its only job is making sure a dev-server full
+      // reload on save lands back where you were instead of at the top.
+      const headings = el.querySelectorAll<HTMLElement>("h2[id], h3[id]")
+      const containerTop = el.getBoundingClientRect().top
+      let current: string | null = null
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top - containerTop <= 96) {
+          current = heading.id
+        } else {
+          break
+        }
+      }
+      if (current !== lastHashRef.current) {
+        lastHashRef.current = current
+        const url = `${window.location.pathname}${window.location.search}${current ? `#${current}` : ""}`
+        window.history.replaceState(null, "", url)
+      }
     }
     el.addEventListener("scroll", handleScroll, { passive: true })
     return () => el.removeEventListener("scroll", handleScroll)
@@ -196,7 +219,15 @@ const AppLayout = ({
   const handleSectionLoaded = useCallback(() => {
     const el = contentAreaRef.current
     if (!el) return
-    el.scrollTop = scrollPositions.current.get(currentPathRef.current) ?? 0
+    const hash = window.location.hash.slice(1)
+    const target = hash
+      ? el.querySelector<HTMLElement>(`#${CSS.escape(hash)}`)
+      : null
+    if (target) {
+      target.scrollIntoView({ block: "start" })
+    } else {
+      el.scrollTop = scrollPositions.current.get(currentPathRef.current) ?? 0
+    }
     // Auto-mark short sections (no scrollable content) as read
     if (el.scrollHeight <= el.clientHeight) {
       const urlPath = currentPathRef.current

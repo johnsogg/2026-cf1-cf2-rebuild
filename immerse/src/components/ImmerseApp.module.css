@@ -39,6 +39,11 @@
   margin-top: 2.5rem;
 }
 
+.lesson h2[id],
+.lesson h3[id] {
+  scroll-margin-top: 1.5rem;
+}
+
 .lesson p {
   margin: 0.4rem 0;
 }
