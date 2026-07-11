@@ -1,0 +1,30 @@
+{
+  "p5exercise block": {
+    "scope": "mdx",
+    "prefix": "p5exercise",
+    "body": [
+      "```p5exercise id=\"${1:exercise-id}\" autorun size=\"${2|small,medium,large|}\"",
+      "function setup() {",
+      "  createCanvas(150, 150)",
+      "}",
+      "",
+      "function draw() {",
+      "  background(\"black\")",
+      "}",
+      "```",
+      "$0"
+    ],
+    "description": "Insert a p5exercise code fence with basic setup/draw"
+  },
+  "jsconsole block": {
+    "scope": "mdx",
+    "prefix": "jsconsole",
+    "body": [
+      "```jsconsole id=\"${1:exercise-id}\" size=\"${2|small,medium,large|}\"",
+      "console.log(\"Hello, World!\")",
+      "```",
+      "$0"
+    ],
+    "description": "Insert a jsconsole code fence"
+  }
+}
