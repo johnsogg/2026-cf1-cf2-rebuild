@@ -568,9 +568,13 @@ or `else if` parts found a match.
 
 (Get it? That header is a pun.)
 
+### Reading `if`fy code
+
 Read the code below, and convince yourself that you understand what it is doing.
 What are `mouseX` and `mouseY`? Can you get the last clause (purple) to trigger?
-What would you need to do to the code to get it to trigger?
+What would you need to do to the code to get it to trigger? Try playing around
+with some of the numbers and see how the running code responds. Remember, it
+does not immediately pick up your changes, you have to re-start it.
 
 ```p5exercise id="if-try-it" autorun size="medium"
 function setup() {
@@ -593,3 +597,90 @@ function draw() {
   }
 }
 ```
+
+### What do you see?
+
+Here's a p5sketch without the code. _What do you see?_
+
+Try to reverse engineer what this code does by playing with it. You'll only need
+your mouse cursor, eyes, and your brain. Here's a hint: you're comparing _two_
+variables that appear in the program above.
+
+```p5sketch autoplay width=250 height=250
+function setup() {
+  createCanvas(250, 250)
+}
+
+function draw() {
+  if (mouseX < mouseY) {
+    background("yellow")
+  } else {
+    background("darkGreen")
+  }
+}
+```
+
+Could you figure it out? Once you're ready, use this empty editor to try to
+replicate what you see above. Like most (all?) worthwhile endeavors, there's
+more than one way to approach this.
+
+```p5exercise id="if-what-you-see" autoplay width=250 height=250
+function setup() {
+  createCanvas(250, 250)
+}
+
+function draw() {
+  // replace following line with your magic
+  background("black")
+}
+```
+
+### English to Code
+
+Write a p5 sketch that examines the `mouseX` and `mouseY` variables. The canvas
+should be 150 x 150 pixels in size. Its color corresponds to the mouse pointer
+location.
+
+- Upper left: blue
+- Mid left: gray
+- Lower left: blue
+- Upper center: red
+- Center: purple
+- Lower center: red
+- Upper right: gray
+- Mid right: blue
+- Lower center: gray
+- If the mouse isn't in any of these cells, make it pink.
+
+Note that the pink background indicates an error state - if you see it,
+something is wrong.
+
+<details>
+<summary>Show one possible solution</summary>
+
+```p5exercise id="exercise-id-sln" autorun size="medium" solutionTo="exercise-id"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  const x = mouseX
+  const y = mouseY
+  if (x < 50 && y < 50) { background("blue") }
+  else if (x < 50 && y < 100) { background("gray") }
+  else if (x < 50 && y <= 150) { background("blue") }
+  else if (x < 100 && y < 50) { background("red") }
+  else if (x < 100 && y < 100) { background("purple") }
+  else if (x < 100 && y <= 150) { background("red") }
+  else if (x < 150 && y < 50) { background("gray") }
+  else if (x < 150 && y < 100) { background("blue") }
+  else if (x < 150 && y <= 150) { background("gray") }
+  else { background("pink")}
+}
+```
+
+</details>
+
+In the coming sections you'll use conditional expressions often. If you don't
+fully get it right now, press on anyway. It might make more sense when you see
+conditional logic done in context of data-driven interactivity.

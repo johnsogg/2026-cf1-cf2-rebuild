@@ -16,6 +16,45 @@
     ],
     "description": "Insert a p5exercise code fence with basic setup/draw"
   },
+  "p5sketch block": {
+    "scope": "mdx",
+    "prefix": "p5sketch",
+    "body": [
+      "```p5sketch autoplay width=${1:150} height=${2:150}",
+      "function setup() {",
+      "  createCanvas(${1:150}, ${2:150})",
+      "}",
+      "",
+      "function draw() {",
+      "  background(\"black\")",
+      "}",
+      "```",
+      "$0"
+    ],
+    "description": "Insert a p5sketch code fence with basic setup/draw"
+  },
+  "solution block": {
+    "scope": "mdx",
+    "prefix": "solution",
+    "body": [
+      "<details>",
+      "<summary>${1:Show one possible solution}</summary>",
+      "",
+      "```p5exercise id=\"${2:exercise-id}-sln\" autorun size=\"${3|small,medium,large|}\" solutionTo=\"${2:exercise-id}\"",
+      "function setup() {",
+      "  createCanvas(150, 150)",
+      "}",
+      "",
+      "function draw() {",
+      "  background(\"black\")",
+      "}",
+      "```",
+      "",
+      "</details>",
+      "$0"
+    ],
+    "description": "Insert a <details>/<summary> block containing a non-graded p5exercise solution"
+  },
   "jsconsole block": {
     "scope": "mdx",
     "prefix": "jsconsole",
