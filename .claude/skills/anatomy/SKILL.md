@@ -24,21 +24,29 @@ canvas, refined by eye. Four calibrated, working examples already live in
 2. Determine whether this is a **new** diagram or an **edit** to an existing
    `<CodeAnatomy>` block already in that file (e.g. "fix the overlap",
    "move X"). For edits, read the existing block in full before changing it.
-3. Pick a **single-line** code snippet. The canvas draws `code.value` as one
-   unbroken line — it does not interpret newlines. Flatten multi-line
-   constructs (e.g. an empty-body function as
-   `function greet(name, timeOfDay) { }`, not a multi-line body).
+3. Prefer a **single-line** code snippet when it stays readable — flatten
+   trivial multi-line constructs (e.g. an empty-body function as
+   `function greet(name, timeOfDay) { }`, not a multi-line body). If the
+   snippet is genuinely hard to read on one line (long `if/else`, a
+   multi-statement body), put `\n` in `code.value` to break it across lines
+   instead of cramming it onto one — the component supports this: each line
+   starts at `code.pos.x` (so leading spaces indent it) and stacks downward
+   at `fontSize * 1.35` px apart (override via `code.lineHeight`).
 4. Compute pixel coordinates using the calibration derived from the four
    existing diagrams:
    - Monospace char width ≈ `fontSize × 0.5833` (fontSize 48 → 28px char
      width; fontSize 40 → 23.33px — both measured against real rendered
      output in this file).
-   - A token's horizontal center: `code.pos.x + (startIndex + length/2) × charWidth`.
-     For a single character: `code.pos.x + (index + 0.5) × charWidth`.
+   - A token's horizontal center: `code.pos.x + (startIndex + length/2) × charWidth`,
+     where `startIndex`/`length` are measured within that token's own line
+     (each line's index starts back at 0).
+   - A label's target `y` for line N (0-indexed): `code.pos.y + N × lineHeight`
+     (`lineHeight` = `code.lineHeight` or `fontSize * 1.35`), then apply the
+     above/below offset below relative to that line's `y`.
    - Arrow target for a label sitting **above** the code line:
-     `target.y = code.pos.y - 10`.
+     `target.y = <that line's y> - 10`.
    - Arrow target for a label sitting **below** the code line:
-     `target.y = code.pos.y + fontSize + 10`.
+     `target.y = <that line's y> + fontSize + 10`.
 5. Lay out labels in a row at `pos.y: 10`, spaced evenly across `width`, with
    each `maxWidth` roughly `width / labelCount` minus a small gutter so
    adjacent label text blocks don't collide horizontally.

@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react"
 import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
 import rehypeSlug from "rehype-slug"
+import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import { fileURLToPath } from "node:url"
 import { copyFileSync } from "node:fs"
 import { exerciseCountPlugin } from "./src/plugins/exerciseCountPlugin"
@@ -38,7 +39,19 @@ export default defineConfig(({ command }) => ({
       enforce: "pre",
       ...mdx({
         remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch, remarkP5Exercise, remarkJsConsole],
-        rehypePlugins: [rehypeSlug, rehypeHighlight],
+        rehypePlugins: [
+          rehypeSlug,
+          [
+            rehypeAutolinkHeadings,
+            {
+              behavior: "append",
+              test: ["h2", "h3"],
+              properties: { className: ["heading-anchor"], ariaLabel: "Link to this section" },
+              content: { type: "text", value: "#" },
+            },
+          ],
+          rehypeHighlight,
+        ],
         providerImportSource: "@mdx-js/react",
       }),
     },
