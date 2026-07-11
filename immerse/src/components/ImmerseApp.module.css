@@ -44,6 +44,25 @@
   scroll-margin-top: 1.5rem;
 }
 
+.lesson h2 :global(.heading-anchor),
+.lesson h3 :global(.heading-anchor) {
+  margin-left: 0.5rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.lesson h2:hover :global(.heading-anchor),
+.lesson h3:hover :global(.heading-anchor),
+.lesson :global(.heading-anchor):focus {
+  opacity: 1;
+}
+
+.lesson :global(.heading-anchor):hover {
+  color: var(--accent);
+}
+
 .lesson p {
   margin: 0.4rem 0;
 }

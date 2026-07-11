@@ -1,16 +1,595 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+
 export const title = "Conditionals"
 
-_This section is a placeholder._
+# Choice!
 
-{/*
-  Teaching the program to make decisions. Goals:
-    - if / else if / else syntax
-    - Boolean expressions: comparison operators (===, !==, <, >, <=, >=)
-    - Logical operators: && (and), || (or), ! (not)
-    - Nested conditionals
-    - Common patterns: checking if something is inside a region, toggling a
-      flag on/off, choosing between behaviors based on state
-  Practical context: making things happen when the mouse is in a certain area,
-  changing color/shape based on a condition, responding differently to different
-  keys. Pairs naturally with the interactivity section.
-*/}
+The world constantly presents us with choices where we have to decide what
+course of action to take, what answer to provide, which process to follow, or if
+you should do a thing at all.
+
+> Really cancel your subscription?
+>
+> What would you like for dinner?
+>
+> Take the
+> [red pill, or the blue pill](https://en.wikipedia.org/wiki/Red_pill_and_blue_pill)?
+>
+> Sign your name on the dotted line...
+
+Conditional execution is one of the most fundamental things that software
+supports. Given some data - a button press, a weather report, data from a
+sensor, a text message... code can determine what to do. Sometimes it is either
+"do the thing or don't". Sometimes it is "do this thing, or this other thing".
+Sometimes, there's a hundred things you could do.
+
+Before we can introduce conditionals, we need to first get a handle on boolean
+expressions.
+
+## Boolean Expressions
+
+Values that can only be true or false are called
+[Boolean Expressions](https://en.wikipedia.org/wiki/Boolean_expression), after
+George Boole.
+
+<Callout intent="note">
+  George Boole was a 19th century mathematician who studied logic, and just
+  about every programming language I know of names true/false variables after
+  him. You can also call them _binary_ values. _Aside: he wrote a book called
+  [The Laws of Thought](https://en.wikipedia.org/wiki/The_Laws_of_Thought), so
+  before you think anything, be sure to read that to be sure it is okay._
+</Callout>
+
+An _expression_ just code that resolves down to a value. You've been doing this
+since elementary school. Here are some arithmetic expressions:
+
+|                       |                                |
+| --------------------: | ------------------------------ |
+|      Simple addition: | &nbsp; `2 + 2`                 |
+|   Get average number: | &nbsp; `(8.5 + 6.4 + 9.9) / 3` |
+| Use variables like x: | &nbsp; `4 * x + 9`             |
+
+A boolean expression is just an expression that gives you a truth value. With
+arithmetic we use operations like plus, minus, multiply and divide; with boolean
+expressions, we have `and`, `or`, and `not` and a few others.
+
+Here are the truth tables for the boolean operations we'll work with. Given one
+or two inputs, a boolean operation results in a single output value. They help
+you express ideas like "is today Saturday after 5pm but before 11pm?", or "is
+the user pressing the mouse over the red circle?".
+
+export const ttCell = {
+  border: "1px solid var(--border)",
+  padding: "0.4rem 0.9rem",
+  textAlign: "center",
+}
+
+export const ttHeader = {
+  ...ttCell,
+  background: "var(--code-bg)",
+  fontWeight: 600,
+}
+
+export const ttCaption = {
+  captionSide: "top",
+  fontWeight: 600,
+  marginBottom: "0.4rem",
+}
+
+<div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "2.5rem",
+    justifyContent: "center",
+    margin: "2rem 0",
+  }}
+>
+  <table style={{ borderCollapse: "collapse" }}>
+    <caption style={ttCaption}>AND</caption>
+    <thead>
+      <tr>
+        <th style={ttHeader}>`A`</th>
+        <th style={ttHeader}>`B`</th>
+        <th style={ttHeader}>`A && B`</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style={ttCell}><code>false</code></td>
+        <td style={ttCell}><code>false</code></td>
+        <td style={ttCell}><code>false</code></td>
+      </tr>
+      <tr>
+        <td style={ttCell}><code>false</code></td>
+        <td style={ttCell}><code>true</code></td>
+        <td style={ttCell}><code>false</code></td>
+      </tr>
+      <tr>
+        <td style={ttCell}><code>true</code></td>
+        <td style={ttCell}><code>false</code></td>
+        <td style={ttCell}><code>false</code></td>
+      </tr>
+      <tr>
+        <td style={ttCell}><code>true</code></td>
+        <td style={ttCell}><code>true</code></td>
+        <td style={ttCell}><code>true</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+<table style={{ borderCollapse: "collapse" }}>
+  <caption style={ttCaption}>OR</caption>
+  <thead>
+    <tr>
+      <th style={ttHeader}>`A`</th>
+      <th style={ttHeader}>`B`</th>
+      <th style={ttHeader}>`A || B`</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style={ttCell}>
+        <code>false</code>
+      </td>
+      <td style={ttCell}>
+        <code>false</code>
+      </td>
+      <td style={ttCell}>
+        <code>false</code>
+      </td>
+    </tr>
+    <tr>
+      <td style={ttCell}>
+        <code>false</code>
+      </td>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+    </tr>
+    <tr>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+      <td style={ttCell}>
+        <code>false</code>
+      </td>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+    </tr>
+    <tr>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+      <td style={ttCell}>
+        <code>true</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <table style={{ borderCollapse: "collapse" }}>
+    <caption style={ttCaption}>NOT</caption>
+    <thead>
+      <tr>
+        <th style={ttHeader}>`A`</th>
+        <th style={ttHeader}>`!A`</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style={ttCell}><code>false</code></td>
+        <td style={ttCell}><code>true</code></td>
+      </tr>
+      <tr>
+        <td style={ttCell}><code>true</code></td>
+        <td style={ttCell}><code>false</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+The Javascript syntax for these operations is also at the top of the output
+column. If the variables are called `A` and `B`, then we write the AND operation
+as `A && B`. That's two ampersands. As you can see from the AND table, it is
+only true if both arguments are true.
+
+In the OR table, you see `A || B` as the JS syntax. That's written with two
+"pipe" symbols (maybe above the enter key on your keyboard). For an OR
+expression to be true, either or both of the inputs must be true. The only time
+an OR statement is false is when both of the inputs are false.
+
+The NOT table looks a bit different because this only takes a single variable,
+`!A`, written with an exclamation point. This is pronounced "not A", just
+inverts the value. You give it true, it gives you false. You give it false, it
+gives you true.
+
+It can be "fun" to translate English statements into boolean logic:
+
+"If the stoplight is green, or if there are no cops around, and I am late, then
+drive fast". (Does not constitute legal advice.)
+
+```js
+if (stoplightIsGreen || (!cops && late)) {
+  driveFast()
+}
+```
+
+### Comparison Operators
+
+We'll have data of many different sorts - numbers, text, booleans, and compound
+types like lists and objects. We can use operators to compare data. "Are these
+the same?", or "Is this greater than that". Comparisons like this are boolean
+expressions, because they result in true/false values. And then you can use them
+in conditional logic. Here's one:
+
+```js
+if (stoplight === "green") {
+  keepDriving()
+}
+```
+
+Here's a rundown of the comparisons to know about:
+
+|           |                                      |
+| --------- | ------------------------------------ |
+| `A === B` | Are `A` and `B` one in the same?     |
+| `A !== B` | Are `A` and `B` not the same?        |
+| `A == B`  | Do `A` and `B` have the same value?  |
+| `A != B`  | Do `A` and `B` have different values |
+| `A > B`   | Is `A` strictly greater than `B`?    |
+| `A >= B`  | Is `A` greater than or equal to `B`? |
+| `A < B`   | Is `A` strictly less than `B`?       |
+| `A <= B`  | Is `A` less than or equal to `B`?    |
+
+If you've never looked at code before the punctuation might look a little weird.
+Instead of `≥` as one cool looking symbol, we write it as `>=` with two
+characters.
+
+You can chain several expressions together. This one reads like natural
+language, no?
+
+```js
+const getGas = fuel < 0.25 || (gasIsCheap && iHaveTime) || today === "Saturday"
+```
+
+It means we'll get gas if we have less than a quarter tank, or if gas is cheap
+and there's time, or if today is Saturday.
+
+Now that we've got the basic machinery down for working with boolean
+expressions, let's use it to give our code the ability to do this or that
+depending on data.
+
+## `if` statements
+
+The most basic form of a <Term>conditional statement</Term> is the `if`
+statement. If some condition is true, run some code. If that condition _isn't_
+true, take no action. We'll directly use the boolean expressions and operators
+we saw above.
+
+How about some anatomy?
+
+<CodeAnatomy
+  code={{
+    value: "if (something) { /* code */ }",
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={460}
+  progressive
+  labels={[
+    {
+      name: "if",
+      text: "Keyword indicating the start of an if statement.",
+      pos: { x: 10, y: 10 },
+      target: { x: 43, y: 250 },
+      maxWidth: 260,
+    },
+    {
+      name: "Parentheses",
+      text: "Punctuation to enclose the condition.",
+      pos: { x: 140, y: 340 },
+      target: [
+        { x: 122, y: 310 },
+        { x: 345, y: 310 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: "something",
+      text: "Boolean expression to evaluate to either true or false.",
+      pos: { x: 320, y: 10 },
+      target: { x: 218, y: 250 },
+      maxWidth: 260,
+    },
+    {
+      name: "Curly braces",
+      text: "Punctuation to enclose the code to run if true.",
+      pos: { x: 460, y: 340 },
+      target: [
+        { x: 412, y: 310 },
+        { x: 705, y: 310 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: "code",
+      text: "Code that runs only if the condition is true.",
+      pos: { x: 620, y: 10 },
+      target: { x: 533, y: 250 },
+      maxWidth: 260,
+    },
+  ]}
+/>
+
+Like most code structures, an `if` statement starts with a keyword, cleverly
+written `if`. This means that the program with consider running some code, or
+not. It decides this by evaluating whatever is inside the parentheses. Here, I'm
+writing `something`, which is a stand-in for anything that can be evaluated. For
+now, just know that this is something that has a truth value: it can be _true_
+or _false_.
+
+If that `something` turns out to be true when it runs this statement, then it
+will look at the code inside the curly braces.
+
+<Callout intent="note">
+  If you only have a single statement to run, you can omit the curly braces.
+  This can make code arguably more aesthetically pleasing. But be aware that
+  omitting curlies can lead to subtle bugs in case you come back later and add
+  more code and forget to add the curlies. I recommend using them all the time.
+</Callout>
+
+Use this to get a little practice.
+
+```p5exercise id="if-stmt-1" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  const feelingBlue = false; // or true
+  background("green")
+  if (feelingBlue) {
+    background("blue")
+  }
+}
+```
+
+This code uses a variable, `feelingBlue`, that determines if the conditional
+statement's code is going to run or not. It starts off as `false`, but you can
+change it to `true`. This is simple code, but can you characterize in plain
+language what it is doing?
+
+In the `draw` function, it establishes `feelingBlue` to a value - my code sets
+it to `false` but you can change it to `true`. On the next line, the
+`background("green")` line does what you'd expect - it changes the background
+color to `"green"`. If you would somehow pause the program at that point, you'd
+see a green background.
+
+The next line has `if (feelingBlue)`. Inside the parentheses we have an
+expression that will be tested for being true or false. If it evaluates to true,
+then the associated code will run. In this example, that's just a single line:
+`background("blue")`. There could be zero, one, five, or a million lines of code
+inside those curly braces - Javascript will run them only when that expression
+inside the parens is true.
+
+This code also has a pattern that you might want to use yourself - establish
+some default status (a green background), and then later on, adjust that status
+when the conditions are right (setting the background to blue).
+
+```p5exercise id="if-stmt-mousepress" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  if (mouseIsPressed) {
+    background("red")
+  }
+}
+```
+
+This code has exactly the same structure as the green/blue thing above it,
+except now we're using a variable that we didn't define and didn't set
+ourselves. The `mouseIsPressed` variable is something that the p5.js library
+maintains for us. It feels like a bit of magic, but this is a _global_ variable.
+And it records exactly what you'd think: if the mouse is currently being held
+down, it should be `true`. Otherwise it should be `false`.
+
+We'll get to interactivity in the next chapter.
+
+## `if..else` statements
+
+A plain `if` statement will either do something, or not. There's an extended
+form of this that lets you do something, or some other thing - it will do
+exactly one things, rather than one or zero as with the plain `if` statement.
+
+This is called an `if/else` statement, and it looks like this:
+
+<CodeAnatomy
+  code={{
+    value: "if (mouseX < 50) {\n  /* code A */\n} else {\n  /* code B */\n}",
+    pos: { x: 20, y: 310 },
+    fontSize: 40,
+  }}
+  width={920}
+  height={580}
+  progressive
+  labels={[
+    {
+      name: "if, parens, squiggles",
+      text: "Same as a regular `if` statement.",
+      pos: { x: 20, y: 10 },
+      target: [
+        { x: 43, y: 300 },
+        { x: 102, y: 300 },
+        { x: 382, y: 300 },
+        { x: 428, y: 300 },
+      ],
+      maxWidth: 240,
+    },
+    {
+      name: "code A",
+      text: "Runs if mouseX is less than 50.",
+      pos: { x: 480, y: 130 },
+      target: { x: 207, y: 354 },
+      maxWidth: 380,
+    },
+    {
+      name: "else",
+      text: "Keyword indicating the alternative path.",
+      pos: { x: 480, y: 280 },
+      target: { x: 113, y: 408 },
+      maxWidth: 380,
+    },
+    {
+      name: "code B",
+      text: "Runs if mouseX is not less than 50.",
+      pos: { x: 480, y: 430 },
+      target: { x: 350, y: 482 },
+      maxWidth: 380,
+    },
+  ]}
+/>
+
+We're just tacking on `else { /* code */}` to the end of the `if` statement.
+Now, we're guaranteed to run one of these code paths. Not zero, not both, just
+one. And that's determined by the boolean expression in the `if` statement. This
+is useful if you have mutually exclusive things you want to do.
+
+## `if..else if`
+
+It might have occurred to you that you could have several possibilities, and you
+want to do just one of them (or maybe, none of them).
+
+<CodeAnatomy
+  code={{
+    value:
+      "if (mouseX < 50) { /* code A */ }\nelse if (mouseX > 150) { /* code B */ }\nelse if (mouseX > 100) { /* code C */ }",
+    pos: { x: 260, y: 90 },
+    fontSize: 40,
+    lineHeight: 110,
+  }}
+  width={1200}
+  height={420}
+  progressive
+  labels={[
+    {
+      name: "if",
+      text: "If statement with code path A.",
+      pos: { x: 20, y: 10 },
+      target: { x: 258, y: 110 },
+      maxWidth: 200,
+    },
+    {
+      name: "else if",
+      text: "Else-if statement and path B.",
+      pos: { x: 20, y: 150 },
+      target: { x: 258, y: 220 },
+      maxWidth: 200,
+    },
+    {
+      name: "else if",
+      text: "Another else-if for path C.",
+      pos: { x: 20, y: 270 },
+      target: { x: 258, y: 330 },
+      maxWidth: 200,
+    },
+  ]}
+/>
+
+The program will execute the first code path that it can, _and it won't keep
+looking_. In this example, if the mouse value is 180, it will only run code path
+B, even though the boolean expression for path C also matches. If you want to
+potentially do more than one thing, just make another `if` statement.
+
+Another important thing here is that there's no `else` clause at the end. This
+means that possibly no code path will run, like if `mouseX` is `70`.
+
+## `if..else if..else`
+
+There's one more in this family, and it is used to cover the situation where you
+have a bunch of conditions, and you want to guarantee that _one_ of the code
+paths runs. This is identical to the `if..else if` from above, but you just add
+an `else` clause at the end.
+
+<CodeAnatomy
+  code={{
+    value:
+      "if (mouseX < 50) { /* code A */ }\nelse if (mouseX > 150) { /* code B */ }\nelse { /* code C */ }",
+    pos: { x: 260, y: 90 },
+    fontSize: 40,
+    lineHeight: 110,
+  }}
+  width={1200}
+  height={420}
+  progressive
+  labels={[
+    {
+      name: "if",
+      text: "If statement with code path A.",
+      pos: { x: 20, y: 10 },
+      target: { x: 258, y: 110 },
+      maxWidth: 200,
+    },
+    {
+      name: "else if",
+      text: "Else-if statement and path B.",
+      pos: { x: 20, y: 150 },
+      target: { x: 258, y: 220 },
+      maxWidth: 200,
+    },
+    {
+      name: "else",
+      text: "Fallback: path C.",
+      pos: { x: 20, y: 270 },
+      target: { x: 258, y: 330 },
+      maxWidth: 200,
+    },
+  ]}
+/>
+
+You can have as many `else if` clauses as you want, _but they have to appear
+below the initial `if` and above the final `else`_. By providing a trailing
+`else` clause, you're guaranteed that at least one of them will run. The last
+`else` clause becomes the fallback, and is executed if none of the previous `if`
+or `else if` parts found a match.
+
+## Try it `if` you like
+
+(Get it? That header is a pun.)
+
+Read the code below, and convince yourself that you understand what it is doing.
+What are `mouseX` and `mouseY`? Can you get the last clause (purple) to trigger?
+What would you need to do to the code to get it to trigger?
+
+```p5exercise id="if-try-it" autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  if (mouseX < 10) {
+    background("red")
+  } else if (mouseX < 50) {
+    background("green")
+  } else if (mouseX < 100) {
+    background("blue")
+  } else if (mouseY < 75) {
+    background("yellow")
+  } else if (mouseY >= 75) {
+    background("cyan")
+  } else {
+    background("purple")
+  }
+}
+```

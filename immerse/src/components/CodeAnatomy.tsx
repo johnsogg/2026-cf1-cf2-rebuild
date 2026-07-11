@@ -38,6 +38,12 @@ import s from "./CodeAnatomy.module.css"
  * `target` may also be an array of points (e.g. both parens of a pair, or
  * both curly braces) to fan out multiple arrows from one label.
  *
+ * `code.value` may contain `\n` to break the snippet across multiple lines.
+ * Each line starts at `code.pos.x` (so leading spaces indent it) and lines
+ * stack downward at `fontSize * 1.35` px apart, unless overridden with
+ * `code.lineHeight`. Label `target.y` for a later line needs that per-line
+ * offset added by hand, same as every other coordinate here.
+ *
  * Order `labels` in the sequence they should be explained - with
  * `progressive` on, that's also the reveal order (plus a final "all
  * revealed" stage).
@@ -72,6 +78,8 @@ export interface CodeAnatomyProps {
     pos: CodeAnatomyPoint
     language?: string
     fontSize?: number
+    /** Vertical spacing between lines when `value` contains `\n`. Default `fontSize * 1.35`. */
+    lineHeight?: number
   }
   labels: CodeAnatomyLabel[]
   width: number
@@ -303,17 +311,20 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
     ctx.textBaseline = "alphabetic"
     const ascent =
       ctx.measureText("M").actualBoundingBoxAscent || fontSize * 0.8
-    const baselineY = code.pos.y + ascent
+    const lineHeight = code.lineHeight ?? fontSize * 1.35
 
-    let cursorX = code.pos.x
-    for (const run of tokenizeHighlighted(
-      hljs.highlight(code.value, { language }).value,
-    )) {
-      const varName = run.className ? TOKEN_COLOR_VAR[run.className] : null
-      ctx.fillStyle = varName ? cssVar(varName) : hljsFg
-      ctx.fillText(run.text, cursorX, baselineY)
-      cursorX += ctx.measureText(run.text).width
-    }
+    code.value.split("\n").forEach((line, lineIndex) => {
+      const baselineY = code.pos.y + ascent + lineIndex * lineHeight
+      let cursorX = code.pos.x
+      for (const run of tokenizeHighlighted(
+        hljs.highlight(line, { language }).value,
+      )) {
+        const varName = run.className ? TOKEN_COLOR_VAR[run.className] : null
+        ctx.fillStyle = varName ? cssVar(varName) : hljsFg
+        ctx.fillText(run.text, cursorX, baselineY)
+        cursorX += ctx.measureText(run.text).width
+      }
+    })
 
     // ── labels ────────────────────────────────────────────────────────────
     const labelBoxes: Rect[] = visibleLabels.map((label) => {
