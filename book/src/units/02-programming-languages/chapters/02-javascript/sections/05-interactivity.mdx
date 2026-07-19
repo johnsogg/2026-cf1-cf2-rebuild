@@ -1,0 +1,65 @@
+export const title = "Interactivity"
+
+> Making programs respond to the user. The sketch is no longer frozen — it
+> reacts to mouse position, mouse clicks, and keyboard input. Goals:
+>
+> - mouseX / mouseY as live variables
+> - mouseIsPressed, keyIsPressed, key
+> - p5.js event functions: mousePressed(), mouseReleased(), keyPressed()
+> - Understand that draw() running 60 fps is what makes interactivity feel
+>   continuous — the program is constantly re-reading the state of the world
+>
+> The assignment framing is an "interactive still life" — the scene from the
+> prior section that now responds to the user in some meaningful way.
+
+# Interactivity
+
+> at the top I'll show a finished p5 sketch without the code that uses all the
+> examples from below, so students know where this is going and what they'll be
+> able to do. That is TBD as I haven't written the rest yet.
+>
+> Need to understand the p5.js life cycle. Importantly, a render loop is used
+> far and wide and not p5-specific. It calls setup() once at the beginning, and
+> then draw() 60 times per second (or another number, if you change the frame
+> rate)
+
+## Aside: `fill(red, green, blue)`
+
+> The examples below depend on understanding the fill function with different
+> components. Just explain this quickly and note that they'll see an example
+> right away.
+
+## Mouse Position and Canvas Coordinates
+
+> We've already seen mouseX and mouseY, so now the job is to explain what they
+> are for, and the screen geometry the fit into - coordinate system conventions
+
+## Several ways to get input - variables, callbacks, utility functions
+
+> talk about variables like mouseX and mouseY, how p5 sets these values for you,
+> so they are always kept up to date. Also talk about callback functions that
+> you need to define, where p5 will invoke them when some action happens, like
+> mouseClicked(). There are non-callback functions like keyIsDown(str)
+>
+> Worked Example: change the background based on mouse position: X sets red
+> (0--255), Y sets green. Also give a callback for mouseClicked that makes the
+> blue channel switch between 0 and 255.
+
+## p5.js variables
+
+> Now show several more built-in variables that are available.
+>
+> key, keyIsPressed
+>
+> mouseButton, mouseIsPressed, movedX, movedY
+
+## p5.js callbacks
+
+> keyPressed(), keyReleased(), keyTyped()
+>
+> mouseClicked(), doubleClicked(), mousePressed(), mouseReleased(), mouseWheel()
+
+## p5.js utility functions
+
+> Functions that you _call_ in order to do something, like check if a particular
+> key is down (keyIsDown(str))

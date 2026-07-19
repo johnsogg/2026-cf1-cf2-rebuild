@@ -1,0 +1,196 @@
+export const title = "Shapes and Style"
+
+# Shapes and Style
+
+> - bridge from the circle/fill/background calls already used informally to a
+>   full survey of shape + style functions
+> - goal: give students the full vocabulary before interactivity needs it
+
+## The Canvas is a Grid of Pixels
+
+> - coordinate system: origin top-left, x increases right, y increases down
+> - contrast with math-class y-up convention (Callout material: CRT scan order
+>   history)
+> - anchor with the three-circles example below (corners + middle)
+
+```p5exercise id="graphics-coords" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  circle(0, 0, 20) // top-left
+  circle(149, 149, 20) // bottom-right
+  circle(75, 75, 20) // middle
+}
+```
+
+## Shape Functions
+
+> - every shape function takes numbers describing size/position and draws
+>   immediately using whatever style is currently active
+
+### `line`
+
+```js
+line(x1, y1, x2, y2)
+```
+
+```p5exercise id="graphics-line" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  line(10, 10, 140, 140)
+}
+```
+
+### `rect` and `square`
+
+> - x, y is the **top-left corner**, not the center - flag this explicitly, sets
+>   up the contrast with ellipse/circle below
+
+```js
+rect(x, y, width, height)
+square(x, y, size)
+```
+
+```p5exercise id="graphics-rect-square" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  rect(10, 10, 100, 40)
+  square(10, 70, 60)
+}
+```
+
+### `ellipse` and `circle`
+
+> - x, y is the **center**, not a corner
+> - Callout: the rect/square vs ellipse/circle positioning inconsistency, just
+>   something to memorize
+
+```js
+ellipse(x, y, width, height)
+circle(x, y, diameter)
+```
+
+```p5exercise id="graphics-ellipse-circle" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  ellipse(75, 40, 100, 50)
+  circle(75, 110, 60)
+}
+```
+
+### Polygons with `beginShape` / `vertex` / `endShape`
+
+> - build a shape from individual points; endShape(CLOSE) vs leaving it open
+> - same technique generalizes to any polygon, not just the triangle example
+
+```js
+beginShape()
+vertex(x1, y1)
+vertex(x2, y2)
+vertex(x3, y3)
+// ...as many vertices as you like
+endShape(CLOSE)
+```
+
+```p5exercise id="graphics-polygon" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  beginShape()
+  vertex(75, 10)
+  vertex(140, 130)
+  vertex(10, 130)
+  endShape(CLOSE)
+}
+```
+
+## Style is State
+
+> - fill/stroke/strokeWeight/noFill/noStroke don't take a shape argument - they
+>   set state that applies to whatever gets drawn after them
+> - state persists across shapes and across draw() frames until changed again
+>   - this is the main "aha" of the section
+> - tie back to variables as a state analogy (Callout material)
+> - colors can be a name, hex string, single 0-255 gray value, or rgb triple
+
+```p5exercise id="graphics-style-state" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+
+  fill("orange")
+  stroke("black")
+  strokeWeight(1)
+  circle(40, 75, 60)
+
+  fill("purple")
+  strokeWeight(6)
+  circle(110, 75, 60)
+}
+```
+
+## Try It
+
+### Reading Shapes
+
+> - prompt: how many shapes, what color is each, does draw order matter
+
+```p5exercise id="graphics-reading" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("skyblue")
+
+  noStroke()
+  fill("darkGreen")
+  rect(0, 110, 150, 40)
+
+  stroke("saddlebrown")
+  strokeWeight(4)
+  fill("sienna")
+  rect(65, 70, 20, 50)
+
+  noStroke()
+  fill("forestgreen")
+  circle(75, 60, 70)
+}
+```
+
+### Draw a Little Scene
+
+> - requirements: 3+ shape functions, fill + stroke each used at least once,
+>   strokeWeight changed at least once
+
+```p5exercise id="graphics-scene" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("white")
+  // your shapes here
+}
+```

@@ -40,8 +40,8 @@ George Boole.
   before you think anything, be sure to read that to be sure it is okay._
 </Callout>
 
-An _expression_ just code that resolves down to a value. You've been doing this
-since elementary school. Here are some arithmetic expressions:
+An _expression_ is just code that resolves down to a value. You've been doing
+this since elementary school. Here are some arithmetic expressions:
 
 |                       |                                |
 | --------------------: | ------------------------------ |
@@ -207,7 +207,7 @@ expression to be true, either or both of the inputs must be true. The only time
 an OR statement is false is when both of the inputs are false.
 
 The NOT table looks a bit different because this only takes a single variable,
-`!A`, written with an exclamation point. This is pronounced "not A", just
+`!A`, written with an exclamation point. This is pronounced "not A", and it just
 inverts the value. You give it true, it gives you false. You give it false, it
 gives you true.
 
@@ -411,7 +411,7 @@ We'll get to interactivity in the next chapter.
 
 A plain `if` statement will either do something, or not. There's an extended
 form of this that lets you do something, or some other thing - it will do
-exactly one things, rather than one or zero as with the plain `if` statement.
+exactly one thing, rather than one or zero as with the plain `if` statement.
 
 This is called an `if/else` statement, and it looks like this:
 
@@ -568,6 +568,9 @@ or `else if` parts found a match.
 
 (Get it? That header is a pun.)
 
+Here are a couple exercises for you to work through. One is styled as 'follow
+the directions', the other 'what do you see'.
+
 ### Reading `if`fy code
 
 Read the code below, and convince yourself that you understand what it is doing.
@@ -649,16 +652,26 @@ location.
 - Lower center: red
 - Upper right: gray
 - Mid right: blue
-- Lower center: gray
+- Lower right: gray
 - If the mouse isn't in any of these cells, make it pink.
 
 Note that the pink background indicates an error state - if you see it,
 something is wrong.
 
+```p5exercise id="english-to-code" autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  // Your magnificent code goes here
+}
+```
+
 <details>
 <summary>Show one possible solution</summary>
 
-```p5exercise id="exercise-id-sln" autorun size="medium" solutionTo="exercise-id"
+```p5exercise id="english-to-code-sln" autorun size="medium" solutionTo="english-to-code"
 function setup() {
   createCanvas(150, 150)
 }

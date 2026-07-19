@@ -66,7 +66,7 @@ These little graphical programs are just JavaScript, using the p5.js library.
   <p>What is a library?</p>
 
   <p>
-    p5.js is a _library_ that provides tools for helping your work faster.
+    p5.js is a _library_ that provides tools for helping you work faster.
     Reading the example code above, `setup`, `draw`, `text`, and `createCanvas`
     are four utilities that work together and give you shortcuts so you don't
     have to reinvent the wheel. A library can do anything the code that you
@@ -108,8 +108,9 @@ that creamy color, `"papayawhip"`, and the text color will be `"cyan"`.
 
 `"papayawhip"` and `"cyan"` are _data values_. Try changing those colors and
 re-running the program. Not every value will work. `"red"` and `"green"` and the
-usual suspects will work, but `"puce"` and `"avocado"` won't. Strangely, `200`
-will work, but `300` won't. (I'll mysteriously leave that unexplained for a
+usual suspects will work, but `"puce"` and `"avocado"` won't. Strangely, Numbers
+`0` through `255` will give you different shades of gray, but anything larger
+like `300` will just show white. (I'll mysteriously leave that unexplained for a
 bit.)
 
 We also used data in other function calls. `createCanvas(150, 150)` means
@@ -151,8 +152,9 @@ If you need a variable that changes, use the `let` keyword instead of `const`.
 It is common to both declare and assign an initial value to a variable at the
 same time. That's what the equals sign is doing. This is called _initializing_ a
 variable. If you change the value of a variable, that is called _assigning_ to
-it. That only works on constants once, at the time you declare it. But if you
-use `let` to declare a variable you can change its value later, as below:
+it. Initialization only works on `const` variables once, at the time you declare
+it. But if you use `let` to declare a variable you can change its value later,
+as below:
 
 ```jsconsole id="cant-reassign-const"
 const size = 300 // since this is const, it can't change
