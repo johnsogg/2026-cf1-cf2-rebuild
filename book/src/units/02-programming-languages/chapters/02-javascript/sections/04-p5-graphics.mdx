@@ -2,29 +2,108 @@ export const title = "Shapes and Style"
 
 # Shapes and Style
 
-> - bridge from the circle/fill/background calls already used informally to a
->   full survey of shape + style functions
-> - goal: give students the full vocabulary before interactivity needs it
+The p5.js framework we've used so far is just one of many, many ways to
+conceptualize and program graphics. This can't be overstated: there is more to
+graphics, and to programming generally, than p5.js. For many of you this is
+where you're starting, but there is a whole world of alternatives out there.
+
+That said, the p5 graphics system is similar in spirit to most other libraries
+you'll find. So learning about graphics via p5 will give you portable intuition
+to anything else you might use in the future.
+
+The previous few chapters used a few p5.js graphics calls but I never really
+explained what's going on. In this chapter, I'll correct that. My goal with this
+chapter is to give a basis for how graphics work in p5 so you can get good
+results. Unless you only aspire to change the background color. But if you want
+more, read on!
+
+The [p5.js reference documentation](https://p5js.org/reference/) is helpful, and
+more complete than this discussion here, but it is an encyclopedia format, which
+might not be great for people new to this.
 
 ## The Canvas is a Grid of Pixels
 
 > - coordinate system: origin top-left, x increases right, y increases down
-> - contrast with math-class y-up convention (Callout material: CRT scan order
->   history)
-> - anchor with the three-circles example below (corners + middle)
 
-```p5exercise id="graphics-coords" autorun size="small"
+When you write `createCanvas(300, 150)` in a p5 program, this function creates a
+graphics buffer that is 300 pixels wide and 150 pixels tall. By default, this
+buffer has nothing in it - it isn't black or white (that would be _something_).
+The buffer starts out as a grid of transparent pixels, yearning for you to paint
+them.
+
+This grid has a coordinate system where the origin, (0, 0) is at the _top left_
+corner. The _x_ dimension grows as you move left. The _y_ dimension grows as you
+move _down_. Does that feel weird to you? The coordinate system we're used to in
+math class has _y_ growing upwards. But here, _y_ gets bigger as you go down.
+
+This sketch illustrates the coordinate system on a 300 wide by 150 tall graphics
+buffer. We've got three dots - green is at `(0, 0)` (top left), blue is at
+`(300, 150)` (bottom right), and the red one is right in the middle at
+`(150, 75)`. In the code, that last parameter `50` specifies the circle radius.
+
+```p5exercise id="graphics-coords" autorun size="medium"
 function setup() {
-  createCanvas(150, 150)
+  createCanvas(300, 150)
 }
 
 function draw() {
   background("white")
-  circle(0, 0, 20) // top-left
-  circle(149, 149, 20) // bottom-right
-  circle(75, 75, 20) // middle
+  fill("green")
+  circle(0, 0, 50) // top-left
+  fill("blue")
+  circle(300, 150, 50) // bottom-right
+  fill("red")
+  circle(150, 75, 50) // middle
 }
 ```
+
+Now that you see how to make circles of different colors, play around with it.
+See if you can make a pink dot just next to each of the three. Ask yourself,
+what happens when two circles overlap? Do you see both? Or is one obscured?
+Which one?
+
+Try making the red dot bigger and giving it obnoxious googly eyes.
+
+<details>
+<summary>Show my googly eye solution</summary>
+
+```p5exercise id="graphics-coords-sln" autorun size="medium" solutionTo="graphics-coords"
+function setup() {
+  createCanvas(300, 150)
+}
+
+function draw() {
+  background("white")
+  fill("green")
+  circle(0, 0, 50) // top-left
+  fill("blue")
+  circle(300, 150, 50) // bottom-right
+  fill("red")
+  circle(150, 75, 130) // middle
+  // whites
+  fill("white")
+  circle(150 - 25, 60, 40)
+  circle(150 + 25, 60, 40)
+  // pupils
+  fill("rebeccapurple")
+  circle(150 - 21, 70, 15)
+  circle(150 + 21, 70, 15)
+}
+```
+
+</details>
+
+### Into the `Z` dimension
+
+Did you check in on what happens when two shapes try to occupy the same space?
+If you draw shape A, and then in a following step you draw shape B, the pixels
+for shape B will be drawn right on top of shape A. This means that the order
+that you draw your shapes matter: draw your shapes from back to front.
+
+You can think of this as stacking, or layering, or Z-ordering. A 2D buffer
+doesn't actually have a concept of the Z dimension, but it will implicitly show
+you which objects were drawn last, because their pixels will "win" over other
+shapes that are behind them.
 
 ## Shape Functions
 
@@ -93,6 +172,17 @@ function draw() {
 }
 ```
 
+### Stateful modes for drawing rectangles and ellipses
+
+> - Ellipses/circles have `ellipseMode`
+>   - Determines how we interpret arguments to `ellipse`, `circle`, and `arc`
+>   - Options are `CENTER`, `RADIUS`, `CORNER`, AND `CORNERS`
+> - Rectangles/Squares have `rectMode`
+>   - Similarly determines interpretation of arguments to `rect` and `square`
+>   - Options are the same as `ellipseMode`, and yes that includes `RADIUS`
+> - Also `colorMode`, likely you won't need them for a while: `RGB`, `HSB`
+> - After setting ellipse or rect mode, it remains stateful
+
 ### Polygons with `beginShape` / `vertex` / `endShape`
 
 > - build a shape from individual points; endShape(CLOSE) vs leaving it open
@@ -124,6 +214,7 @@ function draw() {
 
 ## Style is State
 
+> - Already saw state with ellipse and rect modes - they stick until changed
 > - fill/stroke/strokeWeight/noFill/noStroke don't take a shape argument - they
 >   set state that applies to whatever gets drawn after them
 > - state persists across shapes and across draw() frames until changed again
@@ -149,6 +240,13 @@ function draw() {
   circle(110, 75, 60)
 }
 ```
+
+### `push` and `pop`
+
+> - State can be pushed and popped
+> - Push = record all the state as it is right now, put it on top of a stack
+> - Pop = return to the state sitting on top
+> - Callout to the stack data structure - we will see more on this much later
 
 ## Try It
 
@@ -194,3 +292,16 @@ function draw() {
   // your shapes here
 }
 ```
+
+## Colors
+
+> - Colors have standard names - see
+>   https://www.w3.org/TR/css-color-4/#named-colors for the standard used by
+>   p5.js
+> - Colors can also be built with components:
+>   - One number = grayscale
+>   - Three numbers = mode-dependent, by default red, green, blue
+>   - Four numbers = mode dependent, by default red, green, blue, alpha
+> - Numbers
+>   - hex vs decimal vs float - briefly
+>   - color modes and encoding and math
