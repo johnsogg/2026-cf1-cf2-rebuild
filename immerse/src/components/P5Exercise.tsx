@@ -246,14 +246,23 @@ export function P5Exercise({
   }, [exercise.autorun])
 
   const handleMount = useCallback<OnMount>((editor, monaco) => {
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      runSketchRef.current()
-    })
+    // Dynamic keybindings share one global registry across every Monaco
+    // instance on the page; without this, only the last-mounted exercise's
+    // shortcut would actually fire.
+    const thisEditorOnly = `editorId == '${editor.getId()}'`
+    editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      () => {
+        runSketchRef.current()
+      },
+      thisEditorOnly,
+    )
     editor.addCommand(
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter,
       () => {
         stopSketchRef.current()
       },
+      thisEditorOnly,
     )
   }, [])
 
