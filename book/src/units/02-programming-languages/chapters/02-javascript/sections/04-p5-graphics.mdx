@@ -87,7 +87,7 @@ function draw() {
   // pupils
   fill("rebeccapurple")
   circle(150 - 21, 70, 15)
-  circle(150 + 21, 70, 15)
+  circle(150 + 21, 50, 15)
 }
 ```
 
@@ -96,19 +96,119 @@ function draw() {
 ### Into the `Z` dimension
 
 Did you check in on what happens when two shapes try to occupy the same space?
-If you draw shape A, and then in a following step you draw shape B, the pixels
-for shape B will be drawn right on top of shape A. This means that the order
-that you draw your shapes matter: draw your shapes from back to front.
+If you draw shape A, and then in a following step you draw shape B that overlaps
+the first, the pixels for shape B will be drawn right on top of shape A. This
+means that the order that you draw your shapes matter: draw your shapes from
+back to front.
 
-You can think of this as stacking, or layering, or Z-ordering. A 2D buffer
-doesn't actually have a concept of the Z dimension, but it will implicitly show
-you which objects were drawn last, because their pixels will "win" over other
-shapes that are behind them.
+The _X_ dimension is left and right, and the _Y_ dimension is up and down. Given
+a flat screen, what else is there? Some shapes are 'closer', and some are
+'farther'. You can think of this as stacking, or layering, or Z-ordering. A 2D
+buffer doesn't actually have a concept of the Z dimension, but it will
+implicitly show you which objects were drawn more recently than others, because
+their pixels will "win" over other shapes that are behind them.
+
+If you didn't try it yet, go ahead and try making some circles that overlap
+existing shapes. Then change the order that you draw them in the code, and
+notice what graphic effects that gives.
 
 ## Shape Functions
 
-> - every shape function takes numbers describing size/position and draws
->   immediately using whatever style is currently active
+In p5 and all other graphics libraries that I can think of, drawing a shape is
+really about figuring how to relate numbers to the effect that you intend. A
+circle has a location - X and Y coordinates - and a radius. At your discretion
+(and we'll discuss this more farther down the page) the X and Y coordinate could
+refer to one 'corner' of the shape. Or, instead of specifying a radius, you
+could specify a diameter. These are all just different ways of describing the
+geometry of a shape.
+
+In p5, you draw a shape using a function call such as `circle(125, 50, 25)`.
+These numbers are given in an order that implicitly makes sense to the `circle`
+function... but might not make sense to you the programmer. There are other ways
+to write functions to arguably be more intuitive. But p5 uses this approach, and
+it is common.
+
+The `circle `function takes `125`, then `50`, then `25`, but what do they mean?
+Whoever made this function decided that the first number means the X coordinate,
+followed by the Y coordinate, followed by the radius. They could have chosen to
+put the radius first, or switched the X and Y coordinates.
+
+The library designer chose that order because it made sense to them, and they
+thought it would make sense to you. But even experienced programmers forget the
+order of arguments, which is why documentation and editor hints are so nice to
+have. But usually a library is consistent about argument ordering so once you
+learn their conventions, it is easier to remember and apply.
+
+### Have some style
+
+We'll see many different kinds of shape drawing functions in use below. When you
+use any drawing function, they will be drawn using a current _style_. This
+refers to what graphic attributes are used: the color and thickness of lines,
+the color of the background, among others.
+
+Here is list of frequently used graphic styles. Where I write it like
+`something(..)` with the dots, that means there are different variations that
+take different arguments.
+
+- `fill(..)` - sets the fill color for shapes and text, e.g. `fill("blue")`
+- `noFill()` - disables any existing fill value
+- `stroke(..)` - sets the stroke color for shapes and text, e.g. `stroke("red")`
+- `noStroke()` - disables any existing stroke value
+- `strokeWeight(n)` - sets the stroke thickness to `n` pixels wide, e.g.
+  `strokeWeight(3)`
+
+Study this sketch:
+
+```p5sketch autoplay width=150 height=150
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  stroke("red")
+  strokeWeight(5)
+  fill("white")
+  circle(25, 75, 50)
+
+  stroke("blue")
+  strokeWeight(2)
+  fill("yellow")
+  circle(50, 75, 50)
+
+  noStroke()
+  fill("gray")
+  circle(75, 75, 50)
+
+  stroke("green")
+  noFill()
+  circle(100, 75, 50)
+
+  stroke("white")
+  strokeWeight(15)
+  fill("red")
+  circle(125, 75, 50)
+}
+```
+
+See if you can replicate this on your own in the little editor below. Hints: The
+circles are all at y=75 and all have radius 50 (including the last one, which
+looks bigger because of its stroke thickness). Their X coordinate starts at 25
+and jumps up by 25 each time. Colors are `"red"`, `"white"`, "`blue`",
+`"yellow"`, `"gray"` and `"green"`. Most (but not all) have a fill, and most
+(but not all) have a stroke, and the strokes vary. My code for this was about 20
+lines including blanks to make it easier to read.
+
+```p5exercise id="fill-stroke-thickness" autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  // make circles here
+}
+```
 
 ### `line`
 
