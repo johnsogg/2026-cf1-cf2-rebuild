@@ -1,3 +1,5 @@
+import bearSketch from "./assets/does-a-bear-walk-in-the-woods.jpg"
+
 export const title = "Shapes and Style"
 
 # Shapes and Style
@@ -600,18 +602,107 @@ function draw() {
 
 ### `push` and `pop`
 
-> - State can be pushed and popped
-> - Push = record all the state as it is right now, put it on top of a stack
-> - Pop = return to the state sitting on top
-> - Callout to the stack data structure - we will see more on this much later
+Beyond the graphics state already mentioned like colors and stroke properties,
+there are many other kinds of state that the graphics library understands. We'll
+talk about many of these things later on.
+
+There is a deceptively powerful way of managing this global state using the
+`push` and `pop` functions. Imagine that you can bundle all the state values and
+put them on a sheet of paper - background color is blue, stroke color is white,
+and fifteen other things. When you want to record the overall graphical state at
+this moment, you call `push()`, which 'pushes' the sheet of paper onto a stack
+of similar sheets. You can do this over and over - growing your stack of state
+pages each time. Then, when you want to back out, you `pop()` from this stack,
+and this resets the graphic state to whatever was on the topmost sheet.
+
+This is actually foreshadowing a _data structure_ that you might learn about in
+the back half of this book. A _Stack_ data structure works like I just
+described: you push data onto it, then pop data off the top. This means that the
+data that was added most recently is the first in line to get popped off.
+
+This is a perfect use case for storing and restoring graphic state.
+
+```p5exercise id="graphic-stack-push-pop" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  fill("blue")
+  stroke("white")
+  strokeWeight(10)
+  circle(50, 75, 30)
+  push() // save blue fill, white stroke 10px thick
+  fill("red")
+  stroke("green")
+  strokeWeight(2)
+  circle(75, 75, 30)
+  pop() // restore previously pushed state
+  circle(100, 75, 30)
+}
+```
+
+Another way to think of this like an app that supports undo. As you work, you're
+pushing edits onto a stack. When you want to back out one step, you hit undo,
+which pops the most recent edit from a stack. You can push as much as you like,
+and you can pop so long as there's something on the stack to remove.
+
+In the example above, it only has one `push`/`pop` pair. But you can nest them
+as shown below:
+
+```p5exercise id="graphics-stack-push-pop-nested" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  fill("blue")
+  stroke("white")
+  strokeWeight(10)
+  circle(50, 75, 30)
+  push() // save blue fill, white stroke 10px thick
+  fill("red")
+  stroke("green")
+  strokeWeight(2)
+  circle(75, 75, 30)
+  pop() // restore previously pushed state
+  circle(100, 75, 30)
+}
+```
+
+Something that is critically important: you'll need to balance your `push` and
+`pop` statements. I'll promote a healthy habit of writing drawing functions with
+push and pop at the beginning and end:
+
+```js
+function drawSomething() {
+  push()
+  // whatever state changes I make here will be popped
+  // before returning - this is a safe way to roll.
+  pop()
+}
+```
+
+If you're reading this chapter in sequence, this might look new to you because
+we haven't really discussed functions yet. Suffice it to say that `push` and
+`pop` are extremely useful, and when you do start writing your own drawing
+routines, this is a good pattern to use.
 
 ## Try It
 
+Now that we've had this whirlwind tour of some of the most common graphics
+operations in p5, try these exercises.
+
 ### Reading Shapes
 
-> - prompt: how many shapes, what color is each, does draw order matter
+What do you see in the following sketch? Think about what goes into this
+rendering, and in what order. In the editor below that, replicate what you see.
+The colors in use are `"skyblue"`, `"darkGreen"`, `"saddlebrown"`, `"sienna"`
+and `"forestgreen"`.
 
-```p5exercise id="graphics-reading" autorun size="small"
+```p5sketch id="graphics-reading" autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -634,10 +725,36 @@ function draw() {
 }
 ```
 
+And your attempt goes here:
+
+```p5exercise id="graphics-reading-replicate" autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  // your code here
+}
+```
+
 ### Draw a Little Scene
 
-> - requirements: 3+ shape functions, fill + stroke each used at least once,
->   strokeWeight changed at least once
+Time for some exercise! Close your eyes, and imagine a little scene. Could be
+sailboats on water, an astronaut standing next to a rocket, a flower growing
+from a pot. Whatever you want. Then, simplify it to several shapes, because
+you're going to program this.
+
+Try to involve at least one circle or ellipse, one square or rectangle, and (as
+the stretch goal) one polygon; and use at least two different stroke
+thicknesses. Draw it (paper, whiteboard, your friend's forehead, etc) so you can
+understand where all the shapes are relative to the canvas and to each other.
+
+Make a plan for how you'll code it. You will almost certainly deviate from this
+plan when you get to coding, but you'll probably get a better result if you have
+a strategy from the onset.
+
+(Below the editor, I'll have a sample drawing of my own, a collab between me and
+my friend Xander)
 
 ```p5exercise id="graphics-scene" autorun size="small"
 function setup() {
@@ -649,6 +766,80 @@ function draw() {
   // your shapes here
 }
 ```
+
+<details>
+
+<summary>See my sample scene (story, sketch, and code)</summary>
+
+<p>
+  My prompt: _"A bear walking through the forest at sunrise."_ Here's my sketch
+  (I swore a grown adult made this):
+</p>
+
+<img
+  src={bearSketch}
+  alt="A hand-drawn sketch of a triangular pine tree, a rising sun, and a stick-figure bear on a horizon line"
+  width={300}
+/>
+
+```p5exercise id="p5-graphics-scene-sln" autorun size="small" solutionTo="p5-graphics-scene"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("darkBlue")
+  // sun with rays
+  noStroke()
+  fill("darkOrange")
+  circle(90, 100, 30)
+  stroke("darkOrange")
+  strokeWeight(2)
+  line(70, 90, 40, 80)
+  line(80, 70, 70, 50)
+  line(100, 80, 120, 50)
+  line(120, 90, 140, 80)
+
+  // ground
+  fill("darkGreen")
+  noStroke()
+  rect(0, 100, 150, 50)
+
+  // tree trunk (behind tree so draw first)
+  push()
+  fill("brown")
+  rectMode(CENTER)
+  rect(50, 120, 12, 28)
+  pop()
+
+  // tree
+  stroke("lightGreen")
+  fill("lightGreen")
+  beginShape()
+  vertex(50, 30)
+  vertex(30, 70)
+  vertex(37, 70)
+  vertex(20, 120)
+  vertex(80, 120)
+  vertex(63, 70)
+  vertex(70, 70)
+  endShape(CLOSE)
+
+  // bear
+  fill("brown")
+  noStroke()
+  circle(130, 90, 15) // head
+  ellipse(130, 110, 30, 40) // body
+  circle(120, 130, 10) // left foot
+  circle(140, 130, 10) // right foot
+  strokeWeight(6)
+  stroke("brown")
+  line(120, 105, 100, 105) // left arm
+  line(140, 105, 150, 105) // right arm
+}
+```
+
+</details>
 
 ## Colors
 
@@ -662,10 +853,3 @@ function draw() {
 > - Numbers
 >   - hex vs decimal vs float - briefly
 >   - color modes and encoding and math
-
-# Pizza Order:
-
-- Marco's pizza Watertown SD
-- 2 large pizzas:
-  - pepperoni + pineapple
-  - sausage + black olive + jalapeño
