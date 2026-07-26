@@ -42,3 +42,24 @@ no blank line inside it.
 
 Do NOT use `<!-- prettier-ignore -->` (HTML comment syntax) — it's not valid
 MDX and breaks the real build, even though Prettier itself accepts it.
+
+## Images in chapters
+
+No image-processing plugin is installed (no `vite-imagetools`, `sharp`,
+etc.) — images go through Vite's plain static-asset pipeline.
+
+Convention: co-locate images in an `assets/` folder next to the `.mdx`
+section file, then import and render them:
+
+```mdx
+import mySketch from "./assets/my-sketch.jpg"
+
+<img src={mySketch} alt="..." width={300} />
+```
+
+Vite fingerprints/copies the file at build time and rewrites the `src`, so
+this works correctly under both dev and the GitHub Pages base path without
+any manual `import.meta.env.BASE_URL` handling. Set an explicit `width` (or
+CSS) to size the image — Vite doesn't generate responsive variants on its
+own. If chapters start needing resizing/`srcset` at scale, revisit adding
+`vite-imagetools` rather than resizing images by hand.

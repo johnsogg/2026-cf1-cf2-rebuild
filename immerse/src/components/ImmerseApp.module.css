@@ -29,6 +29,20 @@
   padding-left: var(--gutter);
 }
 
+/*
+ * Plain prose inside a <details> (e.g. a paragraph + image alongside a
+ * sample solution) needs the same gutter offset as summary, since it
+ * doesn't get one from the grid the way top-level content does. Exercise
+ * components are deliberately excluded so they keep using the full width.
+ */
+:where(.lesson) > details > p,
+:where(.lesson) > details > img,
+:where(.lesson) > details > ul,
+:where(.lesson) > details > ol,
+:where(.lesson) > details > blockquote {
+  padding-left: var(--gutter);
+}
+
 .lesson h1 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
