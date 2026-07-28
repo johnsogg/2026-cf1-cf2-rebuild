@@ -37,12 +37,15 @@ import** — noted per component below. The rest need the explicit
   wraps any content (prose, a sketch, an editor, a mixture) and owns
   identity, numbering, the completion-state indicator, reset, and hints —
   independent of what's rendered inside. `<Solution id="...">` pairs with
-  an `Ask` by reusing its id (not a second one). Both live in `Ask.tsx`/
-  `Solution.tsx` and render a live in-page warning banner for the two
-  structural mistakes that used to fail silently: `mode="graded"` wrapping
-  content that can't report a grade, and a `Solution` with no matching
-  `Ask` on the page. No import needed. See root `CLAUDE.md` for the
-  authoring convention.
+  an `Ask` by reusing its id (not a second one) and owns its own
+  click-to-reveal `<details>` — don't hand-wrap it in one. Customize the
+  reveal label with `exposeText` (defaults to "Click here to show
+  solution"). Both live in `Ask.tsx`/`Solution.tsx` and render a live
+  in-page warning banner for the two structural mistakes that used to fail
+  silently: `mode="graded"` wrapping content that can't report a grade,
+  and a `Solution` with no matching `Ask` on the page (that warning stays
+  visible outside the reveal, not hidden behind it). No import needed. See
+  root `CLAUDE.md` for the authoring convention.
 
 - **CodeExercise**, **MultipleChoiceExercise**, **P5Exercise**,
   **ConsoleExercise** - Pure presentation, always used inside an `Ask`

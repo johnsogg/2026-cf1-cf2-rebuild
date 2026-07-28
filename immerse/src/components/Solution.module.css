@@ -4,12 +4,25 @@
   grid-column: full;
 }
 
-.solutionLabel {
+.details {
+  margin-bottom: 8px;
+}
+
+.summary {
   font-size: 90%;
   font-weight: 700;
   font-style: italic;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.summary::marker {
+  color: var(--text-muted);
+}
+
+.content {
+  margin-top: 8px;
 }
 
 .warningBanner {

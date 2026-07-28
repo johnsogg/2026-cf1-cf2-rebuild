@@ -47,11 +47,13 @@ Each entry: date added, priority, note.
 
 > Ideas that don't clearly fit the above.
 
-- **2026-07-19 — P2** — When reviewing `p5exercise`/`jsconsole` blocks, watch
-  for `id`/`solutionTo` agreement, especially on solution blocks. Easy to typo a
-  `solutionTo` value so it doesn't match the exercise's `id` (found and fixed
-  one in conditionals.mdx: `english-to-code` / `english-to-code-sln`). Worth a
-  pass checking these pairs match wherever a solution is offered.
+- **2026-07-27 — P3** — `04-p5-graphics.mdx`'s "nested push/pop" example
+  (`graphics-stack-push-pop-nested`, under `### push and pop`) is byte-identical
+  to the single-pair example right above it — it doesn't actually demonstrate
+  nesting despite the prose saying "you can nest them as shown below." Noticed
+  while migrating this file to `<Ask>`/`<Solution>`; left the code alone since
+  fixing it means writing a real nested example, which is a content call, not a
+  structural one.
 
 - **2026-07-23 — P3** — Revisit upgrading to TypeScript 7 (native Go-ported
   compiler, now npm `latest`). Checked the actual 7.0.2 package: it's a breaking

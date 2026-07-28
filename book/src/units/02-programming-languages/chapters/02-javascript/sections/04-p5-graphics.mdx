@@ -43,7 +43,9 @@ buffer. We've got three dots - green is at `(0, 0)` (top left), blue is at
 `(300, 150)` (bottom right), and the red one is right in the middle at
 `(150, 75)`. In the code, that last parameter `50` specifies the circle radius.
 
-```p5exercise id="graphics-coords" autorun size="medium"
+<Ask id="graphics-coords" mode="interacted" title="Coordinate system">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(300, 150)
 }
@@ -59,6 +61,8 @@ function draw() {
 }
 ```
 
+</Ask>
+
 Now that you see how to make circles of different colors, play around with it.
 See if you can make a pink dot just next to each of the three. Ask yourself,
 what happens when two circles overlap? Do you see both? Or is one obscured?
@@ -66,10 +70,9 @@ Which one?
 
 Try making the red dot bigger and giving it obnoxious googly eyes.
 
-<details>
-<summary>Show my googly eye solution</summary>
+<Solution id="graphics-coords" exposeText="Show my googly eye solution">
 
-```p5exercise id="graphics-coords-sln" autorun size="medium" solutionTo="graphics-coords"
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(300, 150)
 }
@@ -93,7 +96,7 @@ function draw() {
 }
 ```
 
-</details>
+</Solution>
 
 ### Into the `Z` dimension
 
@@ -161,7 +164,7 @@ take different arguments.
 
 Study this sketch:
 
-```p5sketch autoplay width=150 height=150 id="style-circles"
+```p5sketch autoplay width=150 height=150
 function setup() {
   createCanvas(150, 150)
 }
@@ -202,7 +205,9 @@ starts at 25 and jumps up by 25 each time. Colors are `"red"`, `"white"`,
 and most (but not all) have a stroke, and the strokes vary. My code for this was
 about 20 lines including blanks to make it easier to read.
 
-```p5exercise id="fill-stroke-thickness" autorun size="medium"
+<Ask id="fill-stroke-thickness" mode="interacted" title="Replicate the styled circles">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -213,10 +218,11 @@ function draw() {
 }
 ```
 
-<details>
-<summary>Check here for a not quite right solution</summary>
+</Ask>
 
-```p5exercise id="style-circles-sln" autorun size="small" solutionTo="style-circles"
+<Solution id="fill-stroke-thickness" exposeText="Check here for a not quite right solution">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -249,7 +255,7 @@ function draw() {
 }
 ```
 
-</details>
+</Solution>
 
 ### `line`
 
@@ -267,7 +273,9 @@ The `x1` and `y1` are the two components of the first point, `x2` and `y2` are
 for the second. This is a convention you'll see in other calls - lists of points
 alternate x and y, and one point follows the other.
 
-```p5exercise id="graphics-line" autorun size="small"
+<Ask id="graphics-line" mode="untracked" title="line">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -293,6 +301,8 @@ function draw() {
 }
 ```
 
+</Ask>
+
 ### `rect` and `square`
 
 Rectangles and squares are straightforward as well. You technically don't need
@@ -314,7 +324,9 @@ applied to both dimensions.
 In both cases, you can optionally give a radius to make the corners a bit
 rounded.
 
-```p5exercise id="graphics-rect-square" autorun size="small"
+<Ask id="graphics-rect-square" mode="untracked" title="rect and square">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -331,6 +343,8 @@ function draw() {
   square(100, 20, 30, 15)
 }
 ```
+
+</Ask>
 
 You probably noticed that one of those squares looks suspiciously like a
 circle... even though we used the `square` function. Bonkers! This is because
@@ -362,7 +376,9 @@ diameter.
 This canvas below is 150x150, so we can put an ellipse and circle centered at
 (75, 75) to make an eye, staring straight into your very being:
 
-```p5exercise id="graphics-ellipse-circle" autorun size="small"
+<Ask id="graphics-ellipse-circle" mode="untracked" title="ellipse and circle">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -375,6 +391,8 @@ function draw() {
   circle(75, 75, 50) // also canvas center
 }
 ```
+
+</Ask>
 
 Notice how the ellipse is 150 wide, so it stretches the full width of the
 canvas.
@@ -414,7 +432,9 @@ easily.)
 Here is the same rectangle call used several times with the different drawing
 modes. I only change the color so you can tell them apart more easily.
 
-```p5exercise id="rect-mode" autorun size="medium"
+<Ask id="rect-mode" mode="interacted" title="rectMode">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -442,6 +462,8 @@ function draw() {
 }
 ```
 
+</Ask>
+
 Try editing it: See if you can rearrange things here so the red rectangle's
 edges are all visible and not obscured by any others. Then see if you can shift
 things so all the edges are fully rendered and not clipped off the edge of the
@@ -465,7 +487,9 @@ vertex(x3, y3)
 endShape(CLOSE)
 ```
 
-```p5exercise id="graphics-polygon" autorun size="medium"
+<Ask id="graphics-polygon" mode="interacted" title="Polygons">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -484,6 +508,8 @@ function draw() {
   endShape(CLOSE)
 }
 ```
+
+</Ask>
 
 You can call `beginShape` with a few different arguments that will tell p5 how
 to interpret the geometry that you place between that and the `endShape` call.
@@ -539,7 +565,9 @@ lawn and tree (brown trunk and green leaves) with a blue sky. But there are bugs
 caused by the programmer not changing state as apt. See if you can correct this
 sketch so it renders as we want.
 
-```p5exercise id="graphics-style-state" autorun size="medium"
+<Ask id="graphics-style-state" mode="interacted" title="Fix the buggy state">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -566,10 +594,11 @@ function draw() {
 }
 ```
 
-<details>
-<summary>Show one possible solution</summary>
+</Ask>
 
-```p5exercise id="graphics-style-state-sln" autorun size="medium" solutionTo="graphics-style-state-id"
+<Solution id="graphics-style-state">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -598,7 +627,7 @@ function draw() {
 }
 ```
 
-</details>
+</Solution>
 
 ### `push` and `pop`
 
@@ -622,7 +651,9 @@ data that was added most recently is the first in line to get popped off.
 
 This is a perfect use case for storing and restoring graphic state.
 
-```p5exercise id="graphic-stack-push-pop" autorun size="small"
+<Ask id="graphic-stack-push-pop" mode="untracked" title="push and pop">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -642,6 +673,8 @@ function draw() {
   circle(100, 75, 30)
 }
 ```
+
+</Ask>
 
 Another way to think of this like an app that supports undo. As you work, you're
 pushing edits onto a stack. When you want to back out one step, you hit undo,
@@ -651,7 +684,9 @@ and you can pop so long as there's something on the stack to remove.
 In the example above, it only has one `push`/`pop` pair. But you can nest them
 as shown below:
 
-```p5exercise id="graphics-stack-push-pop-nested" autorun size="small"
+<Ask id="graphics-stack-push-pop-nested" mode="untracked" title="Nested push and pop">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -671,6 +706,8 @@ function draw() {
   circle(100, 75, 30)
 }
 ```
+
+</Ask>
 
 Something that is critically important: you'll need to balance your `push` and
 `pop` statements. I'll promote a healthy habit of writing drawing functions with
@@ -702,7 +739,7 @@ rendering, and in what order. In the editor below that, replicate what you see.
 The colors in use are `"skyblue"`, `"darkGreen"`, `"saddlebrown"`, `"sienna"`
 and `"forestgreen"`.
 
-```p5sketch id="graphics-reading" autorun size="small"
+```p5sketch autoplay width=150 height=150
 function setup() {
   createCanvas(150, 150)
 }
@@ -727,7 +764,9 @@ function draw() {
 
 And your attempt goes here:
 
-```p5exercise id="graphics-reading-replicate" autorun size="small"
+<Ask id="graphics-reading-replicate" mode="interacted" title="Replicate what you see">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -736,6 +775,8 @@ function draw() {
   // your code here
 }
 ```
+
+</Ask>
 
 ### Draw a Little Scene
 
@@ -753,7 +794,9 @@ Make a plan for how you'll code it. You will almost certainly deviate from this
 plan when you get to coding, but you'll probably get a better result if you have
 a strategy from the onset.
 
-```p5exercise id="graphics-scene" autorun size="small"
+<Ask id="graphics-scene" mode="interacted" title="Draw a Little Scene">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -764,9 +807,9 @@ function draw() {
 }
 ```
 
-<details>
+</Ask>
 
-<summary>Open this to see my sample scene (story, sketch, and code)</summary>
+<Solution id="graphics-scene" exposeText="See my sample scene (story, sketch, and code)">
 
 <p>
   My prompt: _"A bear walking through the forest at sunrise."_ Here's my sketch
@@ -779,7 +822,7 @@ function draw() {
   width={300}
 />
 
-```p5exercise id="p5-graphics-scene-sln" autorun size="small" solutionTo="p5-graphics-scene"
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -836,4 +879,4 @@ function draw() {
 }
 ```
 
-</details>
+</Solution>

@@ -49,8 +49,10 @@ to other source files.
 content — prose, a sketch, an editor, a mixture — and owns whether/how it
 counts toward book progress, independent of what's rendered inside.
 `<Solution id="...">` pairs with an `Ask` by reusing its id, not a second
-one. Responses persist to local storage and roll up into overall student
-progress.
+one. It owns its own click-to-reveal `<details>` — no need to hand-wrap it
+— customizable via an optional `exposeText` prop (defaults to "Click here
+to show solution"). Responses persist to local storage and roll up into
+overall student progress.
 
 ### `graded` — real correctness signal
 

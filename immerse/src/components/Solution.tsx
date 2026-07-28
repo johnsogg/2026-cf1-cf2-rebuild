@@ -4,18 +4,27 @@ import s from "./Solution.module.css"
 
 /**
  * Pairs with an `<Ask id="...">` by reusing its id — no separate id to
- * typo. Renders a live warning if no matching `Ask` was found on this
- * page. Any editable content inside persists under a namespaced storage
- * key (`${id}::solution`) so tinkering with a solution's own widget never
- * collides with the reader's attempt at the original `Ask`. Globally
- * available in book `.mdx` sections, no import needed.
+ * typo. Owns its own `<details>`/`<summary>` reveal, so authors don't
+ * hand-wrap it — `exposeText` customizes the click-to-reveal label
+ * (defaults to "Click here to show solution"). Renders a live warning
+ * (always visible, not hidden behind the reveal) if no matching `Ask` was
+ * found on this page. Any editable content inside persists under a
+ * namespaced storage key (`${id}::solution`) so tinkering with a
+ * solution's own widget never collides with the reader's attempt at the
+ * original `Ask`. Globally available in book `.mdx` sections, no import
+ * needed.
  */
 export type SolutionProps = {
   id: string
+  exposeText?: string
   children: ReactNode
 }
 
-export function Solution({ id, children }: SolutionProps) {
+export function Solution({
+  id,
+  exposeText = "Click here to show solution",
+  children,
+}: SolutionProps) {
   const { getNumber, hasId } = useAskRegistry()
   const orphaned = !hasId(id)
 
@@ -28,16 +37,21 @@ export function Solution({ id, children }: SolutionProps) {
 
   return (
     <div className={s.solution}>
-      {orphaned ? (
+      {orphaned && (
         <div className={s.warningBanner} role="alert">
           ⚠ Solution id="{id}" has no matching Ask on this page.
         </div>
-      ) : (
-        <div className={s.solutionLabel}>Solution to {getNumber(id)}</div>
       )}
-      <AskContext.Provider value={contextValue}>
-        {children}
-      </AskContext.Provider>
+      <details className={s.details}>
+        <summary className={s.summary}>
+          {orphaned ? exposeText : `Solution to ${getNumber(id)} — ${exposeText}`}
+        </summary>
+        <div className={s.content}>
+          <AskContext.Provider value={contextValue}>
+            {children}
+          </AskContext.Provider>
+        </div>
+      </details>
     </div>
   )
 }

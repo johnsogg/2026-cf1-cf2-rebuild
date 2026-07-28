@@ -12,6 +12,10 @@ const SECTION_RE =
 // inspected — untracked asks don't count toward the completion total.
 const ASK_TAG_RE = /<Ask\b[^>]*>/g
 const UNTRACKED_RE = /\bmode=["']untracked["']/
+// Only catches a literal id="..." — an id={someExpression} (e.g. a CodeExercise
+// pulling its id from an imported exercise object) can't be resolved statically,
+// so those are skipped rather than risk false positives.
+const LITERAL_ID_RE = /\bid=["']([^"']+)["']/
 
 function getMdxFiles(dir: string): string[] {
   const files: string[] = []
@@ -40,6 +44,7 @@ export function exerciseCountPlugin(): Plugin {
       const files = getMdxFiles(unitsDir)
       let totalExercises = 0
       const exercisesPerSection: Record<string, number> = {}
+      const idLocations = new Map<string, string[]>()
 
       for (const file of files) {
         const match = SECTION_RE.exec(file)
@@ -52,6 +57,23 @@ export function exerciseCountPlugin(): Plugin {
           const urlPath = `/${unitSlug}/${chapterSlug}/${sectionSlug}`
           exercisesPerSection[urlPath] = count
           totalExercises += count
+        }
+
+        for (const tag of askTags) {
+          const idMatch = LITERAL_ID_RE.exec(tag)
+          if (!idMatch) continue
+          const id = idMatch[1]
+          const locations = idLocations.get(id) ?? []
+          locations.push(`${unitSlug}/${chapterSlug}/${sectionSlug}`)
+          idLocations.set(id, locations)
+        }
+      }
+
+      for (const [id, locations] of idLocations) {
+        if (locations.length > 1) {
+          console.warn(
+            `[exercise-count] duplicate Ask id="${id}" found in: ${locations.join(", ")}`,
+          )
         }
       }
 

@@ -349,7 +349,9 @@ will look at the code inside the curly braces.
 
 Use this to get a little practice.
 
-```p5exercise id="if-stmt-1" autorun size="small"
+<Ask id="if-stmt-1" mode="interacted" title="feelingBlue">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -362,6 +364,8 @@ function draw() {
   }
 }
 ```
+
+</Ask>
 
 This code uses a variable, `feelingBlue`, that determines if the conditional
 statement's code is going to run or not. It starts off as `false`, but you can
@@ -385,7 +389,9 @@ This code also has a pattern that you might want to use yourself - establish
 some default status (a green background), and then later on, adjust that status
 when the conditions are right (setting the background to blue).
 
-```p5exercise id="if-stmt-mousepress" autorun size="small"
+<Ask id="if-stmt-mousepress" mode="untracked" title="mouseIsPressed">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -397,6 +403,8 @@ function draw() {
   }
 }
 ```
+
+</Ask>
 
 This code has exactly the same structure as the green/blue thing above it,
 except now we're using a variable that we didn't define and didn't set
@@ -579,7 +587,9 @@ What would you need to do to the code to get it to trigger? Try playing around
 with some of the numbers and see how the running code responds. Remember, it
 does not immediately pick up your changes, you have to re-start it.
 
-```p5exercise id="if-try-it" autorun size="medium"
+<Ask id="if-try-it" mode="interacted" title="Reading iffy code">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -600,6 +610,8 @@ function draw() {
   }
 }
 ```
+
+</Ask>
 
 ### What do you see?
 
@@ -627,7 +639,9 @@ Could you figure it out? Once you're ready, use this empty editor to try to
 replicate what you see above. Like most (all?) worthwhile endeavors, there's
 more than one way to approach this.
 
-```p5exercise id="if-what-you-see" autoplay width=250 height=250
+<Ask id="if-what-you-see" mode="interacted" title="Replicate it">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(250, 250)
 }
@@ -637,6 +651,8 @@ function draw() {
   background("black")
 }
 ```
+
+</Ask>
 
 ### English to Code
 
@@ -658,7 +674,9 @@ location.
 Note that the pink background indicates an error state - if you see it,
 something is wrong.
 
-```p5exercise id="english-to-code" autorun size="medium"
+<Ask id="english-to-code" mode="interacted" title="English to Code">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -668,10 +686,11 @@ function draw() {
 }
 ```
 
-<details>
-<summary>Show one possible solution</summary>
+</Ask>
 
-```p5exercise id="english-to-code-sln" autorun size="medium" solutionTo="english-to-code"
+<Solution id="english-to-code">
+
+```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
 }
@@ -692,7 +711,7 @@ function draw() {
 }
 ```
 
-</details>
+</Solution>
 
 In the coming sections you'll use conditional expressions often. If you don't
 fully get it right now, press on anyway. It might make more sense when you see

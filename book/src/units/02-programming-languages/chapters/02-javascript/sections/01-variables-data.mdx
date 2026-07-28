@@ -20,9 +20,13 @@ We've already seen Hello World back in the first section. By tradition, the
 language prints some variation of `Hello World` to a log somewhere. Here it is
 in JavaScript:
 
-```jsconsole id="hello-world-console" size="small"
+<Ask id="hello-world-console" mode="untracked" title="Hello, World!">
+
+```jsconsole size="small"
 console.log("Hello, World!")
 ```
+
+</Ask>
 
 JavaScript is meant to work with web pages - like the text and graphics you see
 here. The console output mentioned above is meant for the web page developer to
@@ -34,7 +38,9 @@ the output.
 Let's try a non-traditional but arguably more interesting example of Hello
 World:
 
-```p5exercise id="hello-world" autorun size="small"
+<Ask id="hello-world-graphical" mode="interacted" title="Graphical Hello World">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -44,13 +50,17 @@ function draw() {
 }
 ```
 
+</Ask>
+
 Throughout this book, the code blocks like that are fully editable. Try changing
 it to greet you by name. You can do the same for the text-only example above
 also.
 
 If you add too much text you'll notice that the words are cut off at some point:
 
-```p5exercise id="hello-world-cut-off" autorun size="small"
+<Ask id="hello-world-cut-off" mode="untracked" title="Text overflow">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -59,6 +69,8 @@ function draw() {
   text("This is pretty long text that doesn't fit in the box", 10, 75)
 }
 ```
+
+</Ask>
 
 These little graphical programs are just JavaScript, using the p5.js library.
 
@@ -87,7 +99,9 @@ the text is barely visible because it is dark on dark. That's because p5's
 canvas is clear, so you see the background through it. We can give the canvas a
 background color, and while we're at it, let's also change the text color:
 
-```p5exercise id="hello-world-colors" autorun size="small"
+<Ask id="hello-world-colors" mode="interacted" title="Background and text color">
+
+```p5exercise autorun size="small"
 function setup() {
   createCanvas(150, 150)
 }
@@ -98,6 +112,8 @@ function draw() {
   text("This is pretty long text that doesn't fit in the box", 10, 75)
 }
 ```
+
+</Ask>
 
 The `background` and `fill` symbols are _function calls_. You can think of these
 as commands that do something like change the canvas's background color, or set
@@ -122,7 +138,9 @@ What if we want to use the _same_ value in more than one place, but only need to
 set it once? We can do this by using _variables_. Here I'll make variables to
 record all the data we'll need, in one convenient place at the top of the file:
 
-```p5exercise id="hello-world-variables" autorun size="medium"
+<Ask id="hello-world-variables" mode="interacted" title="Variables">
+
+```p5exercise autorun size="medium"
 // try changing these values and re-running
 const size = 300
 const bgColor = "darkGreen"
@@ -142,6 +160,8 @@ function draw() {
 }
 ```
 
+</Ask>
+
 In this code above, there are six variables. When you use variables, you have to
 first _declare_ them. That's what the `const` keyword is doing. It's saying "I
 do declare there is a variable called _size_, and once I've set its value, it
@@ -156,12 +176,16 @@ it. Initialization only works on `const` variables once, at the time you declare
 it. But if you use `let` to declare a variable you can change its value later,
 as below:
 
-```jsconsole id="cant-reassign-const"
+<Ask id="cant-reassign-const" mode="untracked" title="Reassigning a const">
+
+```jsconsole
 const size = 300 // since this is const, it can't change
 size = 42 // Error! can't reassign to a constant
 let eyes = "blue" // declared with let means it can change
 eyes = "brown" // no problem
 ```
+
+</Ask>
 
 This code wouldn't run (you can paste it into any editor above and prove it to
 yourself) because of the second line where we try to reassign a `const`

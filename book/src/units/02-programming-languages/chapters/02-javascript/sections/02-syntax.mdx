@@ -221,7 +221,9 @@ anything to see what happens. Then see if you can add variable declarations
 using `const` and `let` so it runs. Stretch goal: change the nickname between
 the first time it is printed and the second.
 
-```jsconsole id="syntax-let-const"
+<Ask id="syntax-let-const" mode="interacted" title="Variable Declaration & Assignment">
+
+```jsconsole
 // add declarations here to make the
 // following code work.
 
@@ -236,10 +238,11 @@ console.log("Now the nickname is:")
 console.log(nickName)
 ```
 
-<details>
-<summary>Show one possible solution</summary>
+</Ask>
 
-```jsconsole id="syntax-let-const-sln" solutionTo="syntax-let-const"
+<Solution id="syntax-let-const">
+
+```jsconsole
 const realName = "Richard"
 let nickName = "Rick"
 
@@ -254,7 +257,7 @@ console.log("Now the nickname is:")
 console.log(nickName)
 ```
 
-</details>
+</Solution>
 
 ## Anatomy - Function Definition
 
@@ -268,7 +271,7 @@ done, it can hand you back some data.
 
 Recall this from earlier:
 
-```p5exercise id="gray-dot" autorun size="small"
+```p5sketch autoplay width=150 height=150
 function setup() {
   createCanvas(150, 150)
 }
@@ -424,17 +427,20 @@ correct.
 Speaking of `sayHello`, here's an exercise for you to write that function and
 then call it.
 
-```jsconsole id="syntax-functions"
+<Ask id="syntax-functions" mode="interacted" title="Define and call a function">
+
+```jsconsole
 // define a function called sayHello with a parameter called name. Make the
 // function body have this: console.log("Hello,", name)
 
 // now invoke that function and pass your name in as the argument
 ```
 
-<details>
-<summary>Click to show one possible solution</summary>
+</Ask>
 
-```jsconsole id="syntax-functions-sln" solutionTo="syntax-functions"
+<Solution id="syntax-functions">
+
+```jsconsole
 function sayHello(name) {
     console.log("Hello,", name)
 }
@@ -442,7 +448,7 @@ function sayHello(name) {
 sayHello("Gibreel")
 ```
 
-</details>
+</Solution>
 
 ## Like Watching Paint Dry
 

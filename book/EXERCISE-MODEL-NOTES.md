@@ -113,3 +113,54 @@ semantics (see root `CLAUDE.md`). Every combination is demoed in
   pass only catch same-page mistakes (a `graded` `Ask` with nothing
   gradable inside, an orphaned `Solution`); a book-wide id index would
   need to extend `exerciseCountPlugin.ts`'s static scan.
+
+## Update: both deferred items done (2026-07-27)
+
+**Migration.** All five old-style files (`02-gray-dot.mdx` needed no
+change — it's pure `p5sketch` illustration, already correct) now use
+`<Ask>`/`<Solution>`:
+
+- `03-hello-world.mdx`, `01-variables-data.mdx`, `02-syntax.mdx`,
+  `03-conditionals.mdx`, `04-p5-graphics.mdx` — every `p5exercise`/
+  `jsconsole` fence wrapped in `<Ask id="..." mode="...">`; every
+  `<details><summary>solution</summary>...</details>` replaced with
+  `<Solution id="...">` (see below — `Solution` now owns its own reveal).
+  All four dangling/incorrect `solutionTo` bugs catalogued above are fixed
+  by construction (id lives once, on the `Ask`; `Solution` just reuses it).
+- `mode` was chosen per block from the surrounding prose: explicit
+  "try this"/"see if you can" language → `interacted`; pure demo with no
+  ask of the reader → `untracked`. No `graded` candidates in this batch —
+  none of this content has unit tests or multiple-choice.
+- The two reused-`gray-dot` collisions resolved differently based on
+  intent: `03-hello-world.mdx`'s copy is a real "play with it" moment →
+  became a distinctly-`id`'d `interacted` `Ask`. `02-syntax.mdx`'s copy is
+  pure "recall this from earlier" with no task → converted from
+  `p5exercise` to a non-editable `p5sketch` illustration instead, so it
+  needs no `Ask`/id at all (matches the doc's pattern 1: pure illustration,
+  not tracked).
+- Also fixed while migrating: `03-conditionals.mdx`'s `if-what-you-see` and
+  `04-p5-graphics.mdx`'s `graphics-reading` fences had attributes from the
+  *other* fence type on them (`p5exercise` with `autoplay width=/height=`,
+  and `p5sketch` with `autorun size=`) — neither plugin parses the other's
+  attributes, so both silently no-op'd. Fixed to the attributes each
+  plugin actually reads.
+- Not fixed (flagged in `book/TODO.md` instead, since it's a content call,
+  not structural): `04-p5-graphics.mdx`'s "nested push/pop" example is
+  byte-identical to the non-nested one above it — doesn't actually
+  demonstrate nesting.
+
+**`Solution` reveal.** Originally this doc anticipated authors hand-wrapping
+`<Solution>` in `<details><summary>`. Instead `Solution` now owns the
+`<details>` internally — an `exposeText` prop customizes the summary label
+(default "Click here to show solution"), prefixed with "Solution to N"
+when paired to a real `Ask`. The orphaned-`Solution` warning banner stays
+outside the collapse (always visible), rather than being hidden behind a
+click.
+
+**Duplicate-id detection.** `exerciseCountPlugin.ts` now extracts literal
+`id="..."` values (skipping `id={expr}` forms it can't resolve statically,
+e.g. `CodeExercise`'s `id={someExercise.id}`) from every `<Ask>` tag across
+all section files, and `console.warn`s at build/dev time if the same id
+appears in more than one file. Verified against the full migrated book
+(28 `Ask` tags, 26 static ids, 0 duplicates) and against a synthetic
+duplicate to confirm it actually fires.
