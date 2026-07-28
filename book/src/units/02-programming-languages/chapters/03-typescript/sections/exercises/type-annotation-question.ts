@@ -1,7 +1,4 @@
-import type { MultipleChoiceExerciseProps } from "immerse/components/MultipleChoiceExercise"
-
-const typeAnnotationQuestion: MultipleChoiceExerciseProps = {
-  type: "multiple-choice",
+const typeAnnotationQuestion = {
   id: "ts-type-annotation-syntax",
   title: "Type annotation syntax",
   prompt:

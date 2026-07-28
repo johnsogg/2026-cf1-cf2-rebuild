@@ -8,7 +8,10 @@ const RESOLVED_ID = "\0" + VIRTUAL_ID
 
 const SECTION_RE =
   /units\/([\w-]+)\/chapters\/([\w-]+)\/sections\/([\w-]+)\.mdx$/
-const EXERCISE_RE = /<Exercise\b/g
+// Matches a whole <Ask ...> opening tag so the mode= attribute can be
+// inspected — untracked asks don't count toward the completion total.
+const ASK_TAG_RE = /<Ask\b[^>]*>/g
+const UNTRACKED_RE = /\bmode=["']untracked["']/
 
 function getMdxFiles(dir: string): string[] {
   const files: string[] = []
@@ -43,7 +46,8 @@ export function exerciseCountPlugin(): Plugin {
         if (!match) continue
         const [, unitSlug, chapterSlug, sectionSlug] = match
         const source = readFileSync(file, "utf-8")
-        const count = (source.match(EXERCISE_RE) ?? []).length
+        const askTags = source.match(ASK_TAG_RE) ?? []
+        const count = askTags.filter((tag) => !UNTRACKED_RE.test(tag)).length
         if (count > 0) {
           const urlPath = `/${unitSlug}/${chapterSlug}/${sectionSlug}`
           exercisesPerSection[urlPath] = count

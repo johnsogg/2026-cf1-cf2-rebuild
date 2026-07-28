@@ -7,7 +7,12 @@ import {
   type ComponentType,
 } from "react"
 import { BrowserRouter, Link, useLocation } from "react-router-dom"
-import { Exercise, ExerciseNumberProvider } from "./Exercise"
+import { Ask, AskProvider } from "./Ask"
+import { Solution } from "./Solution"
+import { CodeExercise } from "./CodeExercise"
+import { MultipleChoiceExercise } from "./MultipleChoiceExercise"
+import { P5Exercise } from "./P5Exercise"
+import { ConsoleExercise } from "./ConsoleExercise"
 import {
   GlossaryProvider,
   GlossaryView,
@@ -138,7 +143,18 @@ const Overview = ({
   )
 }
 
-const defaultComponents = { Exercise, Term, ExpectedReadTime, Kbd, KbdProvider }
+const defaultComponents = {
+  Ask,
+  Solution,
+  CodeExercise,
+  MultipleChoiceExercise,
+  P5Exercise,
+  ConsoleExercise,
+  Term,
+  ExpectedReadTime,
+  Kbd,
+  KbdProvider,
+}
 
 const AppLayout = ({
   overview,
@@ -252,16 +268,18 @@ const AppLayout = ({
             <GlossaryView />
           </div>
         ) : isMisc ? (
-          <div className={s.lesson}>
-            <MiscPageView page={currentMiscPage!} />
-          </div>
+          <AskProvider>
+            <div className={s.lesson}>
+              <MiscPageView page={currentMiscPage!} />
+            </div>
+          </AskProvider>
         ) : (
-          <ExerciseNumberProvider>
+          <AskProvider>
             <div className={s.lesson}>
               <CurrentSection onLoaded={handleSectionLoaded} />
               <NavBar />
             </div>
-          </ExerciseNumberProvider>
+          </AskProvider>
         )}
       </div>
     </div>

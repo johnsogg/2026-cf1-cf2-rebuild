@@ -1,9 +1,7 @@
-import type { CodeExerciseProps } from "immerse/components/CodeExercise"
 import starterCode from "./starter.ts?raw"
 import testCode from "./tests.ts?raw"
 
-const exercise: CodeExerciseProps = {
-  type: "code",
+const exercise = {
   id: "compendium-greet-and-square",
   title: "greet and square",
   description:

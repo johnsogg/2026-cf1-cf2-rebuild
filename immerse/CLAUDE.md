@@ -33,16 +33,28 @@ import** — noted per component below. The rest need the explicit
   snippets, use a ` ```p5sketch autoplay width=300 height=100 ` fenced
   code block instead of a source file + JSX.
 
-- **Exercise** (dispatches to **CodeExercise**, **MultipleChoiceExercise**,
-  **P5Exercise**, **ConsoleExercise**) - Family of graded/practice widgets:
-  `<Exercise exercise={data} />` where `data.type` is `"code"` (Monaco +
-  unit tests), `"multiple-choice"`, `"p5"` (editable sketch, visual
-  grading), or `"console"` (editable JS/TS, plain console.log output, no
-  grading). Attempt/complete state persists to local storage and rolls up
-  into book-wide progress. No import needed for `Exercise` itself. The
-  `p5exercise` and `jsconsole` fenced code blocks are shorthand for
-  authoring `p5`/`console` exercises inline without a separate data
-  object — see the root `CLAUDE.md` for their required unique `id=`.
+- **Ask** / **Solution** - `<Ask id="..." mode="untracked" | "interacted" | "graded">`
+  wraps any content (prose, a sketch, an editor, a mixture) and owns
+  identity, numbering, the completion-state indicator, reset, and hints —
+  independent of what's rendered inside. `<Solution id="...">` pairs with
+  an `Ask` by reusing its id (not a second one). Both live in `Ask.tsx`/
+  `Solution.tsx` and render a live in-page warning banner for the two
+  structural mistakes that used to fail silently: `mode="graded"` wrapping
+  content that can't report a grade, and a `Solution` with no matching
+  `Ask` on the page. No import needed. See root `CLAUDE.md` for the
+  authoring convention.
+
+- **CodeExercise**, **MultipleChoiceExercise**, **P5Exercise**,
+  **ConsoleExercise** - Pure presentation, always used inside an `Ask`
+  (never standalone): `CodeExercise` (Monaco + unit tests, reports a real
+  grade), `MultipleChoiceExercise` (single-answer, reports a real grade),
+  `P5Exercise` (editable sketch, visual only, no grading),
+  `ConsoleExercise` (editable JS/TS, plain `console.log` output, no
+  grading). They read their storage-key `id` from the wrapping `Ask` via
+  `useAsk()`, not from their own props. No import needed. The
+  `p5exercise`/`jsconsole` fenced code blocks are shorthand for
+  `P5Exercise`/`ConsoleExercise` inline — they carry no
+  `id`/`title`/`solutionTo` of their own.
 
 - **Term** (from `Glossary.tsx`) - Marks an inline term
   (`<Term>recursion</Term>`) that pops up its glossary definition on

@@ -7,31 +7,7 @@
 .header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.questionContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-}
-
-.question {
-  font-size: 175%;
-  font-weight: 800;
-}
-
-.solutionLabel {
-  font-size: 90%;
-  font-weight: 700;
-  font-style: italic;
-  color: var(--text-muted);
-}
-
-.attemptIcon {
-  display: flex;
+  justify-content: flex-end;
   align-items: center;
 }
 

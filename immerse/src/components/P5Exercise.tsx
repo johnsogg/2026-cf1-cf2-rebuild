@@ -6,7 +6,6 @@ import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
 import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
-import type { AttemptState } from "./Exercise"
 import s from "./P5Exercise.module.css"
 
 const AUTOSTOP_SECONDS = 120
@@ -97,15 +96,10 @@ const beforeMount: BeforeMount = (monaco) => {
 }
 
 export type P5ExerciseProps = {
-  type: "p5"
-  id: string
-  title?: string
   initialCode: string
-  hints?: string[]
   size?: "small" | "medium" | "large"
   autorun?: boolean
   hoverInfo?: boolean
-  solutionTo?: string
 }
 
 type TranspilerResponse = {
@@ -123,22 +117,11 @@ type SketchError = {
 
 /**
  * Editable p5 sketchpad. Student writes/modifies p5 code in a Monaco editor
- * and sees the result rendered live. No automated grading — success is visual
- * ("make the ball follow the cursor").
+ * and sees the result rendered live. No automated grading — success is
+ * visual ("make the ball follow the cursor"). Always used inside an `Ask`,
+ * which owns identity, numbering, and completion tracking.
  **/
-export function P5Exercise({
-  exercise,
-  questionNumber,
-  isSolution,
-  attemptState,
-  onReset,
-}: {
-  exercise: P5ExerciseProps
-  questionNumber: number
-  isSolution?: boolean
-  attemptState: AttemptState
-  onReset: () => void
-}) {
+export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
   const { initialCode, hoverInfo = true } = exercise
   const height = { small: "200px", medium: "400px", large: "80vh" }[
     exercise.size ?? "medium"
@@ -266,23 +249,9 @@ export function P5Exercise({
     )
   }, [])
 
-  const stateIcon = {
-    idle: <SvgIcon name="statusIdle" size={18} intent="muted" />,
-    attempted: <SvgIcon name="statusAttempted" size={18} intent="error" />,
-    complete: <SvgIcon name="statusComplete" size={18} intent="success" />,
-  }[attemptState]
-
   return (
     <div className={s.wrap}>
       <div className={s.header}>
-        <div className={s.questionContainer}>
-          <div className={s.attemptIcon}>{stateIcon}</div>
-          {isSolution ? (
-            <div className={s.solutionLabel}>Solution to {questionNumber}</div>
-          ) : (
-            <div className={s.question}>{questionNumber}</div>
-          )}
-        </div>
         <div className={s.toolbar}>
           <IconButton
             onClick={runSketch}
@@ -326,9 +295,6 @@ export function P5Exercise({
               timeLeft={timeLeft}
               running={running}
             />
-          </IconButton>
-          <IconButton onClick={onReset} aria-label="Reset">
-            <SvgIcon name="refresh" size={18} intent="muted" />
           </IconButton>
         </div>
       </div>

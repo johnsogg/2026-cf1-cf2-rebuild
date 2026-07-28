@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import type { AttemptState } from "../components/Exercise"
+import type { AskState as AttemptState } from "../components/Ask"
 import { getStorageValue, setStorageValue } from "../storage"
 
 export function getSectionStatus(urlPath: string): AttemptState {

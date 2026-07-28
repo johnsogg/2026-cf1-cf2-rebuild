@@ -1,17 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import s from "./MultipleChoiceExercise.module.css"
 import btn from "../styles/buttons.module.css"
 import { getStorageValue, setStorageValue } from "../storage"
+import { useAsk } from "./Ask"
 
 export type MultipleChoiceExerciseProps = {
-  type: "multiple-choice"
-  id: string
-  title?: string
   prompt: string
   options: Array<{ text: string; image?: string }>
   correct: number
-  hints?: string[]
-  solutionTo?: string
 }
 
 /**
@@ -20,34 +16,31 @@ export type MultipleChoiceExerciseProps = {
  */
 export function MultipleChoiceExercise({
   exercise,
-  onAttempt,
-  onComplete,
 }: {
   exercise: MultipleChoiceExerciseProps
-  onAttempt?: () => void
-  onComplete?: () => void
 }) {
+  const { id, declareGradable, reportGrade } = useAsk()
+
+  useEffect(() => {
+    declareGradable()
+  }, [declareGradable])
+
   const [selected, setSelected] = useState<number | null>(
-    () => getStorageValue((d) => d.exercises?.[exercise.id]?.selected) ?? null,
+    () => getStorageValue((d) => d.exercises?.[id]?.selected) ?? null,
   )
   const [submitted, setSubmitted] = useState(
-    () =>
-      getStorageValue((d) => d.exercises?.[exercise.id]?.submitted) ?? false,
+    () => getStorageValue((d) => d.exercises?.[id]?.submitted) ?? false,
   )
 
   const handleSubmit = (selectedIndex: number) => {
     setSelected(selectedIndex)
     setSubmitted(true)
     setStorageValue((d) => {
-      const e = ((d.exercises ??= {})[exercise.id] ??= {})
+      const e = ((d.exercises ??= {})[id] ??= {})
       e.selected = selectedIndex
       e.submitted = true
     })
-    if (selectedIndex === exercise.correct) {
-      onComplete?.()
-    } else {
-      onAttempt?.()
-    }
+    reportGrade(selectedIndex === exercise.correct)
   }
 
   const handleOptionClick = (i: number, e: React.MouseEvent) => {
@@ -88,7 +81,7 @@ export function MultipleChoiceExercise({
             >
               <input
                 type="radio"
-                name={exercise.id}
+                name={id}
                 value={i}
                 checked={selected === i}
                 onChange={() => {}}

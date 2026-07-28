@@ -1,0 +1,95 @@
+/* ── Ask wrapper ───────────────────────────────────────────────────────────── */
+
+.ask {
+  margin-bottom: 24px;
+  margin-left: 1.5rem;
+  padding-left: calc(var(--gutter) - 1.5rem);
+  border-radius: 6px;
+  border-left: 4px solid var(--text-muted);
+  grid-column: full;
+}
+
+.stateIdle {
+  border-color: var(--text-muted);
+}
+
+.stateComplete {
+  border-color: var(--success);
+}
+
+.stateAttempted {
+  border-color: var(--error);
+}
+
+.title {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.questionContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.question {
+  font-size: 175%;
+  font-weight: 800;
+}
+
+.attemptIcon {
+  display: flex;
+  align-items: center;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  accent-color: var(--success);
+}
+
+/* ── Warning banner ───────────────────────────────────────────────────────── */
+
+.warningBanner {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: var(--error-bg, #fee);
+  border: 2px solid var(--error);
+  color: var(--error);
+  font-weight: 600;
+}
+
+/* ── Hints ────────────────────────────────────────────────────────────────── */
+
+.hints {
+  margin-top: 12px;
+}
+
+.hint {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+  font-size: 13px;
+}
+
+.hintAction {
+  margin-top: 8px;
+}

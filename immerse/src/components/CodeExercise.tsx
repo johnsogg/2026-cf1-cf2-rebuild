@@ -10,6 +10,7 @@ import s from "./CodeExercise.module.css"
 import btn from "../styles/buttons.module.css"
 import { getStorageValue, setStorageValue } from "../storage"
 import { SvgIcon } from "./SvgIcon"
+import { useAsk } from "./Ask"
 
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
@@ -17,15 +18,10 @@ function handleBeforeMount(monaco: Monaco) {
 }
 
 export type CodeExerciseProps = {
-  type: "code"
-  id: string
-  title: string
   description?: string
   starterCode: string
   testCode: string
   moduleName: string
-  hints?: string[]
-  solutionTo?: string
 }
 
 type TestResult = {
@@ -45,24 +41,16 @@ type WorkerResponse = {
  * clicks Run, and automated tests report pass/fail. Intended for pure
  * logic/computation exercises, not visual output.
  */
-export function CodeExercise({
-  exercise,
-  onAttempt,
-  onComplete,
-}: {
-  exercise: CodeExerciseProps
-  onAttempt?: () => void
-  onComplete?: () => void
-}) {
+export function CodeExercise({ exercise }: { exercise: CodeExerciseProps }) {
+  const { id, declareGradable, reportGrade } = useAsk()
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
   const [code, setCode] = useState(
     () =>
-      getStorageValue((d) => d.exercises?.[exercise.id]?.code) ??
-      exercise.starterCode,
+      getStorageValue((d) => d.exercises?.[id]?.code) ?? exercise.starterCode,
   )
   const [results, setResults] = useState<TestResult[]>(
-    () => getStorageValue((d) => d.exercises?.[exercise.id]?.results) ?? [],
+    () => getStorageValue((d) => d.exercises?.[id]?.results) ?? [],
   )
   const [logs, setLogs] = useState<string[]>([])
   const [running, setRunning] = useState(false)
@@ -71,6 +59,10 @@ export function CodeExercise({
   const maxEditorHeight = Math.floor(window.innerHeight * 0.75)
   const [editorHeight, setEditorHeight] = useState(300)
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null)
+
+  useEffect(() => {
+    declareGradable()
+  }, [declareGradable])
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor
@@ -95,21 +87,17 @@ export function CodeExercise({
   useEffect(() => {
     const timer = setTimeout(() => {
       setStorageValue((d) => {
-        ;((d.exercises ??= {})[exercise.id] ??= {}).code = code
+        ;((d.exercises ??= {})[id] ??= {}).code = code
       })
     }, 500)
     return () => clearTimeout(timer)
-  }, [code, exercise.id])
+  }, [code, id])
 
   useEffect(() => {
     if (results.length > 0) {
-      if (results.every((r) => r.passed)) {
-        onComplete?.()
-      } else {
-        onAttempt?.()
-      }
+      reportGrade(results.every((r) => r.passed))
     }
-  }, [results, onComplete, onAttempt])
+  }, [results, reportGrade])
 
   if (window.innerWidth < 640) {
     return <p>This exercise requires a computer or tablet.</p>
@@ -139,7 +127,7 @@ export function CodeExercise({
       setError(e.data.error)
       setRunning(false)
       setStorageValue((d) => {
-        ;((d.exercises ??= {})[exercise.id] ??= {}).results = e.data.results
+        ;((d.exercises ??= {})[id] ??= {}).results = e.data.results
       })
     }
 

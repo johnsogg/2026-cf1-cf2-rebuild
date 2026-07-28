@@ -43,27 +43,111 @@ to other source files.
 
 <P5Sketch code={helloWorld} autoplay />
 
-## Exercises
+## Ask / Solution
 
-One of the main ways to gain skill is via practice. There are several
-`<Exercise>` component types. They all take an `exercise` prop that configures
-it.
+`<Ask id="..." mode="untracked" | "interacted" | "graded">` wraps any
+content — prose, a sketch, an editor, a mixture — and owns whether/how it
+counts toward book progress, independent of what's rendered inside.
+`<Solution id="...">` pairs with an `Ask` by reusing its id, not a second
+one. Responses persist to local storage and roll up into overall student
+progress.
 
-These are persistent - responses are recorded to local storage. It lets you know
-if it is not started, attempted but not completed, or completed. This info rolls
-up to the overall student progress in the book.
+### `graded` — real correctness signal
 
-### Code Exercises
+Only `CodeExercise` (unit tests) and `MultipleChoiceExercise` (right
+answer) can supply this. State goes idle → attempted (partial credit) →
+complete.
 
-This is a powerful coding exercise type with a Monaco editor. There can be unit
-tests, which the student can read to better understand the objective. There are
-also progressive hints available. Users can restart it.
+<Ask
+  id={greetAndSquare.id}
+  mode="graded"
+  title={greetAndSquare.title}
+  hints={greetAndSquare.hints}
+>
+  <CodeExercise exercise={greetAndSquare} />
+</Ask>
 
-<Exercise exercise={greetAndSquare} />
+<Solution id={greetAndSquare.id}>
 
-## Multiple Choice Question
+One way to do it: `` return `Hello ${name}` `` and `return n * n`.
 
-<Exercise exercise={typeAnnotationQuestion} />
+</Solution>
+
+<Ask
+  id={typeAnnotationQuestion.id}
+  mode="graded"
+  title={typeAnnotationQuestion.title}
+  hints={typeAnnotationQuestion.hints}
+>
+  <MultipleChoiceExercise exercise={typeAnnotationQuestion} />
+</Ask>
+
+### `graded` with nothing gradable inside
+
+`P5Exercise`/`ConsoleExercise` never report a grade — wrapping one in
+`mode="graded"` triggers a live warning banner right here in the page,
+not just a build-time console message.
+
+<Ask id="compendium-graded-mismatch" mode="graded" title="This will warn">
+
+```p5exercise size="small" autorun
+function setup() {
+  createCanvas(120, 120)
+}
+
+function draw() {
+  background("black")
+}
+```
+
+</Ask>
+
+### `untracked` — visible in the index, doesn't affect completion
+
+<Ask id="compendium-untracked-sketch" mode="untracked" title="Just a demo">
+
+```p5exercise size="small" autorun
+function setup() {
+  createCanvas(120, 120)
+}
+
+function draw() {
+  background("black")
+  fill("#888")
+  circle(60, 60, 40)
+}
+```
+
+</Ask>
+
+### `interacted` — a standard checkbox, nothing more
+
+Works around content that can't report its own correctness — including
+plain prose with no widget at all.
+
+<Ask id="compendium-interacted-prose" mode="interacted" title="Try it yourself">
+
+Go find something in this room that's roughly a sphere. Nothing to submit
+— just check the box once you've spotted one.
+
+</Ask>
+
+<Ask id="compendium-interacted-console" mode="interacted" title="Play with this">
+
+```jsconsole size="small" autorun
+console.log("edit me, then check the box")
+```
+
+</Ask>
+
+### Orphaned `Solution` — live warning, no matching `Ask`
+
+<Solution id="compendium-does-not-exist">
+
+This solution's id doesn't match any `Ask` on this page, so it renders a
+warning instead of a normal "Solution to N" label.
+
+</Solution>
 
 ## Callouts
 

@@ -1,0 +1,23 @@
+.solution {
+  margin-bottom: 24px;
+  padding-left: var(--gutter);
+  grid-column: full;
+}
+
+.solutionLabel {
+  font-size: 90%;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.warningBanner {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: var(--error-bg, #fee);
+  border: 2px solid var(--error);
+  color: var(--error);
+  font-weight: 600;
+}

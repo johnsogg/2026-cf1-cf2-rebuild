@@ -11,9 +11,48 @@ a priority (P1/P2/P3). Check it when the user wants a quick, self-contained
 task, and add to it when the user surfaces an idea they want to defer
 rather than act on now.
 
-## Exercise code blocks (`p5exercise`, `jsconsole`)
+## Ask / Solution (presentation vs. progress tracking)
 
-Every ` ```p5exercise ` or ` ```jsconsole ` code block must have a unique `id` attribute (e.g., `id="hello-world"`). IDs must be unique within a section and across the entire book. When adding or copying one of these blocks, always assign a new distinct ID — never duplicate an existing one.
+Content (a `p5exercise`/`jsconsole` fence, a `CodeExercise`/
+`MultipleChoiceExercise`, plain prose, an image, any mixture) is always
+wrapped in `<Ask id="..." mode="untracked" | "interacted" | "graded">`.
+The fence/component itself carries no `id`, `title`, or `solutionTo` —
+identity and chrome (question number, reset, completion indicator) belong
+to the wrapping `Ask`, not the content:
+
+```mdx
+<Ask id="hello-world-colors" mode="interacted" title="Try it">
+
+```p5exercise size="small" autorun
+function setup() {
+  createCanvas(150, 150)
+}
+```
+
+</Ask>
+```
+
+- **`untracked`** — doesn't count toward book completion; still gets a
+  number so it shows up in the compiled exercise index. Use for
+  illustration/asides you still want indexable.
+- **`interacted`** — a standard checkbox `Ask` renders itself; checking it
+  is the only completion signal. Use for informal "try this" prompts,
+  including plain prose with no widget at all.
+- **`graded`** — real correctness signal (unit-test pass / right answer).
+  Only content that can report a grade (`CodeExercise`,
+  `MultipleChoiceExercise`) works here — wrapping ungradable content (a
+  `p5exercise`/`jsconsole`) in `mode="graded"` renders a live warning
+  banner on the page itself, not just a build log message.
+
+`<Solution id="...">` pairs with an `Ask` by **reusing its id** — never
+invent a second id for the solution. IDs must still be unique
+book-wide across every `Ask`. If a `Solution`'s id has no matching `Ask`
+on the page, that also renders a live warning banner instead of silently
+doing nothing.
+
+See `book/EXERCISE-MODEL-NOTES.md` for the audit that motivated this and
+what's still deferred (migrating older content, cross-file duplicate-id
+detection).
 
 ## Inline JSX in prose paragraphs (e.g. `<Term>`)
 

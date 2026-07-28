@@ -5,7 +5,6 @@ import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
 import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
-import type { AttemptState } from "./Exercise"
 import s from "./ConsoleExercise.module.css"
 
 const beforeMount: BeforeMount = (monaco) => {
@@ -14,15 +13,10 @@ const beforeMount: BeforeMount = (monaco) => {
 }
 
 export type ConsoleExerciseProps = {
-  type: "console"
-  id: string
-  title?: string
   initialCode: string
-  hints?: string[]
   size?: "small" | "medium" | "large"
   autorun?: boolean
   hoverInfo?: boolean
-  solutionTo?: string
 }
 
 type WorkerResponse =
@@ -37,20 +31,14 @@ type RunError = {
 
 /**
  * Editable console program. Student writes/modifies plain JS/TS in a Monaco
- * editor and sees the console.log output on the right. No automated grading.
+ * editor and sees the console.log output on the right. No automated
+ * grading. Always used inside an `Ask`, which owns identity, numbering,
+ * and completion tracking.
  **/
 export function ConsoleExercise({
   exercise,
-  questionNumber,
-  isSolution,
-  attemptState,
-  onReset,
 }: {
   exercise: ConsoleExerciseProps
-  questionNumber: number
-  isSolution?: boolean
-  attemptState: AttemptState
-  onReset: () => void
 }) {
   const { initialCode, hoverInfo = true } = exercise
   const height = { small: "200px", medium: "400px", large: "80vh" }[
@@ -149,23 +137,9 @@ export function ConsoleExercise({
     )
   }, [])
 
-  const stateIcon = {
-    idle: <SvgIcon name="statusIdle" size={18} intent="muted" />,
-    attempted: <SvgIcon name="statusAttempted" size={18} intent="error" />,
-    complete: <SvgIcon name="statusComplete" size={18} intent="success" />,
-  }[attemptState]
-
   return (
     <div className={s.wrap}>
       <div className={s.header}>
-        <div className={s.questionContainer}>
-          <div className={s.attemptIcon}>{stateIcon}</div>
-          {isSolution ? (
-            <div className={s.solutionLabel}>Solution to {questionNumber}</div>
-          ) : (
-            <div className={s.question}>{questionNumber}</div>
-          )}
-        </div>
         <div className={s.toolbar}>
           <IconButton
             onClick={runCode}
@@ -185,9 +159,6 @@ export function ConsoleExercise({
               size={20}
               intent={!running ? "muted" : "danger"}
             />
-          </IconButton>
-          <IconButton onClick={onReset} aria-label="Reset">
-            <SvgIcon name="refresh" size={18} intent="muted" />
           </IconButton>
         </div>
       </div>
