@@ -1,9 +1,21 @@
 {
+  "ask block": {
+    "scope": "mdx",
+    "prefix": "ask",
+    "body": [
+      "<Ask id=\"${1:ask-id}\" mode=\"${2|untracked,interacted,graded|}\" title=\"${3:Title}\">",
+      "",
+      "$0",
+      "",
+      "</Ask>"
+    ],
+    "description": "Insert an <Ask> wrapper with id/mode/title, ready for content"
+  },
   "p5exercise block": {
     "scope": "mdx",
     "prefix": "p5exercise",
     "body": [
-      "```p5exercise id=\"${1:exercise-id}\" autorun size=\"${2|small,medium,large|}\"",
+      "```p5exercise autorun size=\"${1|small,medium,large|}\"",
       "function setup() {",
       "  createCanvas(150, 150)",
       "}",
@@ -14,7 +26,7 @@
       "```",
       "$0"
     ],
-    "description": "Insert a p5exercise code fence with basic setup/draw"
+    "description": "Insert a p5exercise code fence with basic setup/draw (wrap in <Ask> for id/title)"
   },
   "p5sketch block": {
     "scope": "mdx",
@@ -37,10 +49,9 @@
     "scope": "mdx",
     "prefix": "solution",
     "body": [
-      "<details>",
-      "<summary>${1:Show one possible solution}</summary>",
+      "<Solution id=\"${1:ask-id}\">",
       "",
-      "```p5exercise id=\"${2:exercise-id}-sln\" autorun size=\"${3|small,medium,large|}\" solutionTo=\"${2:exercise-id}\"",
+      "```p5exercise autorun size=\"${2|small,medium,large|}\"",
       "function setup() {",
       "  createCanvas(150, 150)",
       "}",
@@ -50,20 +61,20 @@
       "}",
       "```",
       "",
-      "</details>",
+      "</Solution>",
       "$0"
     ],
-    "description": "Insert a <details>/<summary> block containing a non-graded p5exercise solution"
+    "description": "Insert a <Solution> block reusing the id of the <Ask> it pairs with"
   },
   "jsconsole block": {
     "scope": "mdx",
     "prefix": "jsconsole",
     "body": [
-      "```jsconsole id=\"${1:exercise-id}\" size=\"${2|small,medium,large|}\"",
+      "```jsconsole size=\"${1|small,medium,large|}\"",
       "console.log(\"Hello, World!\")",
       "```",
       "$0"
     ],
-    "description": "Insert a jsconsole code fence"
+    "description": "Insert a jsconsole code fence (wrap in <Ask> for id/title)"
   }
 }

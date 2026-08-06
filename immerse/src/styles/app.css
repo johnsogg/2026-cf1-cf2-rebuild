@@ -9,3 +9,14 @@ body {
 a {
   color: var(--accent);
 }
+
+.figure {
+  display: block;
+  margin: 40px auto;
+}
+
+@media (max-width: 900px) {
+  .figure {
+    margin: 24px auto;
+  }
+}

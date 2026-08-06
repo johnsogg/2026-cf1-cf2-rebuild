@@ -1,10 +1,101 @@
+import colorPicker from "./assets/color-picker.png"
+
 export const title = "Color"
 
 # Color
 
-> - Colors have standard names - see
->   https://www.w3.org/TR/css-color-4/#named-colors for the standard used by
->   p5.js
+Eyes are amazing. When electromagnetic waves enter your eye and stimulate the
+cones in your retina, you 'see' the result of biological computations that give
+you information about color and brightness. Your mind puts this together such
+that you effortlessly see a tree, the sky, or whatever else you're looking at.
+Our eyes sense frequency ranges, and our minds see color.
+
+When you see a picture of a tree/sky/whatever on a computer, you're processing
+the light from millions of tiny picture elements ("pixels") usually composed of
+microscopic red, green, and blue dots. The pixel light that reaches your eye is
+actually nothing like what a real tree reflects, but your vision system
+interprets it in the same way.
+
+For graphics programming, our job is to make those pixels glow with the right
+balance of red/green/blue to produce the color that we intend the user to see.
+
+## Pixels and Colors
+
+The physical pixels on your display are probably made up of red, green, and blue
+sub-pixels. But in code, we can model color in lots of different ways. RGB is
+one of the most common: you just record how much red, green, and blue comprise a
+color, and those components combine to form a high-fidelity color.
+
+For example, the color purple has equal parts red and blue, without green.
+
+Importantly, "how much" of these components is bounded. You can have zero green,
+but you can't have less than that. Similarly there's an upper bound, you can
+think of it as being 100%, and you can't go above that in a meaningful way.
+Numerically, we just pick a convention for what that range is, and write down
+colors using that convention.
+
+If our convention was percentages, purple is 31% red, 0% green, and 31% blue.
+Often the conventional range is from zero to one, so our purple is 0.31 red, 0
+green, 0.31 blue. And other times we use a conventional range of integers from 0
+to 255 (inclusive), in which case our purple is 80 red, 0 green, 80 blue.
+
+### Color Models
+
+For code to work with colors, we need to pick a strategy. I introduced the RGB
+approach above, and there are many
+[color models](https://en.wikipedia.org/wiki/Color_model). Practically, you've
+probably experienced this when you've used color pickers:
+
+<img
+  src={colorPicker}
+  alt="A color picker showing RGB, HSB, and HSL controls for the same purple color"
+  width={600}
+  className="figure"
+/>
+
+These are all subtly different. At left is our 80/0/80 purple color in the RGB
+color space. The next two show the same color, but modeled in HSB (hue,
+saturation, balance), and HSL (hue, saturation, luminance). The color models
+give you different knobs to turn. They're useful in many contexts, but at this
+point it would be distracting to dive deeper.
+
+Regardless of which model you use, colors are translated into a format that can
+be displayed in pixels, and any of these models can produce the same output.
+
+### Named Colors
+
+Using numbers to represent color is helpful because you can do math with it. But
+it is also awkward to think with (what color is `55, 27, 7`?) so we can use
+names for a limited set of colors (for example, `"saddlebrown"`).
+
+Color on the web has gone through an evolution over the years. The "CSS Color
+Module Level 4" (what a mouthful) is the current standard that can be directly
+used by browsers. The WC3's spec has a
+[formal list of every named color](https://www.w3.org/TR/css-color-4/#named-colors),
+along with a note telling you that you shouldn't use them. And for production
+work, they're right. But as you're just learning to code, go ahead and draw from
+that list to your heart's content. Just be aware that there is weirdness, like
+dark gray actually being lighter than gray.
+
+<Ask id="color-named" mode="untracked" title="Try different named colors">
+
+```p5exercise autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  fill("darkgray")
+  square(10, 10, 80)
+  fill("gray")
+  square(60, 60, 80)
+}
+```
+
+</Ask>
+
+## p5.js colors
+
 > - Colors can also be built with components:
 >   - One number = grayscale
 >   - Three numbers = mode-dependent, by default red, green, blue
