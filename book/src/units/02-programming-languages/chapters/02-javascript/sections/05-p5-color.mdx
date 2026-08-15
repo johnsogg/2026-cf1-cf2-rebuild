@@ -1,5 +1,6 @@
 import colorPicker from "./assets/color-picker.png"
 import { CompFoundColorPicker } from "immerse/components/CompFoundColorPicker"
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
 
 export const title = "Color"
 
@@ -56,7 +57,7 @@ numbers are all subtly different for the same apparent color. In RGB, this is
 modeled using red, green, and blue color channels. The next two show the same
 color, but modeled in HSB (hue, saturation, brightness), and HSL (hue,
 saturation, lightness). The color models give you different knobs to turn. By
-default this shows a <Swatch value="#800080" /> purple color, and you can see 
+default this shows a <Swatch size="small" value="#800080" /> purple color, and you can see 
 that there are a few ways to say the same thing.
 
 {/* prettier-ignore-end */}
@@ -176,11 +177,39 @@ red/green/blue/alpha.
 
 ### Change how color numbers are interpreted
 
-> Anatomy: colorMode(RGB, 100)
->
-> 1. colorMode - function to change how color numbers are interpreted
-> 2. RGB - which model to use (RGB, HSB, HSL, a few exotic others)
-> 3. 100 - optional! - the upper bound (inclusive) defining the maximum value
+<CodeAnatomy
+  code={{
+    value: "colorMode(RGB, 100)",
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={320}
+  progressive
+  labels={[
+    {
+      name: "colorMode",
+      text: "Function that changes how color numbers are interpreted.",
+      pos: { x: 10, y: 10 },
+      target: { x: 125, y: 250 },
+      maxWidth: 260,
+    },
+    {
+      name: "RGB",
+      text: "Which color model to use (RGB, HSB, HSL, a few exotic others).",
+      pos: { x: 330, y: 10 },
+      target: { x: 288, y: 250 },
+      maxWidth: 220,
+    },
+    {
+      name: "value (100)",
+      text: "Optional! The upper bound (inclusive) defining the maximum value.",
+      pos: { x: 640, y: 10 },
+      target: { x: 405, y: 250 },
+      maxWidth: 220,
+    },
+  ]}
+/>
 
 You can change how color numbers are interpreted with `colorMode`. You just tell
 it what color model you want (we've been working with `RGB`) and the upper
@@ -197,7 +226,7 @@ colorMode(RGB, 1) // 0 to 1
 colorMode(RGB, 255) // equivalent to the default
 ```
 
-<Ask id="color-clamp-math" mode="untracked">
+<Ask id="color-float-math" mode="untracked">
 
 ```p5exercise autorun size="medium"
 function setup() {
@@ -252,9 +281,14 @@ value. So f leads to 10, 1f leads to 20; ff leads to 100, fff to 1000.
 
 Hex is very common in web and mobile programming. You've probably seen hex
 colors already even if you didn't realize it. You can recognize a hex number as
-a color because we typically write it with a hash tag in front: `#f72e4a`. That
-hash sign is just a cue for both the computer and for you the programmer to
+a color because we typically write it with a hashtag sign in front: `#f72e4a`.
+That hash sign is just a cue for both the computer and for you the programmer to
 interpret what follows as a hex value.
+
+<Callout intent="fun">
+  Various names for the `#` character: _hashtag_, _hash_, _pound_, and (my
+  personal favorite), _octothorpe_.
+</Callout>
 
 Here are just a few colors. Stare at this for a minute and try to spot the
 relationship between the visible color and the hex value.
@@ -278,5 +312,59 @@ numbers, or 0..255 using integers, or in 00..ff using hexadecimal values, these
 are all just _numbers_. There is nothing magical about them, even if a hex code
 like "#f72e4a" confuses you right now, just know that it represents numbers, and
 you'll soon be able to parse it and eventually understand it.
+
+### p5.js `color`
+
+Thus far we've passed raw numbers and strings into the functions that consume
+colors: `fill`, `stroke`, and `background`. When you do this, p5 converts that
+input into a `p5.Color` object. If you notice that you're repeating yourself
+with the same duplicative color statements, you can build a reusable color with
+the `color()` function: `color(42, 87, 205)` returns an object that represents
+that color, using whatever `colorMode` was active at the time you called it.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+
+  // We'll use the same numbers (42, 87, 205) to build
+  // three different colors in three different color modes.
+  // Each is stored as a variable & used to set fill color.
+  colorMode(RGB)
+  const c1 = color(42, 87, 205)
+  fill(c1)
+  square(20, 20, 25) // left
+
+  colorMode(HSB)
+  const c2 = color(42, 87, 205)
+  fill(c2)
+  square(50, 50, 25) // mid
+
+  colorMode(HSL)
+  const c3 = color(42, 87, 205)
+  fill(c3)
+  square(80, 80, 25) // right
+}
+```
+
+Storing a color this way is useful once you want to reuse the same color more
+than once, or reason about it in code. A raw call like `fill(42, 87, 205)`
+computes a fresh color every time and throws it away immediately after use.
+`const skyBlue = color(42, 87, 205)` instead gives you a named value you can
+pass to `fill(skyBlue)`, `stroke(skyBlue)`, or `background(skyBlue)` as many
+times as you like, and you can inspect or transform it later with functions like
+`red(skyBlue)`, `lerpColor(skyBlue, otherColor, 0.5)`, or `skyBlue.toString()`.
+
+You can use one of these pre-computed colors in any case where you'd otherwise
+use a literal color like <Swatch size="small" value="#2a57cd" />`#2a57cd`.
+
+The color picker I built for this book lets you copy the color mode and the
+`color` function that builds it, so you can use this directly in your p5 code.
+
+That said, I will leave you with another color picker to play around with. Happy
+coloring!
 
 <CompFoundColorPicker value="#f72e4a" />
