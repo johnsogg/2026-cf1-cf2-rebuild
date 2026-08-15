@@ -76,5 +76,17 @@
       "$0"
     ],
     "description": "Insert a jsconsole code fence (wrap in <Ask> for id/title)"
+  },
+  "prettier-ignore wrapper": {
+    "scope": "mdx",
+    "prefix": "prettier-ignore",
+    "body": [
+      "{/* prettier-ignore-start */}",
+      "",
+      "${TM_SELECTED_TEXT}$0",
+      "",
+      "{/* prettier-ignore-end */}"
+    ],
+    "description": "Wrap the selection (or insert at point) with prettier-ignore-start/-end markers, blank-line isolated"
   }
 }

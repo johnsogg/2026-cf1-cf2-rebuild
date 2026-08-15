@@ -15,6 +15,23 @@ a {
   margin: 40px auto;
 }
 
+table {
+  border-collapse: collapse;
+  width: fit-content;
+  margin: 24px 0;
+}
+
+th,
+td {
+  padding: 4px 24px 4px 0;
+  text-align: left;
+}
+
+th:last-child,
+td:last-child {
+  padding-right: 0;
+}
+
 @media (max-width: 900px) {
   .figure {
     margin: 24px auto;

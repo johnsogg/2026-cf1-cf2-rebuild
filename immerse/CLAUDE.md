@@ -69,3 +69,8 @@ import** — noted per component below. The rest need the explicit
   `<Kbd mod>Enter</Kbd>` or `<Kbd op="save" />`; switches between Mac/Windows
   glyphs client-side. `op` looks up named shortcuts from the active
   `KbdProvider` map. No import needed.
+
+- **Swatch** - Small colored square for a hex/named color value, e.g.
+  `<Swatch value="#000000" />`. Optional `size` ("small" | "medium" |
+  "large", default "medium") matches the p5 exercise codefence's size
+  values. No import needed.

@@ -1,0 +1,252 @@
+.picker {
+  width: 100%;
+  max-width: 560px;
+  margin: 24px 0;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+}
+
+.modeRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modeLabel {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.modeOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.mainRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.sliders {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sliderRow {
+  display: grid;
+  grid-template-columns: 72px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+}
+
+.sliderLabel {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.sliderValue {
+  width: 100%;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: monospace;
+  text-align: right;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0;
+  cursor: text;
+}
+
+.sliderValue:hover {
+  border-color: var(--border);
+}
+
+.sliderValueInput {
+  width: 100%;
+  color: var(--text);
+  font-size: 13px;
+  font-family: monospace;
+  text-align: right;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0;
+}
+
+.slider {
+  width: 100%;
+  height: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--bg);
+  border: 1.5px solid var(--text);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--bg);
+  border: 1.5px solid var(--text);
+  cursor: pointer;
+}
+
+.swatchCol,
+.historyCol {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 96px;
+  height: 96px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 22px);
+  grid-template-rows: repeat(4, 22px);
+  gap: 3px;
+}
+
+.historyCell {
+  position: relative;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.historyCheckBadge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: var(--bg);
+}
+
+.historyCell:disabled {
+  cursor: default;
+}
+
+.historyCell:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.historyCellEmpty {
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    var(--border) 50%,
+    transparent calc(50% + 1px)
+  );
+}
+
+.colTitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.numbers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.numberRow {
+  display: grid;
+  grid-template-columns: 40px 96px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.numberLabel {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.numberValue {
+  font-family: monospace;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.hexValue {
+  font-family: monospace;
+  font-size: 15px;
+  color: var(--text);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0 0 0 -4px;
+  cursor: text;
+}
+
+.hexValue:hover {
+  border-color: var(--border);
+}
+
+.hexInput {
+  width: 90px;
+  font-family: monospace;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 0 0 0 -5px;
+}
+
+.channelR {
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
+.channelG {
+  color: #2fbf5f;
+  font-weight: 600;
+}
+
+.channelB {
+  color: #4d94ff;
+  font-weight: 600;
+}

@@ -1,4 +1,5 @@
 import colorPicker from "./assets/color-picker.png"
+import { CompFoundColorPicker } from "immerse/components/CompFoundColorPicker"
 
 export const title = "Color"
 
@@ -19,12 +20,18 @@ interprets it in the same way.
 For graphics programming, our job is to make those pixels glow with the right
 balance of red/green/blue to produce the color that we intend the user to see.
 
+<CompFoundColorPicker value="#800080" />
+
+This color picker lets you find any displayable color by fiddling with the
+knobs. The rest of this chapter is about understanding why those knobs are
+there.
+
 ## Pixels and Colors
 
 The physical pixels on your display are probably made up of red, green, and blue
 sub-pixels. But in code, we can model color in lots of different ways. RGB is
 one of the most common: you just record how much red, green, and blue comprise a
-color, and those components combine to form a high-fidelity color.
+color, and those components combine to form a color.
 
 For example, the color purple has equal parts red and blue, without green.
 
@@ -34,50 +41,64 @@ think of it as being 100%, and you can't go above that in a meaningful way.
 Numerically, we just pick a convention for what that range is, and write down
 colors using that convention.
 
-If our convention was percentages, purple is 31% red, 0% green, and 31% blue.
-Often the conventional range is from zero to one, so our purple is 0.31 red, 0
-green, 0.31 blue. And other times we use a conventional range of integers from 0
-to 255 (inclusive), in which case our purple is 80 red, 0 green, 80 blue.
-
 ### Color Models
 
-For code to work with colors, we need to pick a strategy. I introduced the RGB
-approach above, and there are many
+We need to pick a strategy for how our code will interpret color values. I
+introduced the RGB approach above, and there are many
 [color models](https://en.wikipedia.org/wiki/Color_model). Practically, you've
-probably experienced this when you've used color pickers:
+probably experienced this when you've used color pickers. You can play around
+with this using the one above.
 
-<img
-  src={colorPicker}
-  alt="A color picker showing RGB, HSB, and HSL controls for the same purple color"
-  width={600}
-  className="figure"
-/>
+{/* prettier-ignore-start */}
 
-These are all subtly different. At left is our 80/0/80 purple color in the RGB
-color space. The next two show the same color, but modeled in HSB (hue,
-saturation, balance), and HSL (hue, saturation, luminance). The color models
-give you different knobs to turn. They're useful in many contexts, but at this
-point it would be distracting to dive deeper.
+If you flip between the types of color models (RGB, HSB, HSL), you'll notice the
+numbers are all subtly different for the same apparent color. In RGB, this is
+modeled using red, green, and blue color channels. The next two show the same
+color, but modeled in HSB (hue, saturation, brightness), and HSL (hue,
+saturation, lightness). The color models give you different knobs to turn. By
+default this shows a <Swatch value="#800080" /> purple color, and you can see 
+that there are a few ways to say the same thing.
 
-Regardless of which model you use, colors are translated into a format that can
-be displayed in pixels, and any of these models can produce the same output.
+{/* prettier-ignore-end */}
+
+The HSB and HSL color models let you describe a color in a _cylindrical_
+coordinate system. The _hue_ (H) is specified with an angle around a circle. If
+you wrap the visible spectrum around that circle, and then pick an angle, you'll
+get a particular hue. The _saturation_ (S) tells you how vibrant that color
+ought to be, from gray through full color.
+
+Then we can choose between either the _lightness_ if using HSL, or _brightness_
+if using HSB. Turning the L dial with HSL lets you trend towards black or white,
+while retaining the character of the color you chose with the other two knobs.
+With HSB, think of Brightness as applying how much shade the color is in - it
+trends from black through the characteristic color you chose with the others.
+
+Regardless of which model you use, colors are translated into a numeric format
+that can be displayed in pixels, and any of these models can produce the same
+screen output.
 
 ### Named Colors
 
 Using numbers to represent color is helpful because you can do math with it. But
-it is also awkward to think with (what color is `55, 27, 7`?) so we can use
-names for a limited set of colors (for example, `"saddlebrown"`).
+it is also awkward to think with (like, what color is `55, 27, 7`?) so we can
+use names for a limited set of colors (for example, `"saddlebrown"`).
 
-Color on the web has gone through an evolution over the years. The "CSS Color
-Module Level 4" (what a mouthful) is the current standard that can be directly
-used by browsers. The WC3's spec has a
+{/* prettier-ignore-start */}
+
+The "CSS Color Module Level 4" (what a mouthful) is the current standard used by
+browsers. The W3C's spec has a
 [formal list of every named color](https://www.w3.org/TR/css-color-4/#named-colors),
 along with a note telling you that you shouldn't use them. And for production
 work, they're right. But as you're just learning to code, go ahead and draw from
 that list to your heart's content. Just be aware that there is weirdness, like
-dark gray actually being lighter than gray.
+<Swatch size="small" value="#a9a9a9"/>`darkgray` actually being lighter than 
+<Swatch size="small" value="#808080" />`gray`, and 
+<Swatch size="small" value="#ffb6c1" />`lightpink` being darker than
+<Swatch size="small" value="#ffc0cb" />`pink`.
 
-<Ask id="color-named" mode="untracked" title="Try different named colors">
+{/* prettier-ignore-end */}
+
+<Ask id="color-named" mode="untracked" title="Play around with different named colors">
 
 ```p5exercise autorun size="small"
 function setup() {
@@ -96,10 +117,166 @@ function draw() {
 
 ## p5.js colors
 
-> - Colors can also be built with components:
->   - One number = grayscale
->   - Three numbers = mode-dependent, by default red, green, blue
->   - Four numbers = mode dependent, by default red, green, blue, alpha
-> - Numbers
->   - hex vs decimal vs float - briefly
->   - color modes and encoding and math
+{/* prettier-ignore-start */}
+
+Colors in p5.js are modeled just about the same as with other graphics
+libraries, so what you learn using p5 is generally portable. Since p5 is a
+browser-oriented library, it supports named colors like
+<Swatch size="small" value="#f5fffa" /> `mintcream` or any of the others you'll
+find at that W3C link above. Here's a quick summary, and I'll go into details on
+what these mean next:
+
+{/* prettier-ignore-end */}
+
+<Ask id="color-usage-examples" mode="untracked">
+
+```p5exercise autorun size="small"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("mintcream") // text name
+  fill(87) // grayscale color
+  circle(25, 25, 25)
+  fill(42, 87, 205) // rgb color
+  square(50, 50, 25)
+  fill(42, 87, 205, 128) // rgb with opacity
+  rect(85, 85, 50, 25)
+}
+```
+
+</Ask>
+
+The `background("mintcream")` call uses a named color from the official W3C
+list, which is what p5 uses. I'd recommend only using these colors if you happen
+to know one, and if you're not picky.
+
+The `fill(87)` sets a grayscale value. The `fill` function will check to see how
+many arguments you're sending in. In this case, there's just one number, so it
+will interpret this as a grayscale value. The number should be in the range `0`
+(for black) through `255` (for white). `87` happens to be a darker gray.
+
+We also use `fill` with three numbers. `fill(42, 87, 205)` sets the color that
+will be used to fill in the square. It has a little red (42), a little more
+green (87), and a lot of blue (205). As with the grayscale numbers, these are
+interpreted in the range `0-255` (inclusive).
+
+Try changing the values beyond that range, like using -10 or 1000. If you do
+this, it will _clamp_ the value to the expected range: give it something lower
+than the minimum, and p5 will just pretend like you gave it a zero; give larger
+than the maximum, and it will pretend you supplied 255.
+
+In the last `fill` example, the color we're specifying has _four_ numbers. The
+last one specifies _opacity_. `0` means "fully transparent" while `255` means
+"fully opaque". In my example I'm using `128`, which is halfway between the two,
+so it is 50% transparent. Transparency is often referred to as "alpha" in
+graphics lingo. The color scheme RGBA is what we're specifying here:
+red/green/blue/alpha.
+
+### Change how color numbers are interpreted
+
+> Anatomy: colorMode(RGB, 100)
+>
+> 1. colorMode - function to change how color numbers are interpreted
+> 2. RGB - which model to use (RGB, HSB, HSL, a few exotic others)
+> 3. 100 - optional! - the upper bound (inclusive) defining the maximum value
+
+You can change how color numbers are interpreted with `colorMode`. You just tell
+it what color model you want (we've been working with `RGB`) and the upper
+bound.
+
+Numbers like 0.3 are called "floating point" numbers in programming contexts.
+The range of `[0..1]` (zero to one) is useful for many reasons. One reason is
+that you can rely on math functions that work with numbers in that range nicely.
+For example, if you square any number in that range, you'll get another number
+in that range. Same with square root.
+
+```js
+colorMode(RGB, 1) // 0 to 1
+colorMode(RGB, 255) // equivalent to the default
+```
+
+<Ask id="color-clamp-math" mode="untracked">
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  const c = 0.5
+  const c_squared = c * c // 0.25
+  const c_sqrt = sqrt(c)  // 0.707 ish
+
+  colorMode(RGB, 1) // critical for our 0..1 to work!
+  fill(c) // middle gray
+  circle(40, 40, 25)
+  text("c" , 37, 75)
+  fill(c_squared) // fairly dark
+  circle(75, 40, 25)
+  text("c^2" , 66, 75)
+  fill(c_sqrt) // fairly light
+  circle(110, 40, 25)
+  text("√c" , 105, 75)
+}
+```
+
+</Ask>
+
+## Hexadecimal Numbers
+
+It is convenient to write colors in "hexadecimal" values - base 16. Hexadecimal
+is useful because it gives us a compact way to write the values that can fit
+inside a single byte. Just use two hex digits to represent the numbers 0
+through 255.
+
+<Callout intent="question">
+**What is base 16?**
+
+We typically count with ten digits: zero through nine. When you reach nine,
+you've run out of digits so you need to add or increment the adjacent _place
+value_. 9 leads to 10, 19 leads to 20; 99 leads to 100, 999 leads to 1000.
+
+What if we had some other number of fingers? Like, 16? We'd need to invent new
+symbols to represent those digits. Programmers often use _hexadecimal_, which is
+base-16. We borrow letters to fill in the rest. Here are the sixteen hex digits:
+
+`0 1 2 3 4 5 6 7 8 9 a b c d e f`
+
+So once you've counted up to f, you just add (or increment) the adjacent place
+value. So f leads to 10, 1f leads to 20; ff leads to 100, fff to 1000.
+
+</Callout>
+
+Hex is very common in web and mobile programming. You've probably seen hex
+colors already even if you didn't realize it. You can recognize a hex number as
+a color because we typically write it with a hash tag in front: `#f72e4a`. That
+hash sign is just a cue for both the computer and for you the programmer to
+interpret what follows as a hex value.
+
+Here are just a few colors. Stare at this for a minute and try to spot the
+relationship between the visible color and the hex value.
+
+|            Color | Hex       | Swatch                     | Remark                     |
+| ---------------: | --------- | -------------------------- | -------------------------- |
+|            black | `#000000` | <Swatch value="#000000" /> | All zero                   |
+|            white | `#ffffff` | <Swatch value="#ffffff" /> | All ff (full)              |
+|              red | `#ff0000` | <Swatch value="#ff0000" /> | `ff` in red, `0` otherwise |
+|            green | `#00ff00` | <Swatch value="#00ff00" /> | Same but for green         |
+|             blue | `#0000ff` | <Swatch value="#0000ff" /> | Same but blue              |
+|       chartreuse | `#7fff00` | <Swatch value="#7fff00" /> | Named CSS color            |
+|   lightslategrey | `#778899` | <Swatch value="#778899" /> | Named CSS color            |
+|       deep brown | `#4e342e` | <Swatch value="#4e342e" /> | Invented color             |
+| light pale green | `#dcedc8` | <Swatch value="#dcedc8" /> | Invented color             |
+|      flower pink | `#f8bbd0` | <Swatch value="#f8bbd0" /> | Invented color             |
+
+One important point to remember when it comes to color: these are just
+_numbers_. If you write a grayscale value in the range 0..1 using floating point
+numbers, or 0..255 using integers, or in 00..ff using hexadecimal values, these
+are all just _numbers_. There is nothing magical about them, even if a hex code
+like "#f72e4a" confuses you right now, just know that it represents numbers, and
+you'll soon be able to parse it and eventually understand it.
+
+<CompFoundColorPicker value="#f72e4a" />

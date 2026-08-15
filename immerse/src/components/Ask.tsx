@@ -100,7 +100,7 @@ export type AskProps = {
 
 export function Ask({ id, mode, title, hints, children }: AskProps) {
   const { getNumber, registerId } = useAskRegistry()
-  const number = getNumber(id)
+  const number = mode === "untracked" ? undefined : getNumber(id)
   registerId(id)
 
   const { registerExerciseInSection, notifyExerciseChange } = useProgress()
@@ -175,7 +175,9 @@ export function Ask({ id, mode, title, hints, children }: AskProps) {
   }[state]
 
   return (
-    <div className={`${s.ask} ${mode !== "untracked" ? stateClass : ""}`}>
+    <div
+      className={`${s.ask} ${mode === "untracked" ? s.untracked : stateClass}`}
+    >
       <div className={s.header}>
         <div className={s.questionContainer}>
           {mode === "interacted" && (
@@ -210,7 +212,7 @@ export function Ask({ id, mode, title, hints, children }: AskProps) {
               />
             </div>
           )}
-          <div className={s.question}>{number}</div>
+          {number !== undefined && <div className={s.question}>{number}</div>}
         </div>
         <IconButton onClick={handleReset} aria-label="Reset">
           <SvgIcon name="refresh" size={18} intent="muted" />

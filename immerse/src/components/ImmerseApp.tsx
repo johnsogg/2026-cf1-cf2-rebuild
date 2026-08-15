@@ -33,6 +33,7 @@ import { TableOfContents } from "./nav/TableOfContents"
 import { NavBar } from "./nav/Nav"
 import { initStorage, getStorageValue, setStorageValue } from "../storage"
 import { Kbd, KbdProvider } from "./Kbd"
+import { Swatch } from "./Swatch"
 import { ExpectedReadTime } from "./ExpectedReadTime"
 
 export type ImmerseAppProps = {
@@ -154,6 +155,7 @@ const defaultComponents = {
   ExpectedReadTime,
   Kbd,
   KbdProvider,
+  Swatch,
 }
 
 const AppLayout = ({

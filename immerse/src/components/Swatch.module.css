@@ -1,0 +1,22 @@
+.swatch {
+  display: inline-block;
+  vertical-align: middle;
+  border: 1px solid #0003;
+  border-radius: 2px;
+}
+
+.small {
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.25em;
+}
+
+.medium {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.large {
+  width: 3em;
+  height: 3em;
+}

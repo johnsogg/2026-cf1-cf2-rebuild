@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  /* Spans the full grid width when used as a bare fence (a direct child
+   * of .lesson); a no-op when nested inside <Ask>, which already claims
+   * the full column itself. */
+  grid-column: full;
 }
 
 .header {
