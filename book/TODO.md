@@ -43,9 +43,31 @@ Each entry: date added, priority, note.
   save battery. Press Run to re-activate." or something to that effect - be sure
   the text fits in the available space.
 
+- **2026-08-15 — P2** — Add a "Beyond this Book" chapter: a sci-fi
+  starscape-themed parking lot for curiosity-driven topics that come up while
+  drafting but don't belong in the main teaching path (e.g. OKLCH/perceptual
+  color spaces, WebGL, WASM, generative grammars). Gives permission to wave at
+  a topic without owing it a full explanation, keeping scope creep out of the
+  core chapters while still capturing the tangents worth sharing. Seed for
+  this: noticing the OKLCH gamut is "bumpy" — max chroma pinches to zero at
+  L=0/100 and balloons unevenly by hue in between (sRGB's primaries aren't
+  symmetric in perceptual space), so gamut mapping is its own small research
+  topic rather than a clamp. That kind of oddity is exactly what the chapter
+  is for.
+
 ## Other
 
 > Ideas that don't clearly fit the above.
+
+- **2026-08-15 — P3** — Considered adding an OKLCH mode to
+  `CompFoundColorPicker`, decided against it for now: the gamut's bumpiness
+  (max chroma varies by both hue and lightness, pinching to zero at the
+  extremes) means a naive slider UI would let students dial in combinations
+  that don't map cleanly back into sRGB — too misleading for a learning tool.
+  Would need real gamut-mapping/clamping to do honestly, which is more than a
+  "just add sliders" job. Possibly worth revisiting once/if it can be done
+  right — or just discussed conceptually in the "Beyond this Book" chapter
+  above instead of built as an interactive tool.
 
 - **2026-07-27 — P3** — `04-p5-graphics.mdx`'s "nested push/pop" example
   (`graphics-stack-push-pop-nested`, under `### push and pop`) is byte-identical

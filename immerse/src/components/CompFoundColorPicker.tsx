@@ -9,7 +9,7 @@ import {
   rgbToHsb,
   rgbToHsl,
 } from "../utils/colorConversions"
-import type { ColorRGB } from "../utils/colorConversions"
+import type { ColorHSB, ColorHSL, ColorRGB } from "../utils/colorConversions"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./CompFoundColorPicker.module.css"
@@ -23,11 +23,15 @@ import s from "./CompFoundColorPicker.module.css"
  * <CompFoundColorPicker />
  * ```
  *
- * A hands-on color picker for teaching RGB/HSB/HSL representations. Switch
- * modes with the radio row; the three sliders below always drive the
- * current mode's components. The swatch, recent-color history, and the
- * decimal/percentage/hex/CSS readouts all update live from one underlying
- * RGB value, so switching modes never loses or re-interprets the color.
+ * A hands-on color picker for teaching RGB/HSB/HSL representations. The
+ * selected mode's triplet is the single source of truth: dragging one
+ * slider only ever changes that slider's own field, so the other two stay
+ * exactly where you left them — including through degenerate points like
+ * pure black, where hue/saturation would otherwise be undefined. Switching
+ * modes converts the current triplet once into the new mode's terms; the
+ * swatch, history, and decimal/percentage/hex/CSS readouts are all derived
+ * from that on every render, so they always agree with whichever triplet
+ * is authoritative.
  */
 
 type Mode = "rgb" | "hsb" | "hsl"
@@ -65,12 +69,34 @@ type SliderSpec = {
   onChange: (value: number) => void
 }
 
+type NativeColor =
+  | { mode: "rgb"; value: ColorRGB }
+  | { mode: "hsb"; value: ColorHSB }
+  | { mode: "hsl"; value: ColorHSL }
+
+function nativeToRgb(native: NativeColor): ColorRGB {
+  if (native.mode === "rgb") return native.value
+  if (native.mode === "hsb") return hsbToRgb(native.value)
+  return hslToRgb(native.value)
+}
+
+function nativeFromRgb(mode: Mode, rgb: ColorRGB): NativeColor {
+  if (mode === "rgb") return { mode, value: rgb }
+  if (mode === "hsb") return { mode, value: rgbToHsb(rgb) }
+  return { mode, value: rgbToHsl(rgb) }
+}
+
+function convertNative(native: NativeColor, mode: Mode): NativeColor {
+  if (native.mode === mode) return native
+  return nativeFromRgb(mode, nativeToRgb(native))
+}
+
 function slidersForMode(
-  mode: Mode,
-  rgb: ColorRGB,
-  setRgb: (rgb: ColorRGB) => void,
+  native: NativeColor,
+  setNative: (native: NativeColor) => void,
 ): SliderSpec[] {
-  if (mode === "rgb") {
+  if (native.mode === "rgb") {
+    const { value: rgb } = native
     return [
       {
         key: "r",
@@ -80,7 +106,7 @@ function slidersForMode(
         max: 255,
         unit: "",
         gradient: gradient(["#000000", "#ff0000"]),
-        onChange: (v) => setRgb({ ...rgb, r: v }),
+        onChange: (v) => setNative({ mode: "rgb", value: { ...rgb, r: v } }),
       },
       {
         key: "g",
@@ -90,7 +116,7 @@ function slidersForMode(
         max: 255,
         unit: "",
         gradient: gradient(["#000000", "#00ff00"]),
-        onChange: (v) => setRgb({ ...rgb, g: v }),
+        onChange: (v) => setNative({ mode: "rgb", value: { ...rgb, g: v } }),
       },
       {
         key: "b",
@@ -100,13 +126,13 @@ function slidersForMode(
         max: 255,
         unit: "",
         gradient: gradient(["#000000", "#0000ff"]),
-        onChange: (v) => setRgb({ ...rgb, b: v }),
+        onChange: (v) => setNative({ mode: "rgb", value: { ...rgb, b: v } }),
       },
     ]
   }
 
-  if (mode === "hsb") {
-    const hsb = rgbToHsb(rgb)
+  if (native.mode === "hsb") {
+    const { value: hsb } = native
     return [
       {
         key: "h",
@@ -116,7 +142,7 @@ function slidersForMode(
         max: 360,
         unit: "°",
         gradient: HUE_GRADIENT,
-        onChange: (v) => setRgb(hsbToRgb({ h: v, s: hsb.s, b: hsb.b })),
+        onChange: (v) => setNative({ mode: "hsb", value: { ...hsb, h: v } }),
       },
       {
         key: "s",
@@ -126,10 +152,10 @@ function slidersForMode(
         max: 100,
         unit: "%",
         gradient: gradient([
-          rgbToCss(hsbToRgb({ h: hsb.h, s: 0, b: hsb.b })),
-          rgbToCss(hsbToRgb({ h: hsb.h, s: 100, b: hsb.b })),
+          rgbToCss(hsbToRgb({ ...hsb, s: 0 })),
+          rgbToCss(hsbToRgb({ ...hsb, s: 100 })),
         ]),
-        onChange: (v) => setRgb(hsbToRgb({ h: hsb.h, s: v, b: hsb.b })),
+        onChange: (v) => setNative({ mode: "hsb", value: { ...hsb, s: v } }),
       },
       {
         key: "b",
@@ -138,16 +164,13 @@ function slidersForMode(
         min: 0,
         max: 100,
         unit: "%",
-        gradient: gradient([
-          "#000000",
-          rgbToCss(hsbToRgb({ h: hsb.h, s: hsb.s, b: 100 })),
-        ]),
-        onChange: (v) => setRgb(hsbToRgb({ h: hsb.h, s: hsb.s, b: v })),
+        gradient: gradient(["#000000", rgbToCss(hsbToRgb({ ...hsb, b: 100 }))]),
+        onChange: (v) => setNative({ mode: "hsb", value: { ...hsb, b: v } }),
       },
     ]
   }
 
-  const hsl = rgbToHsl(rgb)
+  const { value: hsl } = native
   return [
     {
       key: "h",
@@ -157,7 +180,7 @@ function slidersForMode(
       max: 360,
       unit: "°",
       gradient: HUE_GRADIENT,
-      onChange: (v) => setRgb(hslToRgb({ h: v, s: hsl.s, l: hsl.l })),
+      onChange: (v) => setNative({ mode: "hsl", value: { ...hsl, h: v } }),
     },
     {
       key: "s",
@@ -167,10 +190,10 @@ function slidersForMode(
       max: 100,
       unit: "%",
       gradient: gradient([
-        rgbToCss(hslToRgb({ h: hsl.h, s: 0, l: hsl.l })),
-        rgbToCss(hslToRgb({ h: hsl.h, s: 100, l: hsl.l })),
+        rgbToCss(hslToRgb({ ...hsl, s: 0 })),
+        rgbToCss(hslToRgb({ ...hsl, s: 100 })),
       ]),
-      onChange: (v) => setRgb(hslToRgb({ h: hsl.h, s: v, l: hsl.l })),
+      onChange: (v) => setNative({ mode: "hsl", value: { ...hsl, s: v } }),
     },
     {
       key: "l",
@@ -181,10 +204,10 @@ function slidersForMode(
       unit: "%",
       gradient: gradient([
         "#000000",
-        rgbToCss(hslToRgb({ h: hsl.h, s: hsl.s, l: 50 })),
+        rgbToCss(hslToRgb({ ...hsl, l: 50 })),
         "#ffffff",
       ]),
-      onChange: (v) => setRgb(hslToRgb({ h: hsl.h, s: hsl.s, l: v })),
+      onChange: (v) => setNative({ mode: "hsl", value: { ...hsl, l: v } }),
     },
   ]
 }
@@ -384,16 +407,17 @@ export const CompFoundColorPicker = ({
   value,
 }: CompFoundColorPickerProps = {}) => {
   const groupId = useId()
-  const [mode, setMode] = useState<Mode>("rgb")
-  const [rgb, setRgb] = useState<ColorRGB>(
-    value ? hexToRgb(value) : { r: 59, g: 130, b: 246 },
-  )
+  const [native, setNative] = useState<NativeColor>(() => ({
+    mode: "rgb",
+    value: value ? hexToRgb(value) : { r: 59, g: 130, b: 246 },
+  }))
   const [history, setHistory] = useState<string[]>([])
   const [copiedRow, setCopiedRow] = useState<string | null>(null)
   const [copiedHistoryIndex, setCopiedHistoryIndex] = useState<number | null>(
     null,
   )
 
+  const rgb = nativeToRgb(native)
   const hex = rgbToHex(rgb)
 
   useEffect(() => {
@@ -414,8 +438,12 @@ export const CompFoundColorPicker = ({
     )
   }
 
+  const setAbsoluteRgb = (nextRgb: ColorRGB) => {
+    setNative(nativeFromRgb(native.mode, nextRgb))
+  }
+
   const handleHistoryClick = (i: number, color: string) => {
-    setRgb(hexToRgb(color))
+    setAbsoluteRgb(hexToRgb(color))
     navigator.clipboard.writeText(color)
     setCopiedHistoryIndex(i)
     window.setTimeout(
@@ -424,13 +452,14 @@ export const CompFoundColorPicker = ({
     )
   }
 
-  const sliders = slidersForMode(mode, rgb, setRgb)
+  const sliders = slidersForMode(native, setNative)
   const percent = {
     r: round((rgb.r / 255) * 100),
     g: round((rgb.g / 255) * 100),
     b: round((rgb.b / 255) * 100),
   }
-  const cssValue = mode === "rgb" ? rgbToCss(rgb) : hslToCss(rgbToHsl(rgb))
+  const cssValue =
+    native.mode === "rgb" ? rgbToCss(rgb) : hslToCss(rgbToHsl(rgb))
   const historySlots = Array.from(
     { length: HISTORY_SIZE },
     (_, i) => history[i] ?? null,
@@ -445,8 +474,8 @@ export const CompFoundColorPicker = ({
             <input
               type="radio"
               name={`${groupId}-mode`}
-              checked={mode === m.id}
-              onChange={() => setMode(m.id)}
+              checked={native.mode === m.id}
+              onChange={() => setNative(convertNative(native, m.id))}
             />
             {m.label}
           </label>
@@ -531,7 +560,7 @@ export const CompFoundColorPicker = ({
         >
           <EditableHex
             value={hex}
-            onChange={(newHex) => setRgb(hexToRgb(newHex))}
+            onChange={(newHex) => setAbsoluteRgb(hexToRgb(newHex))}
           />
         </NumberRow>
 
