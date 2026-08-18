@@ -352,14 +352,30 @@ function draw() {
 
 Storing a color this way is useful once you want to reuse the same color more
 than once, or reason about it in code. A raw call like `fill(42, 87, 205)`
-computes a fresh color every time and throws it away immediately after use.
-`const skyBlue = color(42, 87, 205)` instead gives you a named value you can
-pass to `fill(skyBlue)`, `stroke(skyBlue)`, or `background(skyBlue)` as many
-times as you like, and you can inspect or transform it later with functions like
-`red(skyBlue)`, `lerpColor(skyBlue, otherColor, 0.5)`, or `skyBlue.toString()`.
+computes a fresh color every time and throws it away immediately after use. But
+if you create a color object once, you can refer to it many times:
 
-You can use one of these pre-computed colors in any case where you'd otherwise
-use a literal color like <Swatch size="small" value="#2a57cd" />`#2a57cd`.
+```js
+// which is easier to read and change later? this?
+background(42, 87, 205)
+fill(42, 87, 205)
+stroke(42, 87, 205)
+
+// or this?
+const skyBlue = color(42, 87, 205)
+background(skyBlue)
+fill(skyBlue)
+stroke(skyBlue)
+```
+
+{/* prettier-ignore-start */}
+
+Once you have a color object, you can inspect or transform it later with
+functions. You can use one of these pre-computed colors in any case where you'd
+otherwise use a literal color like
+<Swatch size="small" value="#2a57cd" />`#2a57cd`.
+
+{/* prettier-ignore-end */}
 
 The color picker I built for this book lets you copy the color mode and the
 `color` function that builds it, so you can use this directly in your p5 code.
