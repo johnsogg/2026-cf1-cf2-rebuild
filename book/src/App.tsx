@@ -12,6 +12,16 @@ const titles = import.meta.glob<string>("./units/**/*.mdx", {
   eager: true,
 })
 const loaders = import.meta.glob<{ default: ComponentType }>("./units/**/*.mdx")
+const orderModules = import.meta.glob<string[]>("./units/**/_order.json", {
+  import: "default",
+  eager: true,
+})
+const order = Object.fromEntries(
+  Object.entries(orderModules).map(([path, arr]) => [
+    path.replace(/\/_order\.json$/, ""),
+    arr,
+  ]),
+)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const components: Record<string, ComponentType<any>> = { Callout, P5Sketch }
 
@@ -31,6 +41,7 @@ export default () => (
     bookSlug="cf1cf2"
     titles={titles}
     loaders={loaders}
+    order={order}
     glossaryEntries={glossaryEntries}
     components={components}
     overview={Overview}

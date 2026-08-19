@@ -7,7 +7,13 @@ import {
   type ReactNode,
 } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { buildNavTree, type MiscPage, type Section, type Unit } from "./navTree"
+import {
+  buildNavTree,
+  type MiscPage,
+  type OrderMap,
+  type Section,
+  type Unit,
+} from "./navTree"
 
 type NavContextValue = {
   tree: Unit[]
@@ -27,6 +33,7 @@ const NavContext = createContext<NavContextValue | null>(null)
 type NavProviderProps = {
   titles: Record<string, string>
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
+  order: OrderMap
   misc: MiscPage[]
   children: ReactNode
 }
@@ -34,10 +41,14 @@ type NavProviderProps = {
 export const NavProvider = ({
   titles,
   loaders,
+  order,
   misc,
   children,
 }: NavProviderProps) => {
-  const tree = useMemo(() => buildNavTree(titles, loaders), [loaders, titles])
+  const tree = useMemo(
+    () => buildNavTree(titles, loaders, order),
+    [loaders, titles, order],
+  )
   const flat = useMemo<Section[]>(
     () => tree.flatMap((u) => u.chapters.flatMap((c) => c.sections)),
     [tree],

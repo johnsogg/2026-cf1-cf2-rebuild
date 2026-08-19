@@ -22,7 +22,7 @@ import {
 import { ThemeProvider } from "../hooks/useTheme"
 import { Tools } from "./Tools"
 import { NavProvider, useNav } from "../nav/NavContext"
-import type { MiscPage } from "../nav/navTree"
+import type { MiscPage, OrderMap } from "../nav/navTree"
 import {
   ProgressProvider,
   useProgress,
@@ -40,6 +40,7 @@ export type ImmerseAppProps = {
   bookSlug: string
   titles: Record<string, string>
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
+  order: OrderMap
   glossaryEntries: GlossaryEntry[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   components?: Record<string, ComponentType<any>>
@@ -292,6 +293,7 @@ export const ImmerseApp = ({
   bookSlug,
   titles,
   loaders,
+  order,
   glossaryEntries,
   components,
   overview,
@@ -305,7 +307,7 @@ export const ImmerseApp = ({
       <ThemeProvider>
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
-            <NavProvider titles={titles} loaders={loaders} misc={misc}>
+            <NavProvider titles={titles} loaders={loaders} order={order} misc={misc}>
               <ProgressProvider>
                 <AppLayout
                   overview={overview}

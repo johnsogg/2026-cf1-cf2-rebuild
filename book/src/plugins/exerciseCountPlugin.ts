@@ -2,12 +2,12 @@ import type { Plugin } from "vite"
 import { readFileSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { SECTION_PATH_RE } from "../../../immerse/src/nav/sectionPath"
 
 const VIRTUAL_ID = "virtual:exercise-totals"
 const RESOLVED_ID = "\0" + VIRTUAL_ID
 
-const SECTION_RE =
-  /units\/([\w-]+)\/chapters\/([\w-]+)\/sections\/([\w-]+)\.mdx$/
+const SECTION_RE = SECTION_PATH_RE
 // Matches a whole <Ask ...> opening tag so the mode= attribute can be
 // inspected — untracked asks don't count toward the completion total.
 const ASK_TAG_RE = /<Ask\b[^>]*>/g
