@@ -1,5 +1,120 @@
 export const title = "Interactivity"
 
+# Interactivity
+
+So far we've written p5.js sketches that create _static_ images. This means they
+don't change over time, or in response to what the user does. We're going to
+learn about _interactivity_.
+
+p5.js can handle any input that your browser knows about. For starters, you get
+support for mouse and keyboard right out of the box.
+
+## Variables, Callbacks, and Utility Functions
+
+There are three main ways for you to work with interactivity: through variables,
+event callbacks, and utility functions.
+
+### Interactivity Variables
+
+p5.js has special variables with information about mouse and keyboard state.
+
+| Variable       | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| `mouseX`       | Horizontal position of the mouse, in pixels                              |
+| `mouseY`       | Vertical position of the mouse, in pixels                                |
+| `movedX`       | How far the mouse moved horizontally since the last frame                |
+| `movedY`       | How far the mouse moved vertically since the last frame                  |
+| `mouseButton`  | Which mouse button was most recently pressed (`LEFT`, `RIGHT`, `CENTER`) |
+| `key`          | The most recently pressed key, as a string                               |
+| `keyCode`      | The numeric code of the most recently pressed key                        |
+| `keyIsPressed` | Whether any key is currently being held down                             |
+
+You can _read_ these variables at any time, including in the `draw` function.
+p5.js keeps them up to date as the user moves the mouse or types, so
+whatever `draw` reads is the latest value — and by default `draw` runs 60
+times per second.
+
+### Interactivity Callbacks
+
+Another primary way to get interactivity information is to define an event
+callback function:
+
+| Callback          | Description                                                |
+| ----------------- | ---------------------------------------------------------- |
+| `mouseMoved()`    | Called when the mouse moves, with no button pressed        |
+| `mouseDragged()`  | Called when the mouse moves while a button is pressed      |
+| `mousePressed()`  | Called once when a mouse button is pressed                 |
+| `mouseReleased()` | Called once when a mouse button is released                |
+| `mouseClicked()`  | Called after a mouse button is pressed and released        |
+| `doubleClicked()` | Called when the mouse is clicked twice in quick succession |
+| `keyTyped()`      | Called when a key that produces a character is pressed     |
+| `keyReleased()`   | Called once when a key is released                         |
+| `keyPressed()`    | Called once when a key is pressed                          |
+
+This means that you define any of these functions, and p5 will call your version
+of that function as appropriate. It does this between `draw` calls. This means
+you can get the event, write some state, and then use that state during the next
+`draw` call.
+
+{/* prettier-ignore-start */}
+
+For example, say you have a sketch that shows a lightbulb. When the user presses
+the <Kbd>[</Kbd> key, we want to turn the light on, and <Kbd>]</Kbd> turns it 
+off. Your callback could look like this:
+
+{/* prettier-ignore-end */}
+
+```js
+function keyTyped() {
+  if (key === "[") {
+    lightbulbOn = true
+  }
+  if (key === "]") {
+    lightbulbOn = false
+  }
+}
+```
+
+Importantly, you should notice that we're not actually drawing anything here!
+We're only recording the state we need (`lightbulbOn` is either `true` or
+`false`). Then the next time our `draw` function is run, we can use that to
+render the lightbulb as expected.
+
+As a rule of thumb, callback functions should only set state, not draw. (You
+technically *can* draw from inside one, but it'll just get erased on the next
+`draw()` call unless you also call `noLoop()`.)
+
+### Utility Functions
+
+There are a few utility functions that you can call at any time to get
+information. These are convenience functions to help save some typing. You can
+use these in the `draw` function. The one that you're likely to want right away
+is `keyIsDown(k)`:
+
+```js
+function draw() {
+  // a few special keys have their own constants
+  if (keyIsDown(LEFT_ARROW)) {
+    moveLeft()
+  }
+  // most keys don't, so use their numeric key code instead
+  if (keyIsDown(32)) {
+    drawSpaceship()
+  }
+  if (keyIsDown(81)) {
+    drawAlien()
+  }
+}
+```
+
+### When to use each kind of interactivity code
+
+Use variables when you are drawing or updating state.
+
+Use callbacks when you want to react to user input, and only do it one time.
+
+Use utility functions whenever you want, as they just defer to variables.
+
 > Making programs respond to the user. The sketch is no longer frozen — it
 > reacts to mouse position, mouse clicks, and keyboard input. Goals:
 >
@@ -12,8 +127,6 @@ export const title = "Interactivity"
 > The assignment framing is an "interactive still life" — the scene from the
 > prior section that now responds to the user in some meaningful way.
 
-# Interactivity
-
 > at the top I'll show a finished p5 sketch without the code that uses all the
 > examples from below, so students know where this is going and what they'll be
 > able to do. That is TBD as I haven't written the rest yet.
@@ -22,12 +135,6 @@ export const title = "Interactivity"
 > far and wide and not p5-specific. It calls setup() once at the beginning, and
 > then draw() 60 times per second (or another number, if you change the frame
 > rate)
-
-## Aside: `fill(red, green, blue)`
-
-> The examples below depend on understanding the fill function with different
-> components. Just explain this quickly and note that they'll see an example
-> right away.
 
 ## Mouse Position and Canvas Coordinates
 
