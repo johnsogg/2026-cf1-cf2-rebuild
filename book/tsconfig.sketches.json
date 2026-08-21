@@ -11,6 +11,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "files": ["../node_modules/@types/p5/global.d.ts"],
+  "files": ["../node_modules/p5/types/global.d.ts"],
   "include": ["src/**/*code.ts", "src/lib/**/*.ts"]
 }

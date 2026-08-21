@@ -27,10 +27,19 @@ export default defineConfig(({ command }) => ({
     outDir: "../docs",
     emptyOutDir: true,
   },
+  optimizeDeps: {
+    exclude: ["p5/lib/p5.min.js?raw"],
+  },
   resolve: {
     alias: {
       immerse: fileURLToPath(new URL("../immerse/src", import.meta.url)),
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // p5 v2's package.json "exports" map doesn't list this file, even
+      // though it still ships it — alias around the restriction so the
+      // global-mode UMD build can be inlined into the sketch iframe.
+      "p5/lib/p5.min.js?raw": `${fileURLToPath(
+        new URL("../node_modules/p5/lib/p5.min.js", import.meta.url),
+      )}?raw`,
     },
   },
   plugins: [

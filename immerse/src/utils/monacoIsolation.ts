@@ -16,6 +16,10 @@ export function isolateMonacoTypescriptFiles(monaco: Monaco): void {
   const defaults = monaco.languages.typescript.typescriptDefaults
   defaults.setCompilerOptions({
     ...defaults.getCompilerOptions(),
-    moduleDetection: "force",
+    // Monaco's compiler-options API takes TS's internal enum value here, not
+    // the "force" string tsconfig.json accepts — passing the string throws
+    // at runtime ("moduleDetection is a string value..."). 3 is
+    // ts.ModuleDetectionKind.Force; Monaco doesn't re-export that enum.
+    moduleDetection: 3,
   })
 }

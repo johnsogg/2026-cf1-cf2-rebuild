@@ -75,10 +75,11 @@ function AutoStopSvg({
   )
 }
 
-// Eagerly load all @types/p5 declaration files so Monaco gets p5 global types.
+// Eagerly load p5's bundled declaration files so Monaco gets p5 global types.
 // Path goes up from immerse/src/components/ to the monorepo root node_modules.
+// (p5 ships its own types as of v2 — no separate @types/p5 package anymore.)
 const p5TypeFiles = import.meta.glob<string>(
-  "../../../node_modules/@types/p5/**/*.d.ts",
+  "../../../node_modules/p5/types/**/*.d.ts",
   { query: "?raw", import: "default", eager: true },
 )
 
