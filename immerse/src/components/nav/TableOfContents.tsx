@@ -150,6 +150,7 @@ export const TableOfContents = () => {
           </button>
         </span>
       </div>
+      <TocHome />
       {tree.map((unit) => (
         <TocUnit
           key={unit.slug}
@@ -167,6 +168,20 @@ export const TableOfContents = () => {
       ))}
       </nav>
     </div>
+  )
+}
+
+const TocHome = () => {
+  const location = useLocation()
+  const isActive = location.pathname === "/"
+
+  return (
+    <Link
+      to="/"
+      className={`${s.unit} ${s.unitLink} ${isActive ? s.unitLinkActive : ""}`}
+    >
+      Home
+    </Link>
   )
 }
 
@@ -260,6 +275,7 @@ const TocChapter = ({
   isExpanded: boolean
   onToggle: () => void
 }) => {
+  const location = useLocation()
   const collapsibleRef = useRef<HTMLDivElement>(null)
 
   const handleTransitionEnd = () => {
@@ -294,7 +310,9 @@ const TocChapter = ({
               path={[num, idx + 1]}
               status={getSectionStatus(section.urlPath)}
               section={section}
-              isCurrentSection={currentSection === section}
+              isCurrentSection={
+                currentSection === section && location.pathname !== "/"
+              }
             />
           ))}
         </ul>
