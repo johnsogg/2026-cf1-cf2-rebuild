@@ -22,7 +22,7 @@ const copy404Plugin = {
 }
 
 export default defineConfig(({ command }) => ({
-  base: command === "build" ? "/2026-cf1-cf2-rebuild/" : "/",
+  base: "/",
   build: {
     outDir: "../docs",
     emptyOutDir: true,
