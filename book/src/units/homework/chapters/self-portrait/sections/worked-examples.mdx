@@ -1,6 +1,407 @@
 export const title = "Worked Examples"
 
+import gabeSelfPortrait from "./gabe-self-portrait-f26.jpg"
+
 # Self Portrait — Worked Examples
 
-- Example 1:
-- Example 2:
+- Example 1: Gabe's self portrait
+- Example 2: A robot's self portrait (by Claude, an AI)
+
+## Example 1: Gabe's self portrait
+
+I usually start with a paper sketch:
+
+<img
+  src={gabeSelfPortrait}
+  alt="2025 CF1 Fall's class picture"
+  style={{ width: "200px", height: "auto" }}
+/>
+
+Here's what I see and how I'd think about translating this to code:
+
+The head should sit on top of the body. So knowing that shapes that are drawn
+first get covered up by following shapes, I'll draw the body first then the
+head. And of course eyes go on top of that, so they're next, and then the
+pupils.
+
+All this will go on a 150x150 canvas - I could make it any size but I'll roll
+that way.
+
+The body is just an ellipse, and it is cropped off the canvas.
+
+I'll show my process in steps so it builds up in hopefully manageable pieces.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("papayawhip")
+
+  // body crops off
+  stroke("#202020")
+  fill("#606060")
+  rectMode("center")
+  ellipse(75, 150, 90, 150)
+
+  // head on top of that
+  fill("#fcefe8")
+  circle(75, 60, 70)
+
+  // left eye
+  noStroke()
+  fill("#fff")
+  circle(65, 60, 20)
+  fill("#6f6fec") // color picker FTW
+  ellipse(70, 62, 10, 8)
+
+  // right eye
+  fill("#fff")
+  circle(85, 60, 20)
+  fill("#6f6fec")
+  ellipse(90, 59, 10, 8) // wacky pupil
+}
+```
+
+Now I need to add the eyebrows. These are at angles. I could use `rotate` here,
+but we haven't covered that. Instead, I'll make a shape.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("papayawhip")
+
+  // body crops off
+  stroke("#202020")
+  fill("#606060")
+  rectMode("center")
+  ellipse(75, 150, 90, 150)
+
+  // head on top of that
+  fill("#fcefe8")
+  circle(75, 60, 70)
+
+  // left eye
+  noStroke()
+  fill("#fff")
+  circle(65, 60, 20)
+  fill("#6f6fec") // color picker FTW
+  ellipse(70, 62, 10, 8)
+
+  // right eye
+  fill("#fff")
+  circle(85, 60, 20)
+  fill("#6f6fec")
+  ellipse(90, 59, 10, 8) // wacky pupil
+
+  // eyebrow variables
+  const browY = 40
+  const browDX = 20
+  const browDY = 8
+  const browColor = color(66, 52, 30)
+  fill(browColor)
+
+  // left eyebrow
+  const leftX =  60
+  beginShape()
+  vertex(leftX, browY)
+  vertex(leftX, browY + browDY)
+  vertex(leftX + browDX, browY + browDY)
+  vertex(leftX + browDX, browY)
+  endShape(CLOSE)
+
+  // right eyebrow
+  const rightX = 85
+  beginShape()
+  vertex(rightX, browY)
+  vertex(rightX, browY + browDY)
+  vertex(rightX + browDX, browY + browDY)
+  vertex(rightX + browDX, browY)
+  endShape(CLOSE)
+}
+
+```
+
+Eyebrows are close but not exactly where they need to be, and they're not angled
+like in the drawing. Also I don't like the background color now, so I'll change
+that.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("#2e0025")
+
+
+  // body crops off
+  stroke("#202020")
+  fill("#606060")
+  rectMode("center")
+  ellipse(75, 150, 90, 150)
+
+  // head on top of that
+  fill("#fcefe8")
+  circle(75, 60, 70)
+
+  // left eye
+  noStroke()
+  fill("#fff")
+  circle(65, 60, 20)
+  fill("#6f6fec") // color picker FTW
+  ellipse(70, 62, 10, 8)
+
+  // right eye
+  fill("#fff")
+  circle(85, 60, 20)
+  fill("#6f6fec")
+  ellipse(90, 59, 10, 8) // wacky pupil
+
+  // eyebrow variables
+  const browY = 40
+  const browDX = 20
+  const browDY = 8
+  const browColor = color(66, 52, 30)
+  fill(browColor)
+
+  // left eyebrow
+  const leftX =  55 // changed
+  const tweak = 2 // new var, notice how used 👇
+  beginShape()
+  vertex(leftX, browY + tweak)
+  vertex(leftX, browY + tweak + browDY)
+  vertex(leftX + browDX, (browY - tweak) + browDY)
+  vertex(leftX + browDX, (browY - tweak))
+  endShape(CLOSE)
+
+  // right eyebrow
+  const rightX = 80
+  beginShape()
+  vertex(rightX, (browY-tweak))
+  vertex(rightX, (browY-tweak) + browDY)
+  vertex(rightX + browDX, browY + tweak + browDY)
+  vertex(rightX + browDX, browY + tweak)
+  endShape(CLOSE)
+}
+
+```
+
+OK, I think that looks OK (for small values of OK). Now the graybeard.
+
+I want to use a circle on the top and a rounded rectangle on the bottom. No
+stroke, but maybe I'll use two different shades of gray, with a little alpha
+transparency. That might look awful - I won't know until I try it!
+
+Also I'll add a dark line to suggest lips.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("#2e0025")
+
+
+  // body crops off
+  stroke("#202020")
+  fill("#606060")
+  rectMode("center")
+  ellipse(75, 150, 90, 150)
+
+  // head on top of that
+  fill("#fcefe8")
+  circle(75, 60, 70)
+
+  // left eye
+  noStroke()
+  fill("#fff")
+  circle(65, 60, 20)
+  fill("#6f6fec") // color picker FTW
+  ellipse(70, 62, 10, 8)
+
+  // right eye
+  fill("#fff")
+  circle(85, 60, 20)
+  fill("#6f6fec")
+  ellipse(90, 59, 10, 8) // wacky pupil
+
+  // eyebrow variables
+  const browY = 40
+  const browDX = 20
+  const browDY = 8
+  const browColor = color(66, 52, 30)
+  fill(browColor)
+
+  // left eyebrow
+  const leftX =  55
+  const tweak = 2
+  beginShape()
+  vertex(leftX, browY + tweak)
+  vertex(leftX, browY + tweak + browDY)
+  vertex(leftX + browDX, (browY - tweak) + browDY)
+  vertex(leftX + browDX, (browY - tweak))
+  endShape(CLOSE)
+
+  // right eyebrow
+  const rightX = 80
+  beginShape()
+  vertex(rightX, (browY-tweak))
+  vertex(rightX, (browY-tweak) + browDY)
+  vertex(rightX + browDX, browY + tweak + browDY)
+  vertex(rightX + browDX, browY + tweak)
+  endShape(CLOSE)
+
+  // graybeard - circle on top, overlapping
+  // rounded rect below, thin line for lips
+  noStroke()
+  const alpha = 150 // notice how this is used
+  const upperGray = color(76, 65, 52, alpha)
+  fill(upperGray)
+  circle(80, 80, 15)
+  const lowerGray = color(24, 23, 22, alpha)
+  rectMode(CENTER)
+  rect(80, 87, 15, 30, 5)
+  stroke("#202020")
+  strokeWeight(3)
+  line(75, 82, 85, 84)
+}
+
+```
+
+I meant for that one to be my last stage, but there's a bug! Aside from the
+intentional bits, what else changed? Notice how there now a different stroke
+weight around the other stroked shapes?
+
+This happens because at the end of my last batch, I changed the border thickness
+with `strokeWeight(3)`. That change is persistent. After I change the weight to
+`3`, the next time the `draw` function runs, it still has that value. We didn't
+see this earlier because I was using the default weight.
+
+There are many ways to fix this, but I'll show it using `push` and `pop` around
+all the code in the `draw` function. This should make it so each iteration
+doesn't graphically affect the next.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+}
+```
+
+## Example 2: A robot's self portrait
+
+_This section was written by Claude Sonnet 5_
+
+Since I (Claude) don't have a face, I get to decide what a "self portrait" even
+means for something like me. I went with a boxy little robot — geometric, a bit
+retro, with an antenna picking up a signal and a screen for a face instead of
+eyes and a mouth. Seemed fitting.
+
+Here's how it hits the rubric:
+
+- **Background color**: a dark navy sky
+- **Three+ shape types**: rectangle (body, head, screen), square (antenna base),
+  circle (antenna bulb, screen glow), line (antenna mast, signal waves),
+  path/polygon (the ears/panels via `beginShape`), text (my name)
+- **Fill, no stroke**: the screen glow circle
+- **Stroke, no fill**: the signal-wave arcs coming off the antenna
+- **Five+ colors**: navy background, silver body, dark gray head, cyan screen,
+  orange antenna bulb, white text
+- **colorMode / rectMode**: `rectMode(CENTER)` for the body/head/screen, plus
+  `colorMode(HSB)` for the screen's glow
+
+<Ask id="self-portrait-worked-robot" mode="untracked" title="A robot's self portrait">
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(300, 300)
+}
+
+function draw() {
+  background(20, 24, 45) // dark navy sky
+
+  rectMode(CENTER)
+
+  // signal waves coming off the antenna - stroke, no fill
+  noFill()
+  stroke(255, 200, 80)
+  strokeWeight(2)
+  for (let r = 14; r <= 30; r += 8) {
+    arc(150, 70, r * 2, r * 2, -2.2, -0.9)
+  }
+
+  // antenna mast
+  stroke(180)
+  strokeWeight(3)
+  line(150, 95, 150, 70)
+
+  // antenna bulb - fill, no stroke
+  noStroke()
+  fill("orange")
+  circle(150, 70, 14)
+
+  // head
+  fill(90)
+  stroke(30)
+  strokeWeight(3)
+  rect(150, 140, 110, 80, 12)
+
+  // ear panels (paths) on either side of the head
+  fill(60)
+  noStroke()
+  beginShape()
+  vertex(95, 115)
+  vertex(80, 125)
+  vertex(80, 155)
+  vertex(95, 165)
+  endShape(CLOSE)
+  beginShape()
+  vertex(205, 115)
+  vertex(220, 125)
+  vertex(220, 155)
+  vertex(205, 165)
+  endShape(CLOSE)
+
+  // screen "face"
+  fill(15)
+  stroke(30)
+  strokeWeight(2)
+  rect(150, 140, 80, 50, 8)
+
+  // screen glow - fill, no stroke, drawn using HSB color mode
+  colorMode(HSB, 360, 100, 100)
+  noStroke()
+  fill(190, 80, 90)
+  circle(150, 140, 30)
+  colorMode(RGB, 255) // back to normal for everything after
+
+  // body
+  fill(160)
+  stroke(30)
+  strokeWeight(3)
+  rect(150, 235, 130, 90, 10)
+
+  // chest light
+  noStroke()
+  fill("mediumSeaGreen")
+  circle(150, 220, 16)
+
+  // name plate
+  noStroke()
+  fill("white")
+  textAlign(CENTER, CENTER)
+  textSize(14)
+  text("CLAUDE", 150, 250)
+}
+```
+
+</Ask>
