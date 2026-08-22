@@ -35,6 +35,7 @@ import { initStorage, getStorageValue, setStorageValue } from "../storage"
 import { Kbd, KbdProvider } from "./Kbd"
 import { Swatch } from "./Swatch"
 import { ExpectedReadTime } from "./ExpectedReadTime"
+import { RobotText } from "./RobotText"
 
 export type ImmerseAppProps = {
   bookSlug: string
@@ -157,6 +158,7 @@ const defaultComponents = {
   Kbd,
   KbdProvider,
   Swatch,
+  RobotText,
 }
 
 const AppLayout = ({

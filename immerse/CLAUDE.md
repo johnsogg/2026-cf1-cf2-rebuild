@@ -74,3 +74,8 @@ import** — noted per component below. The rest need the explicit
   `<Swatch value="#000000" />`. Optional `size` ("small" | "medium" |
   "large", default "medium") matches the p5 exercise codefence's size
   values. No import needed.
+
+- **RobotText** - Wraps AI-generated content (`<RobotText>...</RobotText>`)
+  in Doto (a dot-matrix variable Google Font, loaded via `book/index.html`)
+  so readers can tell it apart from hand-written material. Wrap the whole
+  passage (prose, code fences, an `Ask`, any mixture). No import needed.

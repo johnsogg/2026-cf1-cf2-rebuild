@@ -13,7 +13,7 @@ I usually start with a paper sketch:
 
 <img
   src={gabeSelfPortrait}
-  alt="2025 CF1 Fall's class picture"
+  alt="Gabe's self portrait Fall 2026"
   style={{ width: "200px", height: "auto" }}
 />
 
@@ -42,7 +42,7 @@ function draw() {
   // body crops off
   stroke("#202020")
   fill("#606060")
-  rectMode("center")
+  rectMode(CENTER)
   ellipse(75, 150, 90, 150)
 
   // head on top of that
@@ -78,7 +78,7 @@ function draw() {
   // body crops off
   stroke("#202020")
   fill("#606060")
-  rectMode("center")
+  rectMode(CENTER)
   ellipse(75, 150, 90, 150)
 
   // head on top of that
@@ -142,7 +142,7 @@ function draw() {
   // body crops off
   stroke("#202020")
   fill("#606060")
-  rectMode("center")
+  rectMode(CENTER)
   ellipse(75, 150, 90, 150)
 
   // head on top of that
@@ -211,7 +211,7 @@ function draw() {
   // body crops off
   stroke("#202020")
   fill("#606060")
-  rectMode("center")
+  rectMode(CENTER)
   ellipse(75, 150, 90, 150)
 
   // head on top of that
@@ -275,7 +275,7 @@ function draw() {
 ```
 
 I meant for that one to be my last stage, but there's a bug! Aside from the
-intentional bits, what else changed? Notice how there now a different stroke
+intentional bits, what else changed? Notice how there is now a different stroke
 weight around the other stroked shapes?
 
 This happens because at the end of my last batch, I changed the border thickness
@@ -293,11 +293,80 @@ function setup() {
 }
 
 function draw() {
-  background("black")
+  push() // 🟢 Store graphics state as it starts
+  background("#2e0025")
+
+  // body crops off
+  stroke("#202020")
+  fill("#606060")
+  rectMode(CENTER)
+  ellipse(75, 150, 90, 150)
+
+  // head on top of that
+  fill("#fcefe8")
+  circle(75, 60, 70)
+
+  // left eye
+  noStroke()
+  fill("#fff")
+  circle(65, 60, 20)
+  fill("#6f6fec") // color picker FTW
+  ellipse(70, 62, 10, 8)
+
+  // right eye
+  fill("#fff")
+  circle(85, 60, 20)
+  fill("#6f6fec")
+  ellipse(90, 59, 10, 8) // wacky pupil
+
+  // eyebrow variables
+  const browY = 40
+  const browDX = 20
+  const browDY = 8
+  const browColor = color(66, 52, 30)
+  fill(browColor)
+
+  // left eyebrow
+  const leftX =  55
+  const tweak = 2
+  beginShape()
+  vertex(leftX, browY + tweak)
+  vertex(leftX, browY + tweak + browDY)
+  vertex(leftX + browDX, (browY - tweak) + browDY)
+  vertex(leftX + browDX, (browY - tweak))
+  endShape(CLOSE)
+
+  // right eyebrow
+  const rightX = 80
+  beginShape()
+  vertex(rightX, (browY-tweak))
+  vertex(rightX, (browY-tweak) + browDY)
+  vertex(rightX + browDX, browY + tweak + browDY)
+  vertex(rightX + browDX, browY + tweak)
+  endShape(CLOSE)
+
+  // graybeard - circle on top, overlapping
+  // rounded rect below, thin line for lips
+  noStroke()
+  const alpha = 150 // notice how this is used
+  const upperGray = color(76, 65, 52, alpha)
+  fill(upperGray)
+  circle(80, 80, 15)
+  const lowerGray = color(24, 23, 22, alpha)
+  rectMode(CENTER)
+  rect(80, 87, 15, 30, 5)
+  stroke("#202020")
+  strokeWeight(3)
+  line(75, 82, 85, 84)
+
+  pop() // 🟢 Restore graphics state to beginning
 }
+
 ```
 
 ## Example 2: A robot's self portrait
+
+<RobotText>
 
 _This section was written by Claude Sonnet 5_
 
@@ -405,3 +474,5 @@ function draw() {
 ```
 
 </Ask>
+
+</RobotText>
