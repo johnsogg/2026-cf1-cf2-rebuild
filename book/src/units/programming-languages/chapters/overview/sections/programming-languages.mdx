@@ -1,34 +1,263 @@
 export const title = "Programming Languages"
 
-> Callback to the previous section. Natural languages are messy/ambiguous;
-> programming languages borrow the same vocabulary (syntax, semantics,
-> idioms) but each concept gets stricter and more literal. Reuse the same
-> subheadings as the previous section so the parallel is obvious. Goals:
->
-> - Syntax: a PL's grammar is formal and enforced by a parser — there's no
->   "figure it out with a little extra brain power" the way there is with
->   the garbled English example. Invalid syntax just fails.
-> - Semantics: same syntax, different meaning depending on context — e.g.
->   `+` means numeric addition or string concatenation depending on operand
->   types. Maybe also touch overloading/coercion.
-> - Idioms: PL idioms are patterns "insiders" recognize but that aren't
->   derivable from syntax alone (callback to the JS `x || default` example
->   from earlier). Unlike natural-language idioms, breaking one doesn't
->   cause a parse error — just marks you as an outsider/beginner.
-> - Domain jargon: libraries/frameworks/APIs and DSLs layer their own
->   vocabulary on top of the base language. Decide whether this is its own
->   heading here or folds into Idioms. Keep the label "Domain Jargon" but
->   use expansive language to make the analogy land — an API is opaque
->   until you've learned it, same as law or medicine are opaque to
->   outsiders; once fluent, it works for you, almost like magic. "Insiders
->   club" angle ties back to the Idioms section's baseball-idiom framing.
+In the previous section we talked about _natural_ languages, the kind we use to
+hold personal conversations or order dinner. This section takes that as a
+starting point for getting into the kind of _unnatural_ languages we use to
+program computers. These are often called _artificial_ or _constructed_, and
+programming languages are not the only kind: mathematics, music, graphical
+schematics could all arguably be described as unnatural languages.
 
-# Programming Languages
+But here we're going to go deep on **programming** languages.
+
+## From Natural to Programming Language
+
+I'll start by drawing contrasts between natural and programming languages.
+
+Natural languages let you express just about any idea you can put into words.
+This includes all the mess and ambiguity that poorly thought out speech might
+yield. And this isn't an indictment of natural language, just because it has the
+capacity to produce nonsense! Our brains are actually really good at resolving
+unclear language based on what is known or reasonably guessed from context.
+
+Programming languages are typically designed to make it possible to express
+ideas and instructions in a way that is unambiguous and clear. Programming
+languages do **not** prevent you from writing nonsense; rather, they just give
+you more succinct rules about how that nonsense should be written. And by doing
+so, the nonsense is often more obvious.
+
+In the last section we talked about natural language through several lenses:
+syntax, semantics, idioms, and jargon. When you write code in any programming
+language, these topics are all very important, even if you're not consciously
+thinking about them.
 
 ## Syntax
 
+Code is written according to that language's rules, and language tools check to
+see if code is structured correctly in a process called _parsing_. If the code
+doesn't follow the rules, it might not run at all (this depends on the nature of
+the language and tooling).
+
+This can be super frustrating for new coders and seasoned veterans alike: a
+single missing comma, semicolon, or out of place parentheses can render a
+program inoperable. Fortunately, the parser will often be able to give you hints
+about where the problem has occurred. Just like in a document editor, a code
+editor can give you red squiggles that indicate incorrect syntax.
+
+So the programming language parser understands the rules that constitute a
+well-formed program. What do those rules look like? They're actually written out
+in what we call a _grammar_. You'll not really encounter this much unless you
+study programming languages, but it is helpful to know that it is there.
+
+Consider basic arithmetic: `2 + 3` or `8 * (x + 1)`. The grammar for this might
+look like the following:
+
+```
+expr   = term { ("+" | "-") term } ;
+term   = factor { ("*" | "/") factor } ;
+factor = number | identifier | "(" expr ")" ;
+```
+
+This probably looks like nonsense to you, which is normal. You just need to know
+how to read it. Or, should I say, _parse_ it? Each line is a grammatical
+production that has a name (`expr`, `term`, `factor`) with an associated rule.
+
+In as plain English as I can put it: The first production means that an
+expression is a term, followed by zero or more clauses of "+ term" or "- term".
+So, this would match `4`, or `4 + 9` or `4 + 9 - 2`, but NOT `4 +` or `3 + - 2`
+or `4 9 +`.
+
+Notice that the `expr` production was defined using the `term` production.
+Language rules can refer to other language rules. `term` is defined as a
+`factor` followed by zero or more multiplication or division clauses just like
+the addition/subtraction for `expr`. And `factor` is defined as either a number,
+or an identifier, or a parenthetical expression.
+
+This is a little grammar that is still missing quite a bit, like what is the
+production for `number` or `identifier`? In a real grammar, everything must be
+defined. This was just a grammar fragment to show what they look like.
+
+This is likely the last you'll see about programming language parsers in this
+book. I just wanted to show you how language grammars are defined so that you
+have a little more intuition that the code you write is being processed with a
+mechanical process.
+
 ## Semantics
+
+Say you happened to catch the following sentence from somebody else's book:
+
+> He was tired, but had finally made it to the bank.
+
+The syntax is clear, but the meaning isn't. You could reasonably interpret this
+in several ways, because there are several kinds of banks. Food bank, financial
+bank, river bank, to name a few. You would need additional context to pin the
+meaning, the _semantics_ of this sentence. If the previous text was talking
+about money or such, it would be reasonable to assume a financial institution,
+and it reads clearly. Context matters.
+
+We have a similar quandary in programming. In code, you might have two symbols
+`a` and `b`. Depending on what these things are, they could behave differently.
+Maybe you want to add them together?
+
+```
+a = 4
+b = 3
+a + b  <-- this means 4 + 3, so we can resolve this to 7
+
+a = "Four"
+b = "Three"
+a + b  <-- a and b are text. could resolve to "FourThree"
+```
+
+In our case, `a + b` matches a known syntax, but _what happens_ is dependent on
+what the items mean. If they're numbers, you add them together to get a new
+number. If they're text, in most languages you concatenate them (glue them
+together).
+
+In a later section on color, you'll see that there are many syntactically
+correct ways to specify a color value, but _semantically_ these values mean the
+same thing, even if they're expressed in different ways.
+
+And there are many other kinds of semantics that a language can't derive without
+the help of a programmer. Going back to our `a + b` example, what if `a` and `b`
+are both something abstract, like bank accounts? What does it mean to add them
+together? Transfer funds? If so, into where? Or, sum their values? Group them
+into a user account? It could _mean_ any of these things, but unless the
+language has a mechanical way to work this out, it is on the programmer to
+decide.
+
+I'd say that defining what the code _means_ is both fun and challenging, because
+the programmer becomes a designer of a little digital world, where things mean
+what you want them to if you can express it reliably.
 
 ## Idioms
 
+> - Idioms: PL idioms are patterns "insiders" recognize but that aren't
+>   derivable from syntax alone (callback to the JS `x || default` example from
+>   earlier). Unlike natural-language idioms, breaking one doesn't cause a parse
+>   error — just marks you as an outsider/beginner.
+
+Programmers like to talk about "idiomatic Python" or "idiomatic Javascript",
+because there seems to be a more natural way to do things depending on what
+language you're working with. An idiom is an expected pattern that experienced
+programmers have internalized and can use without really thinking too hard. This
+could be as simple as a naming convention:
+
+```
+my_favorite_color     (snake case)
+myFavoriteColor       (camel case)
+MyFavoriteColor       (pascal case)
+MY_FAVORITE_COLOR     (screaming snake case)
+```
+
+Same idea, different ways of writing it, and depending on which language you're
+in, there might be one preferred approach even if they're all syntactically
+valid. And the styling can communicate purpose as well. In Javascript,
+`myFavoriteColor` tells you this is a regular variable; while
+`MY_FAVORITE_COLOR` tells you this is a constant. If you see `my_favorite_color`
+in a Javascript codebase, you'd be right to suspect a Python programmer was
+asked to do something in JS. Similarly, `MyFavoriteColor` with a capital M
+suggests it is a class; if you're using Typescript, it is probably a type.
+
+Idioms often reach into behavior expectations. In the Go language, one common
+pattern is to invoke some code that produces either an error or a value, so
+functions can return both an error (even if it is empty) and a value (which
+could be empty if there's an error).
+
+```go
+data, err := os.ReadFile(path)
+if err != nil {
+    // handle error...
+}
+```
+
+This idiom is made possible by language syntax that supports returning multiple
+values from a function. Other languages (like Javascript) only support
+individual values as return types. Javascript has its own idioms around this,
+which we will get to soon enough. (If you're impatient, look up
+'destructuring'.)
+
+For now I want to give just one Javascript idiom:
+
+```js
+const color = myFavoriteColor || "blue"
+```
+
+This pattern leverages language semantics to create a nice shortcut. This reads
+"set color to myFavoriteColor if we have one, otherwise set it to blue". This is
+_arguably_ more legible than an alternative (this is called a _ternary
+expression_):
+
+```js
+// ternaries are kinda cryptic
+const color = myFavoriteColor != null ? myFavoriteColor : "blue"
+```
+
+One advantage the `||` approach has is that you can chain several alternatives
+together, which you can't do with the ternary in a legible way:
+
+```js
+// choose the first option with a legitimate value
+const color = optionA || optionB || optionC || "blue"
+```
+
+I won't even attempt to write that out using ternaries because it would cause me
+physical pain.
+
+<RobotText>
+
+_Written by Claude Sonnet 5, so the author doesn't have to touch it:_
+
+```js
+const color = optionA ? optionA : optionB ? optionB : optionC ? optionC : "blue"
+```
+
+Technically legal. Do not do this.
+
+</RobotText>
+
+Thanks, robot!
+
+Often, idiomatic patterns look strange to people coming from other languages.
+They don't necessarily make one approach better or worse. But if a language is
+highly steeped in convention-based patterns, it really does pay to understand
+them so you can read and write them yourself.
+
 ## Domain Jargon
+
+Just like lawyers have their legalese, programmers have their jargon. In fact,
+programmers have elevated jargon to the point where it has a three letter
+acronym: the API. This stands for Application Programming Interface, and it
+basically formalizes how you can work with that code, on its terms, using its
+worldview.
+
+An API isn't the _only_ way to crystallize programmer jargon - we also have
+libraries, frameworks, design patterns, and domain-specific languages (another
+great acronym there, the DSL). And often the distinction between these things is
+blurry.
+
+This book uses the p5.js library, which is a code package that you mix in with
+your own software, and work with it using its API. Like any good abstraction
+layer, p5.js is organized to be pretty self-explanatory and memorable. You can
+use p5's suite of function calls to write pretty amazing interactive graphics
+apps, because it gives you such powerful machinery with a nice interface. You
+_could_ do everything that p5.js does without using any 3rd party library and
+write code directly against the browser's Canvas or WebGL API. This is actually
+what p5.js does, so you don't have to.
+
+Shoulders of giants, people!
+
+Most modern programming languages have their own way to deliver code like this,
+called a package management system. Javascript has `npm` (Node Package Manager),
+Rust has `cargo`, Python has... like nine to choose from. Each package codifies
+some abilities, and you use them by learning their jargon. The upside is that
+you don't have to understand how these packages work internally. But that is
+also the downside. If you're just learning to code, my advice is to be
+intentional about what you want to learn, and don't rely on somebody else's code
+if your objective is to learn the material.
+
+## Programming is much more than the language
+
+I'll close this part off by pointing out what I hope to be clear by now: modern
+programming are much more than just knowing the language. Yes, the language is
+important, but to do interesting things with code, you need to also understand
+the tooling, the ecosystem, and the culture.
