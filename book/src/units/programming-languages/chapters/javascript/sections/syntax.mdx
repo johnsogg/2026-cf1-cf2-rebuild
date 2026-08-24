@@ -2,7 +2,22 @@ import { CodeAnatomy } from "immerse/components/CodeAnatomy"
 
 export const title = "Javascript Syntax"
 
-> TODO: need an intro for JS Syntax section, it is too cold of a start
+# Javascript Syntax
+
+We've talked about language, we've talked about programming languages, but we so
+far we've kept it abstract. In this section we'll talk about the specifics of
+_Javascript's syntax_.
+
+A programming language's syntax is defined as one big whole, but this is too
+much for a new programmer to understand in one glance. So in this section we
+will build up the syntax in pieces. We can examine little pieces of the big
+picture by taking a view of little parts, like how you'd assign values to
+variables, or how to make a new function definition.
+
+From this perspective, I like the analogy of _anatomy_. A syntactical structure
+has certain parts that make it unique - keywords and punctuation and the order
+they are written. So in this section and elsewhere I will use _anatomy_ as a
+metaphor to describe how correct code is written. Let's start with assignment.
 
 ## Anatomy: Assignment
 
@@ -162,15 +177,16 @@ because the language won't let you change it later.
 
 ## Try It - Variable Declaration & Assignment
 
-OK, that was a lot. Let's try it out now. Here's an editor that will print out
-values for our variables. But the starter code is broken as it is. You'll need
-to declare and assign the variables for it to work - just read the comments,
-they tell you where to put the new code. Try running it without changing
-anything to see what happens. Then see if you can add variable declarations
-using `const` and `let` so it runs. Stretch goal: change the nickname between
-the first time it is printed and the second.
+OK, that was a lot. Let's try it out now.
 
 <Ask id="syntax-let-const" mode="interacted" title="Variable Declaration & Assignment">
+
+This will print out values for our variables. But the starter code is broken!
+You'll need to declare and assign the variables for it to work - just read the
+comments, they tell you where to put the new code. Try running it without
+changing anything to see what happens. Then see if you can add variable
+declarations using `const` and `let` so it runs. Stretch goal: change the
+nickname between the first time it is printed and the second.
 
 ```jsconsole
 // add declarations here to make the
@@ -220,7 +236,7 @@ done, it can hand you back some data.
 
 Recall this from earlier:
 
-```p5sketch autoplay width=150 height=150
+```p5exercise autoplay width=150 height=150
 function setup() {
   createCanvas(150, 150)
 }
@@ -373,10 +389,10 @@ correct.
 
 ## Try It - Functions
 
-Speaking of `sayHello`, here's an exercise for you to write that function and
-then call it.
-
 <Ask id="syntax-functions" mode="interacted" title="Define and call a function">
+
+Write a `sayHello` function and then call it. When you've done it correctly, it
+will print "Hello, _name_".
 
 ```jsconsole
 // define a function called sayHello with a parameter called name. Make the

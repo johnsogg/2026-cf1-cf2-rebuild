@@ -1,5 +1,9 @@
 export const title = "Interactivity"
 
+<Callout intent="danger">
+  This section is a work in progress. Oh, the bleeding edge.
+</Callout>
+
 # Interactivity
 
 So far we've written p5.js sketches that create _static_ images. This means they
@@ -30,9 +34,9 @@ p5.js has special variables with information about mouse and keyboard state.
 | `keyIsPressed` | Whether any key is currently being held down                             |
 
 You can _read_ these variables at any time, including in the `draw` function.
-p5.js keeps them up to date as the user moves the mouse or types, so
-whatever `draw` reads is the latest value — and by default `draw` runs 60
-times per second.
+p5.js keeps them up to date as the user moves the mouse or types, so whatever
+`draw` reads is the latest value — and by default `draw` runs 60 times per
+second.
 
 ### Interactivity Callbacks
 
@@ -81,7 +85,7 @@ We're only recording the state we need (`lightbulbOn` is either `true` or
 render the lightbulb as expected.
 
 As a rule of thumb, callback functions should only set state, not draw. (You
-technically *can* draw from inside one, but it'll just get erased on the next
+technically _can_ draw from inside one, but it'll just get erased on the next
 `draw()` call unless you also call `noLoop()`.)
 
 ### Utility Functions

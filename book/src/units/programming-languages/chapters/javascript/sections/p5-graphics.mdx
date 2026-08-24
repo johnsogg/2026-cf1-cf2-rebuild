@@ -43,6 +43,8 @@ buffer. We've got three dots - green is at `(0, 0)` (top left), blue is at
 
 <Ask id="graphics-coords" mode="interacted" title="Coordinate system">
 
+See if you can place a black circle above and to the right of the red circle.
+
 ```p5exercise autorun size="medium"
 function setup() {
   createCanvas(300, 150)
@@ -160,6 +162,8 @@ take different arguments.
 - `strokeWeight(n)` - sets the stroke thickness to `n` pixels wide, e.g.
   `strokeWeight(3)`
 
+<Ask id="fill-stroke-thickness" mode="interacted" title="Replicate the styled circles">
+
 Study this sketch:
 
 ```p5sketch autoplay width=150 height=150
@@ -194,7 +198,7 @@ function draw() {
 }
 ```
 
-See if you can replicate this on your own in the little editor below.
+See if you can replicate this sketch in this editor.
 
 Hints: The circles are all at y=75 and all have radius 50 (including the last
 one, which looks bigger because of its stroke thickness). Their X coordinate
@@ -202,8 +206,6 @@ starts at 25 and jumps up by 25 each time. Colors are `"red"`, `"white"`,
 "`blue`", `"yellow"`, `"gray"` and `"green"`. Most (but not all) have a fill,
 and most (but not all) have a stroke, and the strokes vary. My code for this was
 about 20 lines including blanks to make it easier to read.
-
-<Ask id="fill-stroke-thickness" mode="interacted" title="Replicate the styled circles">
 
 ```p5exercise autorun size="medium"
 function setup() {
@@ -370,7 +372,9 @@ diameter.
 This canvas below is 150x150, so we can put an ellipse and circle centered at
 (75, 75) to make an eye, staring straight into your very being:
 
-<Ask id="graphics-ellipse-circle" mode="untracked" title="ellipse and circle">
+<Ask id="graphics-ellipse-circle" mode="interacted" title="ellipse and circle">
+
+See if you can place a black pupil dot that fits inside the green circle.
 
 ```p5exercise autorun size="small"
 function setup() {
@@ -428,6 +432,10 @@ modes. I only change the color so you can tell them apart more easily.
 
 <Ask id="rect-mode" mode="interacted" title="rectMode">
 
+See if you can rearrange things here so the red rectangle's edges are all
+visible and not obscured by any others. Then see if you can shift things so all
+the edges are fully rendered and not clipped off the edge of the canvas.
+
 ```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 150)
@@ -458,11 +466,6 @@ function draw() {
 
 </Ask>
 
-Try editing it: See if you can rearrange things here so the red rectangle's
-edges are all visible and not obscured by any others. Then see if you can shift
-things so all the edges are fully rendered and not clipped off the edge of the
-canvas.
-
 ### Polygons with `beginShape` / `vertex` / `endShape`
 
 We can draw shapes with arbitrary polygon geometry using `beginShape`, followed
@@ -481,7 +484,27 @@ vertex(x3, y3)
 endShape(CLOSE)
 ```
 
+You can call `beginShape` with a few different arguments that will tell p5 how
+to interpret the geometry that you place between that and the `endShape` call.
+The two you _might_ want any time soon are `POINTS` and `LINES`. There are
+others but they're advanced.
+
+As you can see, `endShape` takes an optional argument: `CLOSE` will connect the
+last point you specified with the first one. Without this argument, it doesn't
+connect them (though it behaves funny for filled shapes).
+
 <Ask id="graphics-polygon" mode="interacted" title="Polygons">
+
+Play with this code by changing the arguments to `beginShape` and `endShape`,
+and moving the points around. See how it responds.
+
+Important safety tip! If you `beginShape`, you really better `endShape`! This is
+because the graphics library goes into a special state where it is looking for
+certain things - `vertex` calls among others that I'm coyly not mentioning
+(yet).
+
+Also, don't use normal geometric calls like `circle` while you're defining a
+shape, because they won't work.
 
 ```p5exercise autorun size="medium"
 function setup() {
@@ -504,24 +527,6 @@ function draw() {
 ```
 
 </Ask>
-
-You can call `beginShape` with a few different arguments that will tell p5 how
-to interpret the geometry that you place between that and the `endShape` call.
-The two you _might_ want any time soon are `POINTS` and `LINES`. There are
-others but they're advanced.
-
-As you can see, `endShape` takes an optional argument: `CLOSE` will connect the
-last point you specified with the first one. Without this argument, it doesn't
-connect them (though it behaves funny for filled shapes).
-
-Play with the code above by changing the arguments to `beginShape` and
-`endShape`, and moving the points around.
-
-Important safety tip! If you `beginShape`, you really better `endShape`! This is
-because the graphics library goes into a special state where it is looking for
-certain things - `vertex` calls among others that I'm coyly not mentioning
-(yet). Also, don't use normal geometric calls like `circle` while you're
-defining a shape, because they won't work.
 
 ## Style is State
 
@@ -546,12 +551,43 @@ marker, and whatever you draw will be red; to change to blue you give up the red
 and pick up the blue, now whatever you draw is blue. The pen in your hand is the
 graphic state.
 
-Here's an exercise for you. The code is meant to show a red house with a green
-lawn and tree (brown trunk and green leaves) with a blue sky. But there are bugs
-caused by the programmer not changing state as apt. See if you can correct this
-sketch so it renders as we want.
-
 <Ask id="graphics-style-state" mode="interacted" title="Fix the buggy state">
+
+Here's a sketch showing a scene as we want it:
+
+```p5sketch autoplay width=150 height=150
+
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("blue")
+
+  // lawn - stretch horizontally all the way across
+  fill("darkGreen")
+  rectMode(CORNER)
+  rect(0, 100, 150, 50)
+
+  // house
+  fill("red")
+  stroke("black")
+  rect(30, 80, 50, 40)
+
+  // tree trunk, centered at 120, 100
+  fill("brown")
+  rectMode(CENTER)
+  rect(120, 100, 20, 40)
+
+  // tree leaves, centered at 120, 70
+  fill("lightGreen")
+  ellipse(120, 70, 40, 60)
+}
+```
+
+The code below has bugs. See if you can correct this sketch so it renders as we
+want. The secret here is to ensure your drawing state is always what you need it
+to be before drawing shapes.
 
 ```p5exercise autorun size="medium"
 function setup() {
@@ -720,10 +756,10 @@ operations in p5, try these exercises.
 
 ### Reading Shapes
 
+<Ask id="graphics-reading-replicate" mode="interacted" title="Replicate what you see">
+
 What do you see in the following sketch? Think about what goes into this
-rendering, and in what order. In the editor below that, replicate what you see.
-The colors in use are `"skyblue"`, `"darkGreen"`, `"saddlebrown"`, `"sienna"`
-and `"forestgreen"`.
+rendering, and in what order.
 
 ```p5sketch autoplay width=150 height=150
 function setup() {
@@ -748,9 +784,8 @@ function draw() {
 }
 ```
 
-And your attempt goes here:
-
-<Ask id="graphics-reading-replicate" mode="interacted" title="Replicate what you see">
+Replicate what you see using this editor. The colors in use are `"skyblue"`,
+`"darkGreen"`, `"saddlebrown"`, `"sienna"` and `"forestgreen"`.
 
 ```p5exercise autorun size="small"
 function setup() {
@@ -766,10 +801,12 @@ function draw() {
 
 ### Draw a Little Scene
 
-Time for some exercise! Close your eyes, and imagine a little scene. Could be
-sailboats on water, an astronaut standing next to a rocket, a flower growing
-from a pot. Whatever you want. Then, simplify it to several shapes, because
-you're going to program this.
+<Ask id="graphics-scene" mode="interacted" title="Draw a Little Scene">
+
+Here's an exercise that asks you to imagine a scene, and then implement it.
+Could be sailboats on water, an astronaut standing next to a rocket, a flower
+growing from a pot. Whatever you want. Then, simplify it to only a few shapes,
+because you're going to program this.
 
 Try to involve at least one circle or ellipse, one square or rectangle, and (as
 the stretch goal) one polygon; and use at least two different stroke
@@ -779,8 +816,6 @@ understand where all the shapes are relative to the canvas and to each other.
 Make a plan for how you'll code it. You will almost certainly deviate from this
 plan when you get to coding, but you'll probably get a better result if you have
 a strategy from the onset.
-
-<Ask id="graphics-scene" mode="interacted" title="Draw a Little Scene">
 
 ```p5exercise autorun size="small"
 function setup() {

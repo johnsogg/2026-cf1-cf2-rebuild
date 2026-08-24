@@ -27,7 +27,7 @@ the output.
 Let's try a non-traditional but arguably more interesting example of Hello
 World:
 
-<Ask id="hello-world-graphical" mode="interacted" title="Graphical Hello World">
+<Ask id="hello-world-graphical" mode="untracked" title="Graphical Hello World">
 
 ```p5exercise autorun size="small"
 function setup() {
@@ -35,6 +35,7 @@ function setup() {
 }
 
 function draw() {
+  background("white")
   text("Hello, World!", 10, 75)
 }
 ```
@@ -55,6 +56,7 @@ function setup() {
 }
 
 function draw() {
+  background("white")
   text("This is pretty long text that doesn't fit in the box", 10, 75)
 }
 ```
@@ -83,12 +85,17 @@ draw graphics and text, play sounds, capture interaction, and make animations.
 
 ## Data
 
-If you happen to run these code examples in a dark theme, you might notice that
-the text is barely visible because it is dark on dark. That's because p5's
-canvas is clear, so you see the background through it. We can give the canvas a
-background color, and while we're at it, let's also change the text color:
+The canvas used by p5 is transparent by default. This means if you want to have
+the background show through, all you need to do is omit the `background` call.
+But generally you want this to be sure that your art has a known canvas color.
+Similarly you can use the `fill` call to change the text color and the fill
+color on shapes. If you remove the `background` call here or above, and you run
+these code examples in a dark theme, you'll see that the text is barely visible
+because it is dark text on a dark background.
 
-<Ask id="hello-world-colors" mode="interacted" title="Background and text color">
+Try changing the background and text color in this code below.
+
+<Ask id="hello-world-colors" mode="untracked" title="Background and text color">
 
 ```p5exercise autorun size="small"
 function setup() {
@@ -127,7 +134,7 @@ What if we want to use the _same_ value in more than one place, but only need to
 set it once? We can do this by using _variables_. Here I'll make variables to
 record all the data we'll need, in one convenient place at the top of the file:
 
-<Ask id="hello-world-variables" mode="interacted" title="Variables">
+<Ask id="hello-world-variables" mode="untracked" title="Variables">
 
 ```p5exercise autorun size="medium"
 // try changing these values and re-running
