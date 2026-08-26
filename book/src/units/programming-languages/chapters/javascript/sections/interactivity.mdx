@@ -1,5 +1,7 @@
 export const title = "Interactivity"
 
+import { CoordinatePlane } from "immerse/components/CoordinatePlane"
+
 <Callout intent="danger">
   This section is a work in progress. Oh, the bleeding edge.
 </Callout>
@@ -37,6 +39,41 @@ You can _read_ these variables at any time, including in the `draw` function.
 p5.js keeps them up to date as the user moves the mouse or types, so whatever
 `draw` reads is the latest value — and by default `draw` runs 60 times per
 second.
+
+<Ask id="js-interactivity-variables-demo" mode="untracked">
+Click into the canvas here so it gains keyboard focus, then play around by 
+moving/clicking/dragging various mouse buttons, and pressing keys.
+
+We have not yet covered most of what the code does here, so for now, try to
+maintain a sense of awe and wonder at the unknown, and try to make sense of it
+anyway. The point is to see how the input variables update automatically and are
+available to you in the `draw` function.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(400, 230)
+  textSize(16)
+}
+
+function draw() {
+  background(30)
+  fill(240)
+  text(`(mouseX, mouseY): ${Math.round(mouseX)}, ${Math.round(mouseY)}`, 10, 30)
+  text(`(movedX, movedY): ${Math.round(movedX)}, ${Math.round(movedY)}`, 10, 55)
+  if (mouseIsPressed) {
+    text(`mouseButton left: ${mouseButton.left}`, 10, 80)
+    text(`mouseButton center: ${mouseButton.center}`, 10, 105)
+    text(`mouseButton right: ${mouseButton.right}`, 10, 130)
+  } else {
+    text(`mouseButton: N/A`, 10, 80)
+  }
+  text(`key: ${key}`, 10, 155)
+  text(`keyCode: ${keyCode}`, 10, 180)
+  text(`keyIsPressed: ${keyIsPressed}`, 10, 205)
+}
+```
+
+</Ask>
 
 ### Interactivity Callbacks
 
@@ -88,36 +125,158 @@ As a rule of thumb, callback functions should only set state, not draw. (You
 technically _can_ draw from inside one, but it'll just get erased on the next
 `draw()` call unless you also call `noLoop()`.)
 
+<Ask id="js-interactivity-callbacks-demo" mode="untracked">
+Click into the canvas here so it gains keyboard focus, then move, drag, press,
+release, click, and type to rack up the counts below. This is the boringest 
+"number go up" game in existence but it is better than watching paint dry.
+
+```p5exercise autorun size="large"
+// declaring these variables up here will let us keep track
+// of state. they are read in the draw function, but
+// updated in the callback functions.
+let distanceMoved = 0
+let distanceDragged = 0
+let pressedCount = 0
+let releasedCount = 0
+let clickedCount = 0
+let doubleClickedCount = 0
+let keyPressedCount = 0
+let keyReleasedCount = 0
+let keyTypedCount = 0
+
+function setup() {
+  createCanvas(400, 180)
+  textSize(16)
+}
+
+function draw() {
+  background(30)
+  fill(240)
+  text(`distance mouse moved: ${Math.round(distanceMoved)}`, 10, 30)
+  text(`distance mouse dragged: ${Math.round(distanceDragged)}`, 10, 55)
+  text(`times mouse pressed/released: ${pressedCount}, ${releasedCount}`, 10, 80)
+  text(`times mouse clicked/double-clicked: ${clickedCount}, ${doubleClickedCount}`, 10, 105)
+  text(`times key pressed/released/typed: ${keyPressedCount}, ${keyReleasedCount}, ${keyTypedCount}`, 10, 130)
+}
+
+function mouseMoved() {
+  // add how far the mouse moved to the running total
+  distanceMoved += Math.abs(movedX) + Math.abs(movedY)
+}
+
+function mouseDragged() {
+  // add how far the mouse dragged to the running total
+  distanceDragged += Math.abs(movedX) + Math.abs(movedY)
+}
+
+function mousePressed() {
+  // increment mouse press count
+  pressedCount++
+}
+
+function mouseReleased() {
+  // increment mouse release count
+  releasedCount++
+}
+
+function mouseClicked() {
+  // increment mouse click count
+  clickedCount++
+}
+
+function doubleClicked() {
+  // increment double-click count
+  doubleClickedCount++
+}
+
+function keyPressed() {
+  // increment key press count
+  keyPressedCount++
+}
+
+function keyReleased() {
+  // increment key release count
+  keyReleasedCount++
+}
+
+function keyTyped() {
+  // increment key typed count
+  keyTypedCount++
+}
+```
+
+</Ask>
+
 ### Utility Functions
 
 There are a few utility functions that you can call at any time to get
 information. These are convenience functions to help save some typing. You can
 use these in the `draw` function. The one that you're likely to want right away
-is `keyIsDown(k)`:
+is `keyIsDown(k)`.
 
-```js
+<Ask id="js-interactivity-utility-demo" mode="untracked">
+Check out how `keyIsDown` works here. As before, click into the canvas here so 
+it gains keyboard focus, then hold down the left or right arrow keys, spacebar, 
+and Q key to see the emoji change. Do you notice anything funky about which one 
+is shown if there is a tie? Can you say _why_?
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(300, 200)
+  textSize(96)
+  textAlign(CENTER, CENTER)
+}
+
 function draw() {
-  // a few special keys have their own constants
+  background(30)
+  const px = width / 2
+  const py = height / 2
   if (keyIsDown(LEFT_ARROW)) {
-    moveLeft()
+    text("👈", px, py)
   }
-  // most keys don't, so use their numeric key code instead
-  if (keyIsDown(32)) {
-    drawSpaceship()
+  else if (keyIsDown(RIGHT_ARROW)) {
+    text("👉", px, py)
   }
-  if (keyIsDown(81)) {
-    drawAlien()
+  else if (keyIsDown("Space")) {
+    // use KeyboardEvent.code string to test conditional
+    text("🚀", px, py)
+  }
+  else if (keyIsDown("KeyQ")) {
+    text("👽", px, py)
+  }
+  else {
+    text("🖼️", px, py) // watch paint dry
   }
 }
 ```
 
-### When to use each kind of interactivity code
-
-Use variables when you are drawing or updating state.
-
-Use callbacks when you want to react to user input, and only do it one time.
+</Ask>
 
 Use utility functions whenever you want, as they just defer to variables.
+
+### When and how to use interaction variables and callbacks
+
+So to summarize:
+
+1. **Declare and initialize** variables at the top, using _let_ so they can be
+   changed to store whatever you're tracking.
+2. **Read** variables during the `draw` function.
+3. **Write** variables during the callback functions.
+
+## Canvas Coordinate System
+
+If you've ever graphed a function in a math class, you're probably used to a
+coordinate system that looks like the following, where x grows to the right and
+y grows upwards:
+
+<CoordinatePlane />
+
+However, in p5.js and many other graphics packages, the coordinate system flips
+the y dimension so y grows _downward_.
+
+<CoordinatePlane variant="screen" />
+
+## Writing interactive programs
 
 > Making programs respond to the user. The sketch is no longer frozen — it
 > reacts to mouse position, mouse clicks, and keyboard input. Goals:
@@ -139,38 +298,3 @@ Use utility functions whenever you want, as they just defer to variables.
 > far and wide and not p5-specific. It calls setup() once at the beginning, and
 > then draw() 60 times per second (or another number, if you change the frame
 > rate)
-
-## Mouse Position and Canvas Coordinates
-
-> We've already seen mouseX and mouseY, so now the job is to explain what they
-> are for, and the screen geometry the fit into - coordinate system conventions
-
-## Several ways to get input - variables, callbacks, utility functions
-
-> talk about variables like mouseX and mouseY, how p5 sets these values for you,
-> so they are always kept up to date. Also talk about callback functions that
-> you need to define, where p5 will invoke them when some action happens, like
-> mouseClicked(). There are non-callback functions like keyIsDown(str)
->
-> Worked Example: change the background based on mouse position: X sets red
-> (0--255), Y sets green. Also give a callback for mouseClicked that makes the
-> blue channel switch between 0 and 255.
-
-## p5.js variables
-
-> Now show several more built-in variables that are available.
->
-> key, keyIsPressed
->
-> mouseButton, mouseIsPressed, movedX, movedY
-
-## p5.js callbacks
-
-> keyPressed(), keyReleased(), keyTyped()
->
-> mouseClicked(), doubleClicked(), mousePressed(), mouseReleased(), mouseWheel()
-
-## p5.js utility functions
-
-> Functions that you _call_ in order to do something, like check if a particular
-> key is down (keyIsDown(str))

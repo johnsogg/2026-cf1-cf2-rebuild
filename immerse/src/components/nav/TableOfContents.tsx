@@ -151,10 +151,11 @@ export const TableOfContents = () => {
         </span>
       </div>
       <TocHome />
-      {tree.map((unit) => (
+      {tree.map((unit, idx) => (
         <TocUnit
           key={unit.slug}
           unit={unit}
+          num={idx + 1}
           currentSection={currentSection}
           isExpanded={expandedUnits.has(unit.slug)}
           onToggle={() => toggleUnit(unit.slug)}
@@ -218,6 +219,7 @@ const TocMiscPage = ({ page }: { page: MiscPage }) => {
 
 const TocUnit = ({
   unit,
+  num,
   currentSection,
   isExpanded,
   onToggle,
@@ -225,6 +227,7 @@ const TocUnit = ({
   onToggleChapter,
 }: {
   unit: Unit
+  num: number
   currentSection: Section
   isExpanded: boolean
   onToggle: () => void
@@ -239,7 +242,9 @@ const TocUnit = ({
         role="button"
         aria-expanded={isExpanded}
       >
-        <span>{unit.title}</span>
+        <span>
+          {num}. {unit.title}
+        </span>
         <SvgIcon name={isExpanded ? "chevronUp" : "chevronDown"} size={18} />
       </div>
       <div
@@ -250,6 +255,7 @@ const TocUnit = ({
             <TocChapter
               key={chapter.slug}
               chapter={chapter}
+              unitNum={num}
               num={idx + 1}
               currentSection={currentSection}
               isExpanded={expandedChapters.has(chapter.slug)}
@@ -264,12 +270,14 @@ const TocUnit = ({
 
 const TocChapter = ({
   chapter,
+  unitNum,
   num,
   currentSection,
   isExpanded,
   onToggle,
 }: {
   chapter: Chapter
+  unitNum: number
   num: number
   currentSection: Section
   isExpanded: boolean
@@ -294,7 +302,9 @@ const TocChapter = ({
         role="button"
         aria-expanded={isExpanded}
       >
-        <span>{num}.</span>{" "}
+        <span>
+          {unitNum}.{num}.
+        </span>{" "}
         <span className={s.chapterTitleText}>{chapter.title}</span>
         <SvgIcon name={isExpanded ? "chevronUp" : "chevronDown"} size={16} />
       </div>
@@ -307,7 +317,7 @@ const TocChapter = ({
           {chapter.sections.map((section, idx) => (
             <TocSection
               key={section.path}
-              path={[num, idx + 1]}
+              path={[unitNum, num, idx + 1]}
               status={getSectionStatus(section.urlPath)}
               section={section}
               isCurrentSection={
@@ -322,7 +332,7 @@ const TocChapter = ({
 }
 
 interface TocSectionProps {
-  path: number[] // e.g. [1, 3] for chapter 1, section 3
+  path: number[] // e.g. [2, 1, 3] for unit 2, chapter 1, section 3
   section: Section
   status: AttemptState
   isCurrentSection: boolean

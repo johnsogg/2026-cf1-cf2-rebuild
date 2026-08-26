@@ -16,6 +16,15 @@ import** — noted per component below. The rest need the explicit
   syntax and prose alone won't clearly call out each token's role. Optional
   `progressive` prop steps through labels one at a time. Needs an import.
 
+- **CoordinatePlane** - Canvas diagram of a labeled x/y coordinate plane.
+  `variant="math"` (default): origin centered, y grows upward, hovering a
+  quadrant names its signs and highlights it. `variant="screen"`: origin
+  top-left, y grows downward (the p5.js/pixel convention), hovering shows
+  a live `(x, y)` readout with guide lines instead. Same theme-color
+  approach as CodeAnatomy (resolves CSS custom properties at draw time)
+  but repaints only on hover/theme change, not a draw loop. Needs an
+  import.
+
 - **Callout** - Colored aside box (`<Callout intent="note">...</Callout>`)
   for warnings, fun facts, or questions posed to the reader. Registered
   globally on the MDXProvider in `book/src/App.tsx`, so no import needed
