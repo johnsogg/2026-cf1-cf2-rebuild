@@ -2,7 +2,9 @@ import { defineConfig } from "vite"
 import mdx from "@mdx-js/rollup"
 import react from "@vitejs/plugin-react"
 import remarkGfm from "remark-gfm"
+import remarkMath from "remark-math"
 import rehypeHighlight from "rehype-highlight"
+import rehypeKatex from "rehype-katex"
 import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import { fileURLToPath } from "node:url"
@@ -47,7 +49,7 @@ export default defineConfig(({ command }) => ({
     {
       enforce: "pre",
       ...mdx({
-        remarkPlugins: [remarkGfm, remarkWordCount, remarkP5Sketch, remarkP5Exercise, remarkJsConsole],
+        remarkPlugins: [remarkGfm, remarkMath, remarkWordCount, remarkP5Sketch, remarkP5Exercise, remarkJsConsole],
         rehypePlugins: [
           rehypeSlug,
           [
@@ -60,6 +62,7 @@ export default defineConfig(({ command }) => ({
             },
           ],
           rehypeHighlight,
+          rehypeKatex,
         ],
         providerImportSource: "@mdx-js/react",
       }),
