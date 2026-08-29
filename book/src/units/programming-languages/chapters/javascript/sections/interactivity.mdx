@@ -278,6 +278,159 @@ the y dimension so y grows _downward_.
 
 ## Writing interactive programs
 
+<Ask id="interactivity-face-sketch" mode="untracked">
+
+Click into this sketch so it gains keyboard focus. Then move your mouse and
+press the left/right/up arrow keys, or the space key.
+
+Can you describe what the effects are? Can you imagine how this might work?
+Which strategies for capturing and responding to interactivity would you use?
+What data is needed to record the face's state between draws?
+
+```p5sketch autoplay width=150 height=150
+// Interactive Face
+//
+// Sketch is for 2nd week students, so limited syntactic range.
+
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+const pupilColorCount = 4;
+
+// four possible pupilColors
+const pupilColor0 = "#000";
+const pupilColor1 = "#243ba3";
+const pupilColor2 = "#47350f";
+const pupilColor3 = "#118246";
+let pupilIndex = 0;
+let pupilColor = pupilColor0;
+
+// nose
+const noseX = xMid;
+const noseY = yMid;
+const noseW = 20;
+const noseH = 10;
+
+// mouth - a circle arc, so define the circle and angles
+const mouthCX = xMid;
+const mouthCY = yMid - 20;
+const mouthRad = 100;
+const mouthStartAngle = (1 / 4) * Math.PI;
+const mouthEndAngle = (3 / 4) * Math.PI;
+const mouthFlatY = yMid + 30;
+const mouthFlatW = 70;
+let mouthIsSmiling = true;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill(pupilColor);
+  if (keyIsDown(LEFT_ARROW)) {
+    pupilRadius = Math.max(1, pupilRadius - 0.1);
+  }
+  if (keyIsDown(RIGHT_ARROW)) {
+    pupilRadius = Math.min(eyeRadius - 2, pupilRadius + 0.1);
+  }
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+
+  // --------------------------- nose
+  // two lines
+  const nX1 = noseX;
+  const nY1 = noseY - noseH / 2;
+  const nX2 = noseX - noseW / 2;
+  const nY2 = noseY + noseH / 2;
+  const nX3 = noseX + noseW / 2;
+  const nY3 = nY2;
+  line(nX1, nY1, nX2, nY2);
+  line(nX2, nY2, nX3, nY3);
+
+  // --------------------------- mouth
+  noFill();
+  // two mouth styles - smile and flat
+  if (mouthIsSmiling) {
+    arc(mouthCX, mouthCY, mouthRad, mouthRad, mouthStartAngle, mouthEndAngle);
+  } else {
+    line(xMid - mouthFlatW / 2, mouthFlatY, xMid + mouthFlatW / 2, mouthFlatY);
+  }
+}
+
+// make pupils follow the mouse
+function mouseMoved() {
+  // update pupil positions based on mouse position, each eye center,
+  // while preventing pupils from being positioned outside of the eye
+  const maxOffset = eyeRadius - pupilRadius;
+
+  const mouse = createVector(mouseX, mouseY);
+
+  const eyeLeft = createVector(eyeLeftX, eyeY);
+  const deltaLeft = p5.Vector.sub(mouse, eyeLeft);
+  deltaLeft.limit(maxOffset);
+  pupilLeftX = eyeLeft.x + deltaLeft.x;
+  pupilLeftY = eyeLeft.y + deltaLeft.y;
+
+  const eyeRight = createVector(eyeRightX, eyeY);
+  const deltaRight = p5.Vector.sub(mouse, eyeRight);
+  deltaRight.limit(maxOffset);
+  pupilRightX = eyeRight.x + deltaRight.x;
+  pupilRightY = eyeRight.y + deltaRight.y;
+}
+
+// up/down keys control the mouth shape
+function keyPressed() {
+  if (key === " ") {
+    mouthIsSmiling = !mouthIsSmiling;
+  }
+  if (key === "ArrowUp") {
+    // this approach is not recommended - when we learn
+    // about lists you'll have a much better way
+    pupilIndex = (pupilIndex + 1) % pupilColorCount;
+    if (pupilIndex === 0) {
+      pupilColor = pupilColor0;
+    } else if (pupilIndex === 1) {
+      pupilColor = pupilColor1;
+    } else if (pupilIndex === 2) {
+      pupilColor = pupilColor2;
+    } else if (pupilIndex === 3) {
+      pupilColor = pupilColor3;
+    }
+    return false; // prevents page from receiving this & scrolling
+  }
+}
+```
+
+</Ask>
+
 > Making programs respond to the user. The sketch is no longer frozen — it
 > reacts to mouse position, mouse clicks, and keyboard input. Goals:
 >

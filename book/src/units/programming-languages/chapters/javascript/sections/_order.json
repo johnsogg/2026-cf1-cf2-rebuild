@@ -4,6 +4,7 @@
   "conditionals",
   "p5-graphics",
   "p5-color",
+  "arithmetic",
   "interactivity",
   "functions",
   "loops",

@@ -25,6 +25,13 @@ import** — noted per component below. The rest need the explicit
   but repaints only on hover/theme change, not a draw loop. Needs an
   import.
 
+- **VectorPlayground** - Canvas sandbox with two draggable vectors A and B
+  (p5/screen convention: origin top-left, y grows downward). Also draws
+  the derived vectors `B - A` and `A + B`, plus a side readout of X/Y/mag
+  for all four vectors and the cross/dot products. Grabbing near a dot and
+  dragging moves whichever of A/B is closest to the mouse. Same
+  theme-color approach as CoordinatePlane. Needs an import.
+
 - **Callout** - Colored aside box (`<Callout intent="note">...</Callout>`)
   for warnings, fun facts, or questions posed to the reader. Registered
   globally on the MDXProvider in `book/src/App.tsx`, so no import needed

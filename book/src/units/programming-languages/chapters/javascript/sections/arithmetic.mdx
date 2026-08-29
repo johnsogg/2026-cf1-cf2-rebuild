@@ -1,0 +1,303 @@
+export const title = "Arithmetic"
+
+import { VectorPlayground } from "immerse/components/VectorPlayground"
+
+# Arithmetic
+
+This is a quick section on how to write basic math expressions in JS. There's
+the obvious stuff, and then a couple non-obvious things.
+
+## Basic arithmetic operations `+ - * /`
+
+Javascript supports all the basic arithmetic that you'd expect: addition,
+subtraction, multiplication, division. Programming languages follow conventional
+operation ordering: multiplication and division are handled before addition and
+subtraction. You might have learned this with a mnemonic like "My Dear Aunt
+Sally" to remember more easily.
+
+{/* prettier-ignore-start */}
+
+```js
+// the operators for addition, subtraction, multiplication, and division
+5 + 3
+5 - 3
+5 * 3
+5 / 3
+
+// what about this one?
+5 + 5 * 3 // is this 30? or 20? do you enjoy squinting?
+
+// be nice to yourself and others with the cunning use of parentheses
+(5 + 5) * 3 // 30, obviously
+5 + (5 * 3) // 20, obviously
+```
+
+{/* prettier-ignore-end */}
+
+## Modulo `%`
+
+Reach far back into your mind to when you first learned about division in grade
+school. You might have written things like "ten divided by two is five with no
+remainder" or "ten divided by three is three with a remainder of one". It turns
+out that the remainder part can be very useful in programming, because it can
+tell you about how many things didn't fit evenly in a division operation.
+
+The 'remainder' can be found with the <Term>Modulo</Term> operator, and it is
+written with a percent symbol, much like we use the forward slash character for
+division.
+
+In Javascript, writing `a / b` will give you the real result of dividing `a` by
+`b`. In many other languages, writing `a / b` will give you just the integer
+part, but JS does give you easy ways to get the integer part if you want. An
+example will make this more clear:
+
+{/* prettier-ignore-start */}
+
+```js
+10 / 3             // 3.33333 - the real number
+Math.floor(10 / 3) // 3
+10 % 3             // 1 - use modulo to get the remainder
+```
+{/* prettier-ignore-end */}
+
+## `Math` functions
+
+In the last bit I showed `Math.floor` without explanation, and I hope you were
+curious and maybe a little confused. That `Math` term is actually the name of a
+little mini-library, containing a bunch of helpful functions. There are many of
+them, and you should reference the
+[MDN Math documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math)
+to understand the breadth of what is available.
+
+Here's a shorter list of some of the functions you'll want, and why they're
+useful:
+
+{/* prettier-ignore-start */}
+
+<table style={{ tableLayout: "fixed", width: "100%" }}>
+  <colgroup>
+    <col style={{ width: "14%" }} />
+    <col style={{ width: "46%" }} />
+    <col style={{ width: "40%" }} />
+  </colgroup>
+  <thead>
+    <tr>
+      <th style={{ textAlign: "left", verticalAlign: "top" }}>Function</th>
+      <th style={{ textAlign: "left", verticalAlign: "top" }}>What it's for</th>
+      <th style={{ textAlign: "left", verticalAlign: "top" }}>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style={{ verticalAlign: "top" }}><code>Math.floor</code></td>
+      <td style={{ verticalAlign: "top" }}>Rounds down</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.floor(4.7) // 4</code></td>
+    </tr>
+    <tr style={{ background: "var(--code-bg)" }}>
+      <td style={{ verticalAlign: "top" }}><code>Math.ceil</code></td>
+      <td style={{ verticalAlign: "top" }}>Rounds up</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.ceil(4.2) // 5</code></td>
+    </tr>
+    <tr>
+      <td style={{ verticalAlign: "top" }}><code>Math.abs</code></td>
+      <td style={{ verticalAlign: "top" }}>Distance from zero (never negative!)</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.abs(-7) // 7</code></td>
+    </tr>
+    <tr style={{ background: "var(--code-bg)" }}>
+      <td style={{ verticalAlign: "top" }}><code>Math.sign</code></td>
+      <td style={{ verticalAlign: "top" }}>Positive, negative, or zero</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.sign(-7) // -1</code></td>
+    </tr>
+    <tr>
+      <td style={{ verticalAlign: "top" }}><code>Math.max</code></td>
+      <td style={{ verticalAlign: "top" }}>Largest of several numbers</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.max(3, 9, 1) // 9</code></td>
+    </tr>
+    <tr style={{ background: "var(--code-bg)" }}>
+      <td style={{ verticalAlign: "top" }}><code>Math.min</code></td>
+      <td style={{ verticalAlign: "top" }}>Smallest of several numbers</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.min(3, 9, 1) // 1</code></td>
+    </tr>
+    <tr>
+      <td style={{ verticalAlign: "top" }}><code>Math.round</code></td>
+      <td style={{ verticalAlign: "top" }}>Rounds to nearest whole number</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.round(4.5) // 5</code></td>
+    </tr>
+    <tr style={{ background: "var(--code-bg)" }}>
+      <td style={{ verticalAlign: "top" }}><code>Math.trunc</code></td>
+      <td style={{ verticalAlign: "top" }}>Chops off the decimal part, unlike <code>floor</code>, which rounds toward negative infinity</td>
+      <td style={{ verticalAlign: "top", whiteSpace: "nowrap" }}><code>Math.trunc(-4.7) // -4</code> (floor gives <code>-5</code>)</td>
+    </tr>
+  </tbody>
+</table>
+
+{/* prettier-ignore-end */}
+
+This syntax, `Math.trunc`, means we're looking for a thing called `Math`, and
+reaching inside it for something called `trunc`. We will cover this "dot
+notation" more when we get to objects and lists. For now, just think of it as a
+way to gather related features into one convenient place. You'll see this below
+as well, so keep an eye out for it.
+
+## Vectors
+
+A vector is just a set of related values that locates an item in a grid, volume,
+or some other space. We've actually seen this before, when we worked with
+colors:
+
+```js
+colorMode(RGB, 255) // interpret colors as 0--255 in RGB
+color(128, 68, 187) // actual red, green, blue values here
+```
+
+The `128, 68, 187` values can be thought of (abstractly) as a vector. Each
+number represents one component: 128 for red, 68 for green, 187 for blue. And
+since we constrain each value to be in a certain range (0 through 255
+inclusive), and since there are three dimensions (red, green, and blue), you can
+think of this as a 3D color cube, where each axis represents a dimension.
+
+In graphics we often use vectors to represent geometric ideas like locations,
+directions, and (like we saw) colors. Since p5 is a graphics library, it gives
+you a built-in vector type. These are incredibly handy for doing geometric
+calculations.
+
+Often, vectors are introduced in context of a physics or calculus class. Some of
+you have already encountered them. For those of you who haven't, take heart
+because you don't need to know much more than what is shown here to start using
+them to do interesting geometry math.
+
+<VectorPlayground />
+
+In 2D graphics, we only need a 2D vector to show a position, like `A` and `B`
+are here. So each dot has an `X` and `Y` coordinate. And yes, if you're thinking
+_this is just an obscure way to talk about points!_ I won't argue with you.
+Points and vectors are just two ways of looking at the same idea: a way to
+identify a location in space.
+
+A vector's magnitude is just its length. If you think of a vector as a point,
+this is just the distance to the origin. And if you remember your trig, that's
+just the Pythagorean theorem: if your point is at `(X, Y)`, then the distance to
+the origin is just:
+
+$$
+\sqrt{X^2 + Y^2}.
+$$
+
+The math way to write "magnitude of vector V" is $\|V\|$. You'll see this again
+below.
+
+You can do various operations with vectors. Visualize addition by picking one of
+those arrows up and moving it so it starts at the end of the other vector. The
+location where that moved vector points is the result. `A + B` gives you another
+vector!
+
+Subtraction is similar, but now you're making an arrow that starts at the end of
+one vector and points to the other vector. `A - B` also gives you another
+vector. Be careful here, though. Because the direction that the arrow points is
+meaningful. If you want an arrow that goes _from_ A and points _to_ B, you
+actually need to calculate `B - A`.
+
+I don't show scalar multiplication (or division) in the interactive example
+here, but you can always scale a vector. If you want it twice as long, that's
+just doubling both its X and Y values; if you want it one third the length,
+divide X and Y by three.
+
+The other two operations I'm showing here - dot product and cross product - are
+a little harder to explain in an intuitive way, but I'll give it a shot.
+
+The dot product, written `A ⋅ B`, gives you a number, not a vector. In
+math-speak, it relates the length of each vector and the angle formed between
+them:
+
+$$
+A \cdot B = \|A\|\|B\| \cos \theta
+$$
+
+Practically, the dot product can be used to tell you how close to perpendicular
+two vectors are. Play with the interactive vector thing above and put A and B on
+the x and y axes. When you do that, notice that the dot product becomes zero.
+The closer to zero the dot product, the closer to perpendicular they are.
+Magnitude also plays a role, but if the two vectors are exactly perpendicular,
+the dot product will be zero.
+
+For our 2D cross product, it actually interprets the inputs as three dimensional
+vectors (where the Z dimension is zero), and gives us a vector output where X
+and Y are both zero and the Z component has a number. Since the cross product is
+a 3D vector that points straight out of (or into) the screen, you wouldn't be
+able to see it in the 2D vector playground above, so I left the arrow visual
+out. You can still see the numeric results in the table on the side.
+
+If you ever get into 3D graphics, you work with vectors that start out as 3D,
+and the cross product is a vector that is perpendicular to both of them. When
+you get there, that's a super useful property! But we're sticking to 2D here, so
+enough said about that.
+
+In 2D, the cross product can be used to determine the relative angle of two
+vectors. Like, is A to the left of B? If so, Z is positive. Or, are A and B
+pointing the same direction? In that case Z is zero. Or if A is to the _right_
+of B, the cross vector's Z is negative.
+
+The magnitude of the cross product is also maybe useful: it tells you the area
+of the parallelogram formed by the origin, A and B. E.g., how big of an area is
+the parallelogram formed by these two vectors?
+
+### p5.js vector operations
+
+To show you how this works in p5, here's some code showing a few of the
+operations I mentioned above, and a few I didn't.
+
+```js
+// same starting points as the interactive example above
+let a = createVector(100, 50)
+let b = createVector(25, 200)
+
+p5.Vector.add(a, b) // { x: 125, y: 250 } - a new vector, doesn't change a or b
+p5.Vector.sub(b, a) // { x: -75, y: 150 } - points from a to b
+
+a.dot(b) // 12500 - a number, not a vector
+a.cross(b) // { x: 0, y: 0, z: 18750 } - only z is nonzero in 2D
+
+a.dist(b) // 169.783... - distance between the two points
+
+// mult scales a vector - here, doubling a's length
+let doubled = a.copy().mult(2) // { x: 200, y: 100 }
+
+// normalize rescales a vector to length 1, keeping its direction
+let direction = a.copy().normalize() // { x: 0.894, y: 0.447 }
+
+// limit caps a vector's length if it's too long, otherwise leaves it alone
+let capped = a.copy().limit(50) // { x: 44.72..., y: 22.36... }
+```
+
+This code shows you how to build new vectors with `createVector`, add and
+subtract them, compute dot and cross products, and use a few helpful functions.
+
+- `v.mult(2)` scales the length of `v` by a given amount. The direction stays
+  the same, unless you multiply by a negative amount, in which case the arrow
+  flips around completely.
+- `v.normalize()` scales `v` so it has magnitude 1 (e.g. to fit inside a unit
+  circle - very useful for storing direction or heading info)
+- `v.limit(36)` scales `v` to no more than a given amount. Useful when your
+  addressable space is constrained, like if you need to point to a location
+  inside a circle of radius 36.
+
+Some statements you might have noticed as looking different from others:
+
+```js
+p5.Vector.add(a, b) // leave a and b alone, return a new vector holding the result
+```
+
+With this approach, it won't modify your inputs. However, if you wrote this:
+
+```js
+a.add(b) // this will modify a in place
+```
+
+... that means to calculate `a + b` and then store the result inside `a`. You
+are _mutating_ `a`. Sometimes you want this. But if you want to create a new
+independent vector, you'll either use the `p5.Vector.add` call, or you can use
+`copy`. The following is equivalent to the `p5.Vector.add` call:
+
+```js
+a.copy().add(b) // copy a, adds b to the copy, and returns the result
+```

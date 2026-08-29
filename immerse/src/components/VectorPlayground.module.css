@@ -1,0 +1,59 @@
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.canvasWrapper {
+  flex: 0 1 var(--vp-width);
+  max-width: var(--vp-width);
+  min-width: 200px;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--vp-aspect-ratio);
+  cursor: grab;
+}
+
+.canvas.dragging {
+  cursor: grabbing;
+}
+
+.readout {
+  flex: 0 0 auto;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.readout th,
+.readout td {
+  padding: 3px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.readout th {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.readout td:first-child {
+  text-align: left;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
