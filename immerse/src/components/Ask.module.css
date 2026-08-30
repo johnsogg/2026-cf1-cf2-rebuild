@@ -9,6 +9,26 @@
   grid-column: full;
 }
 
+/* Plain prose inside an Ask (unlike exercise widgets) should read at the
+ * same width as top-level lesson content, not stretch across the full
+ * grid column the Ask itself occupies. */
+:where(.ask) > .title,
+:where(.ask) > p,
+:where(.ask) > ul,
+:where(.ask) > ol,
+:where(.ask) > blockquote,
+:where(.ask) > img {
+  max-width: var(--content-width);
+}
+
+/* P5Sketch's own left/right padding is meant to inset it from the true
+ * page edge when it spans the full grid column on its own. Inside an Ask
+ * it's already indented by the Ask's own padding above, so the sketch's
+ * padding-left just double-indents it relative to the surrounding prose. */
+.ask > :global(.p5-sketch-wrap) {
+  padding-left: 0;
+}
+
 .stateIdle {
   border-color: var(--text-muted);
 }

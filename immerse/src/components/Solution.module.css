@@ -1,6 +1,6 @@
 .solution {
   margin-bottom: 24px;
-  padding-left: var(--gutter);
+  padding-top: 24px;
   grid-column: full;
 }
 

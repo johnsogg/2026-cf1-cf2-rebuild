@@ -1,9 +1,10 @@
 .lesson {
   --gutter: 4rem;
+  --content-width: min(832px, calc(100% - 2 * var(--gutter)));
   display: grid;
   grid-template-columns:
     [full-start] var(--gutter)
-    [content-start] min(832px, calc(100% - 8rem))
+    [content-start] var(--content-width)
     [content-end] 1fr
     [full-end];
 }

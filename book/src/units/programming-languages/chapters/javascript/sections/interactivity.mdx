@@ -2,18 +2,53 @@ export const title = "Interactivity"
 
 import { CoordinatePlane } from "immerse/components/CoordinatePlane"
 
-<Callout intent="danger">
-  This section is a work in progress. Oh, the bleeding edge.
-</Callout>
-
 # Interactivity
 
 So far we've written p5.js sketches that create _static_ images. This means they
 don't change over time, or in response to what the user does. We're going to
 learn about _interactivity_.
 
-p5.js can handle any input that your browser knows about. For starters, you get
-support for mouse and keyboard right out of the box.
+p5.js can handle almost any input that your browser knows about. For starters,
+you get support for mouse and keyboard right out of the box.
+
+## Lifecycle functions `setup` and `draw`
+
+A p5 sketch that doesn't react to the environment or the user is considered
+static - it won't need to change after it has rendered once. But a program that
+responds to interactivity has to be prepared to re-render on a moment's notice.
+
+p5 has lifecycle functions for covering this. The `setup` function is called
+_one time_ at the beginning of the sketch's life. This is the appropriate place
+to configure the canvas, load resources, and whatever other one-time operations
+you might need to take care of so that they're ready for the future. And if your
+sketch is static, you can even draw graphics in the `setup` function.
+
+The other main lifecycle function is called `draw`, and we've seen it many times
+already but haven't really described it. The `draw` function is invoked over and
+over by p5 - you don't call it yourself. If your sketch is static, you can omit
+this function entirely.
+
+Each call to `draw` starts and finishes — and in the gap before the next one, p5
+is still running, capturing input and getting ready for the next cycle. _That's
+what allows the program to be interactive in the first place_.
+
+{/* prettier-ignore-start */}
+
+The timing that p5 uses to repeatedly invoke the `draw` function is called the
+<Term>frame rate</Term>, and you can change it by calling `frameRate(n)`, where
+`n` is the number of times per second it should be called.
+
+{/* prettier-ignore-end */}
+
+By default the frame rate is 60, which means it will draw to the screen at 60
+Hertz. This works out to about every 16 milliseconds - fast enough that it is
+difficult for us humans to discern one frame from the next. A fast frame rate
+gives the appearance of nice fluid motion.
+
+What this means for you the programmer is that whatever you do during a `draw`
+call, it must complete quickly, otherwise you'll get choppy graphics behavior
+called "jank" - dropped frames because the computer is doing too much. Avoid
+jank.
 
 ## Variables, Callbacks, and Utility Functions
 
@@ -24,16 +59,17 @@ event callbacks, and utility functions.
 
 p5.js has special variables with information about mouse and keyboard state.
 
-| Variable       | Description                                                              |
-| -------------- | ------------------------------------------------------------------------ |
-| `mouseX`       | Horizontal position of the mouse, in pixels                              |
-| `mouseY`       | Vertical position of the mouse, in pixels                                |
-| `movedX`       | How far the mouse moved horizontally since the last frame                |
-| `movedY`       | How far the mouse moved vertically since the last frame                  |
-| `mouseButton`  | Which mouse button was most recently pressed (`LEFT`, `RIGHT`, `CENTER`) |
-| `key`          | The most recently pressed key, as a string                               |
-| `keyCode`      | The numeric code of the most recently pressed key                        |
-| `keyIsPressed` | Whether any key is currently being held down                             |
+| Variable         | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| `mouseX`         | Horizontal position of the mouse, in pixels                               |
+| `mouseY`         | Vertical position of the mouse, in pixels                                 |
+| `movedX`         | How far the mouse moved horizontally since the last frame                 |
+| `movedY`         | How far the mouse moved vertically since the last frame                   |
+| `mouseButton`    | Object with `left`, `right`, `center` booleans for which buttons are down |
+| `mouseIsPressed` | Whether any mouse button is currently being held down                     |
+| `key`            | The most recently pressed key, as a string                                |
+| `keyCode`        | The numeric code of the most recently pressed key                         |
+| `keyIsPressed`   | Whether any key is currently being held down                              |
 
 You can _read_ these variables at any time, including in the `draw` function.
 p5.js keeps them up to date as the user moves the mouse or types, so whatever
@@ -252,7 +288,8 @@ function draw() {
 
 </Ask>
 
-Use utility functions whenever you want, as they just defer to variables.
+Use utility functions whenever you want - under the hood they use values that
+essentially mirror the provided variables like `key` and `keyCode`.
 
 ### When and how to use interaction variables and callbacks
 
@@ -278,7 +315,7 @@ the y dimension so y grows _downward_.
 
 ## Writing interactive programs
 
-<Ask id="interactivity-face-sketch" mode="untracked">
+<Ask id="interactivity-face-sketch" mode="tracked">
 
 Click into this sketch so it gains keyboard focus. Then move your mouse and
 press the left/right/up arrow keys, or the space key.
@@ -431,23 +468,574 @@ function keyPressed() {
 
 </Ask>
 
-> Making programs respond to the user. The sketch is no longer frozen — it
-> reacts to mouse position, mouse clicks, and keyboard input. Goals:
->
-> - mouseX / mouseY as live variables
-> - mouseIsPressed, keyIsPressed, key
-> - p5.js event functions: mousePressed(), mouseReleased(), keyPressed()
-> - Understand that draw() running 60 fps is what makes interactivity feel
->   continuous — the program is constantly re-reading the state of the world
->
-> The assignment framing is an "interactive still life" — the scene from the
-> prior section that now responds to the user in some meaningful way.
+You can see a few interactive aspects to this sketch: moving the mouse and
+pressing various keys all have an effect. But how you capture user input, update
+your stateful data, and render it all depends on what you're trying to do.
 
-> at the top I'll show a finished p5 sketch without the code that uses all the
-> examples from below, so students know where this is going and what they'll be
-> able to do. That is TBD as I haven't written the rest yet.
->
-> Need to understand the p5.js life cycle. Importantly, a render loop is used
-> far and wide and not p5-specific. It calls setup() once at the beginning, and
-> then draw() 60 times per second (or another number, if you change the frame
-> rate)
+The sketch above has _a lot_ going on.
+
+- **Eye color**: controlled with <Kbd>Up</Kbd> to cycle between four eye colors.
+- **Pupil size**: <Kbd>Left</Kbd> and <Kbd>Right</Kbd> to smoothly transition
+  pupil size within limits.
+- **Pupil mouse tracking**: This is the tricky one. Each pupil tracks the mouse
+  position independently of the other.
+- **Mouth shape**: Press space <Kbd>Space</Kbd> to switch between smiling 🙂 and
+  neutral 😐.
+
+From here on, I'll show you several partial versions of the full interactive
+face sketch, and give you a shot at building out the related feature in
+isolation. There are solutions provided for all of these.
+
+### Pupil Color
+
+Here is a simplified version of the interactive face sketch that only involves
+eyes and pupils. It responds to the <Kbd>Up</Kbd> key to cycle eye color.
+
+<Ask id="interactivity-eyes-pupils" mode="untracked" title="Pupil Color">
+
+Click into the canvas here so it gains keyboard focus, then press the up arrow
+key to cycle through the pupil colors.
+
+Your challenge is to fill in the `keyPressed` function. I've provided pseudocode
+(a natural language description of the steps to follow). There's a solution
+provided so you can see just this part in isolation.
+
+```p5exercise autorun size="medium"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+const pupilColorCount = 4;
+
+// four possible pupilColors
+const pupilColor0 = "#000";
+const pupilColor1 = "#243ba3";
+const pupilColor2 = "#47350f";
+const pupilColor3 = "#118246";
+let pupilIndex = 0;
+let pupilColor = pupilColor0;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill(pupilColor);
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+
+// up key cycles through pupil colors
+function keyPressed() {
+  // pseudocode:
+  // if the key that is pressed is 'ArrowUp':
+  //    1. increment the pupilIndex by one, but use modulo to keep it
+  //        between 0 (inclusive) and pupilColorCount (exclusive).
+  //    2. then set pupilColor to pupilColor0, pupilColor1, etc.
+  //    3. return false to stop page from scrolling up
+  //
+  //  your code goes here
+}
+```
+
+<Solution id="interactivity-eyes-pupils">
+
+```p5exercise autorun size="small"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+const pupilColorCount = 4;
+
+// four possible pupilColors
+const pupilColor0 = "#000";
+const pupilColor1 = "#243ba3";
+const pupilColor2 = "#47350f";
+const pupilColor3 = "#118246";
+let pupilIndex = 0;
+let pupilColor = pupilColor0;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill(pupilColor);
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+
+// up key cycles through pupil colors
+function keyPressed() {
+  if (key === "ArrowUp") {
+    // this approach is not recommended - when we learn
+    // about lists you'll have a much better way
+    pupilIndex = (pupilIndex + 1) % pupilColorCount;
+    if (pupilIndex === 0) {
+      pupilColor = pupilColor0;
+    } else if (pupilIndex === 1) {
+      pupilColor = pupilColor1;
+    } else if (pupilIndex === 2) {
+      pupilColor = pupilColor2;
+    } else if (pupilIndex === 3) {
+      pupilColor = pupilColor3;
+    }
+    return false; // prevents page from receiving this & scrolling
+  }
+}
+```
+
+</Solution>
+</Ask>
+
+### Pupil Size
+
+The pupil size is changed with the <Kbd>Left</Kbd> and <Kbd>Right</Kbd> keys. In
+this case, we use `keyIsDown(LEFT_ARROW)` and `keyIsDown(RIGHT_ARROW)` during
+the `draw` function to both notice the key activity and to change the variable
+that records the pupil size. Since this runs at 60Hz, we want to change the size
+by a pretty small amount. For my solution I arbitrarily chose 0.1, which seems
+to work pretty well.
+
+See if you can update the `draw` function so it checks if those keys are being
+used, and if so, update the pupil size as appropriate.
+
+<Ask id="interactivity-pupil-size" mode="untracked" title="Pupil Size">
+
+Click into the canvas here so it gains keyboard focus, then hold the left or
+right arrow key to shrink or grow the pupils.
+
+Your challenge is to fill in the pupil-size part of the `draw` function. I've
+provided pseudocode (a natural language description of the steps to follow).
+There's a solution provided so you can see just this part in isolation.
+
+```p5exercise autorun size="medium"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill("#000");
+  // pseudocode:
+  // if the left arrow key is down:
+  //    decrease pupilRadius by 0.1, but never let it go below 1
+  // if the right arrow key is down:
+  //    increase pupilRadius by 0.1, but never let it go above eyeRadius - 2
+  //
+  // your code goes here
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+```
+
+<Solution id="interactivity-pupil-size">
+
+```p5exercise autorun size="small"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill("#000");
+  if (keyIsDown(LEFT_ARROW)) {
+    pupilRadius = Math.max(1, pupilRadius - 0.1);
+  }
+  if (keyIsDown(RIGHT_ARROW)) {
+    pupilRadius = Math.min(eyeRadius - 2, pupilRadius + 0.1);
+  }
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+```
+
+</Solution>
+</Ask>
+
+### Pupils following mouse
+
+The trickiest part in this interactive sketch is how the pupils creepily follow
+the mouse position. There are many ways to do this, but my solution involves
+using vectors (see the arithmetic section).
+
+If you've never used vectors before, don't despair if the solution is baffling
+when you first see it. This is the kind of thing that you really only start to
+understand by building with it.
+
+Note that each eye is independent of the other. You might want to have one pupil
+follow the mouse to start with, for comedic relief.
+
+<Ask id="interactivity-pupil-tracking" mode="untracked" title="Pupil Tracking">
+
+Click into the canvas here so it gains keyboard focus, then move the mouse
+around to see the pupils track it.
+
+Your challenge is to fill in the `mouseMoved` function. I've once again provided
+pseudocode to help you out. There's a solution provided so you can see just this
+part in isolation.
+
+```p5exercise autorun size="medium"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill("#000");
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+
+// make pupils follow the mouse
+function mouseMoved() {
+  // pseudocode:
+  // 1. figure out the max distance a pupil can move from its eye's
+  //    center: maxOffset = eyeRadius - pupilRadius
+  // 2. make a vector for the mouse position: createVector(mouseX, mouseY)
+  //
+  // for the left eye:
+  //   3. make a vector for the left eye's center: createVector(eyeLeftX, eyeY)
+  //   4. subtract the eye vector from the mouse vector with p5.Vector.sub,
+  //      giving the direction/distance from the eye to the mouse
+  //   5. limit that vector's length to maxOffset
+  //   6. set pupilLeftX/pupilLeftY to the eye center's x/y plus that
+  //      vector's x/y
+  //
+  // do the same thing again for the right eye, using eyeRightX and
+  // updating pupilRightX/pupilRightY
+  //
+  // your code goes here
+}
+```
+
+<Solution id="interactivity-pupil-tracking">
+
+```p5exercise autorun size="small"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// eyes
+const eyeRadius = 10;
+const eyeY = yMid - 30;
+const eyeSpreadX = 20;
+const eyeLeftX = xMid - eyeSpreadX;
+const eyeRightX = xMid + eyeSpreadX;
+
+// pupils
+let pupilRadius = 5;
+let pupilLeftX = eyeLeftX + 2;
+let pupilLeftY = eyeY + eyeRadius / 8;
+let pupilRightX = eyeRightX - 2;
+let pupilRightY = eyeY + eyeRadius / 8;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- eyes
+  strokeWeight(1);
+  fill("#fff");
+  // left
+  circle(eyeLeftX, eyeY, eyeRadius * 2);
+  // right
+  circle(eyeRightX, eyeY, eyeRadius * 2);
+
+  // --------------------------- pupils
+  fill("#000");
+  circle(pupilLeftX, pupilLeftY, pupilRadius * 2);
+  circle(pupilRightX, pupilLeftY, pupilRadius * 2);
+}
+
+// make pupils follow the mouse
+function mouseMoved() {
+  // update pupil positions based on mouse position, each eye center,
+  // while preventing pupils from being positioned outside of the eye
+  const maxOffset = eyeRadius - pupilRadius;
+
+  const mouse = createVector(mouseX, mouseY);
+
+  const eyeLeft = createVector(eyeLeftX, eyeY);
+  const deltaLeft = p5.Vector.sub(mouse, eyeLeft);
+  deltaLeft.limit(maxOffset);
+  pupilLeftX = eyeLeft.x + deltaLeft.x;
+  pupilLeftY = eyeLeft.y + deltaLeft.y;
+
+  const eyeRight = createVector(eyeRightX, eyeY);
+  const deltaRight = p5.Vector.sub(mouse, eyeRight);
+  deltaRight.limit(maxOffset);
+  pupilRightX = eyeRight.x + deltaRight.x;
+  pupilRightY = eyeRight.y + deltaRight.y;
+}
+```
+
+</Solution>
+</Ask>
+
+### Mouth shape
+
+The last interactive aspect of the face sketch is the mouth shape. This one is
+relatively straightforward - if you can dig the `arc` function. The `arc` call
+lets you draw a portion of a circular or elliptical arc, starting and ending at
+some angle that you specify.
+[Check out the p5 reference](https://p5js.org/reference/p5/arc/).
+
+<Ask id="interactivity-mouth-shape" mode="untracked" title="Mouth Shape">
+
+Click into the canvas here so it gains keyboard focus, then press space to
+toggle between a smiling and a flat mouth.
+
+Your challenge is to fill in the mouth-drawing part of the `draw` function. I've
+provided pseudocode (a natural language description of the steps to follow).
+There's a solution provided so you can see just this part in isolation.
+
+For this one, you should use the `keyPressed` callback and check for
+`key === " "` (that's a literal space string!).
+
+```p5exercise autorun size="medium"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// mouth - a circle arc, so define the circle and angles
+const mouthCX = xMid;
+const mouthCY = yMid - 20;
+const mouthRad = 100;
+const mouthStartAngle = (1 / 4) * Math.PI;
+const mouthEndAngle = (3 / 4) * Math.PI;
+const mouthFlatY = yMid + 30;
+const mouthFlatW = 70;
+let mouthIsSmiling = true;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- mouth
+  noFill();
+  // pseudocode:
+  // if mouthIsSmiling is true:
+  //    draw an arc centered at (mouthCX, mouthCY), width and height
+  //    mouthRad, starting at mouthStartAngle and ending at mouthEndAngle
+  // otherwise:
+  //    draw a flat mouth: a straight line at height mouthFlatY, running
+  //    from xMid - mouthFlatW / 2 to xMid + mouthFlatW / 2
+  //
+  // your code goes here
+}
+
+// space bar toggles the mouth shape
+function keyPressed() {
+  if (key === " ") {
+    mouthIsSmiling = !mouthIsSmiling;
+  }
+}
+```
+
+<Solution id="interactivity-mouth-shape">
+
+```p5exercise autorun size="small"
+// constants for special locations
+// canvas
+const w = 150;
+const xMid = w / 2;
+const h = w;
+const yMid = h / 2;
+
+// mouth - a circle arc, so define the circle and angles
+const mouthCX = xMid;
+const mouthCY = yMid - 20;
+const mouthRad = 100;
+const mouthStartAngle = (1 / 4) * Math.PI;
+const mouthEndAngle = (3 / 4) * Math.PI;
+const mouthFlatY = yMid + 30;
+const mouthFlatW = 70;
+let mouthIsSmiling = true;
+
+function setup() {
+  createCanvas(w, h);
+}
+
+function draw() {
+  background("#ddd");
+
+  // --------------------------- mouth
+  noFill();
+  // two mouth styles - smile and flat
+  if (mouthIsSmiling) {
+    arc(mouthCX, mouthCY, mouthRad, mouthRad, mouthStartAngle, mouthEndAngle);
+  } else {
+    line(xMid - mouthFlatW / 2, mouthFlatY, xMid + mouthFlatW / 2, mouthFlatY);
+  }
+}
+
+// space bar toggles the mouth shape
+function keyPressed() {
+  if (key === " ") {
+    mouthIsSmiling = !mouthIsSmiling;
+  }
+}
+```
+
+</Solution>
+</Ask>

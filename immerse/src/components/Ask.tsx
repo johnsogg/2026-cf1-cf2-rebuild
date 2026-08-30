@@ -42,8 +42,9 @@ export function useAsk(): AskContextValue {
 
 type AskRegistryValue = {
   getNumber: (id: string) => number
-  registerId: (id: string) => void
+  registerId: (id: string, title?: string) => void
   hasId: (id: string) => boolean
+  getTitle: (id: string) => string | undefined
 }
 
 const AskRegistryContext = createContext<AskRegistryValue | null>(null)
@@ -66,9 +67,11 @@ export function AskProvider({ children }: { children: ReactNode }) {
   const counter = useRef(0)
   const assignedNumbers = useRef(new Map<string, number>())
   const knownIds = useRef(new Set<string>())
+  const titles = useRef(new Map<string, string>())
   counter.current = 0
   assignedNumbers.current = new Map()
   knownIds.current = new Set()
+  titles.current = new Map()
 
   const getNumber = useCallback((id: string) => {
     if (assignedNumbers.current.has(id)) return assignedNumbers.current.get(id)!
@@ -77,14 +80,19 @@ export function AskProvider({ children }: { children: ReactNode }) {
     return n
   }, [])
 
-  const registerId = useCallback((id: string) => {
+  const registerId = useCallback((id: string, title?: string) => {
     knownIds.current.add(id)
+    if (title) titles.current.set(id, title)
   }, [])
 
   const hasId = useCallback((id: string) => knownIds.current.has(id), [])
 
+  const getTitle = useCallback((id: string) => titles.current.get(id), [])
+
   return (
-    <AskRegistryContext.Provider value={{ getNumber, registerId, hasId }}>
+    <AskRegistryContext.Provider
+      value={{ getNumber, registerId, hasId, getTitle }}
+    >
       {children}
     </AskRegistryContext.Provider>
   )
@@ -101,7 +109,7 @@ export type AskProps = {
 export function Ask({ id, mode, title, hints, children }: AskProps) {
   const { getNumber, registerId } = useAskRegistry()
   const number = mode === "untracked" ? undefined : getNumber(id)
-  registerId(id)
+  registerId(id, title)
 
   const { registerExerciseInSection, notifyExerciseChange } = useProgress()
   const { currentSection } = useNav()

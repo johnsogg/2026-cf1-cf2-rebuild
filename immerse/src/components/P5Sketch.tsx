@@ -141,7 +141,7 @@ export function P5Sketch({
   const gridColumn = layout === "content" ? "content" : "full"
 
   return (
-    <div className={s.wrap} style={{ gridColumn }}>
+    <div className={`${s.wrap} p5-sketch-wrap`} style={{ gridColumn }}>
       <div className={s.row}>
         <div className={s.canvas}>
           {srcdoc ? (

@@ -25,8 +25,9 @@ export function Solution({
   exposeText = "Click here to show solution",
   children,
 }: SolutionProps) {
-  const { getNumber, hasId } = useAskRegistry()
+  const { getNumber, hasId, getTitle } = useAskRegistry()
   const orphaned = !hasId(id)
+  const ref = getTitle(id) ?? getNumber(id)
 
   const contextValue: AskContextValue = {
     id: `${id}::solution`,
@@ -44,7 +45,7 @@ export function Solution({
       )}
       <details className={s.details}>
         <summary className={s.summary}>
-          {orphaned ? exposeText : `Solution to ${getNumber(id)} — ${exposeText}`}
+          {orphaned ? exposeText : `Solution to ${ref} — ${exposeText}`}
         </summary>
         <div className={s.content}>
           <AskContext.Provider value={contextValue}>
