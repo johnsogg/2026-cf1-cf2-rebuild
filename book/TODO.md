@@ -18,6 +18,11 @@ Each entry: date added, priority, note.
 > Isolated additions or edits — good grabs when you have ~10 minutes and want a
 > self-contained task instead of drafting new prose.
 
+- **2026-08-29 — P1** — `web-page` homework (HTML/CSS, brief UX/AI week):
+  undecided whether the assignment is a vibe-coded site, hand-written
+  ("artisanal") code, or a student choice between the two. Needs a decision
+  before fleshing out "What students are asked to build/do."
+
 - **2026-07-11 — P2** — AI tools are very good at getting syntax right. It's
   still important for a programmer to understand and work with syntactically
   correct code, but the presence of AI relieves us of some of the ongoing
