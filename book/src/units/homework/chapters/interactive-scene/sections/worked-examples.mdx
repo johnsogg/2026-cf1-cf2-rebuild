@@ -2,5 +2,167 @@ export const title = "Worked Examples"
 
 # Interactive Scene — Worked Examples
 
-- Example 1:
-- Example 2:
+This interactive scene is a little 'game' that isn't quite finished, but it does
+check all the boxes for this homework. The goal is to move the barrels onto the
+magenta platform. Which is hard, because you can't actually pick them up!
+
+We have not yet covered enough of language to have adequate tools to take this
+much farther. Not without pain, at least. For now, "enjoy" this partially made
+"game".
+
+**If your screen isn't big enough to see the whole thing:** you can also view
+this in the p5 editor here:
+[https://editor.p5js.org/johnsogg/sketches/J9VHe2u_a](https://editor.p5js.org/johnsogg/sketches/J9VHe2u_a)
+
+---
+
+Moving the mouse up and down changes the background color. Mouse at top gives a
+fully black background, mouse at bottom gives fully white. Mouse in between
+gives you a proportional gray value.
+
+Use the arrow keys to move the crane's grabber around. When you're over a blue
+barrel, press the space <Kbd>Space</Kbd> key, and a little electro-grabby-cone
+will appear until you either press <Kbd>Space</Kbd> again, or you run out of
+power.
+
+Power will drain as the magnet grabber is on, and recharge a bit slower when it
+is off. A rectangle at the top shows its current power reserves.
+
+```p5exercise autorun size="large"
+let bgColor = 255;
+
+const groundHeight = 60;
+
+const barrelHeight = 20;
+const barrelWidth = 12;
+
+const craneBaseHeight = 300;
+const craneBaseWidth = 30;
+let craneBaseY = 0; // 'let' because it will be based on current value of height
+const craneArmOffsetFromTop = 50;
+const craneArmHeight = 10;
+const craneArmWidth = 700;
+
+const handWidth = 20;
+const handHeight = 10;
+let handX = 200; // use 'let' because it can vary based on user input
+let handY = 200;
+
+const targetX = 600;
+let targetY = 0;
+const targetWidth = 100;
+const targetHeight = 10;
+
+let grabMode = false;
+const coneW = 40;
+const coneH = 60;
+
+let electroMagnetPower = 100;
+const electroMagnetDrain = 0.1;
+const electroMagnetRestore = 0.05;
+
+function setup() {
+  createCanvas(800, 400);
+}
+
+function draw() {
+  background(bgColor);
+
+  // catch user input
+  if (keyIsDown(DOWN_ARROW) === true) {
+    handY += 1;
+  }
+
+  if (keyIsDown(UP_ARROW) === true) {
+    handY -= 1;
+  }
+
+  if (keyIsDown(LEFT_ARROW) === true) {
+    handX -= 1;
+  }
+
+  if (keyIsDown(RIGHT_ARROW) === true) {
+    handX += 1;
+  }
+
+  craneBaseY = height - groundHeight - craneBaseHeight;
+  targetY = height - groundHeight - targetHeight;
+
+  // ground
+  fill("green");
+  rect(0, height - groundHeight, width, groundHeight);
+
+  // barrels
+  fill("blue");
+  rect(200, height - groundHeight - barrelHeight, barrelWidth, barrelHeight);
+  rect(300, height - groundHeight - barrelHeight, barrelWidth, barrelHeight);
+  rect(400, height - groundHeight - barrelHeight, barrelWidth, barrelHeight);
+  rect(500, height - groundHeight - barrelHeight, barrelWidth, barrelHeight);
+
+  // crane
+  fill("darkgray");
+  rect(100, craneBaseY, craneBaseWidth, craneBaseHeight);
+  rect(10, craneBaseY + craneArmOffsetFromTop, craneArmWidth, craneArmHeight);
+
+  // hand
+  fill("red");
+  rect(handX, handY, handWidth, handHeight);
+  line(
+    handX + handWidth / 2,
+    craneBaseY + craneArmOffsetFromTop + craneArmHeight,
+    handX + handWidth / 2,
+    handY
+  );
+
+  // target
+  fill("magenta");
+  rect(targetX, targetY, targetWidth, targetHeight);
+
+  // grabber cone
+  if (grabMode) {
+    // drain power
+    electroMagnetPower = electroMagnetPower - electroMagnetDrain;
+    if (electroMagnetPower < 0) {
+      // out of juice, turn it off
+      grabMode = false;
+    }
+    // render cone
+    push();
+    const coneOrigin = createVector(handX + handWidth / 2, handY + handHeight);
+    fill(86, 156, 152, 100);
+    beginShape();
+    vertex(coneOrigin.x, coneOrigin.y);
+    vertex(coneOrigin.x - coneW / 2, coneOrigin.y + coneH);
+    vertex(coneOrigin.x + coneW / 2, coneOrigin.y + coneH);
+    endShape(CLOSE);
+    pop();
+  } else {
+    // magnet not on, allow it to recharge
+    electroMagnetPower = Math.min(
+      100,
+      electroMagnetPower + electroMagnetRestore
+    );
+  }
+
+  // magnet power readout
+  push();
+  noStroke();
+  fill("#0e8724");
+  rect(width - 110, 10, electroMagnetPower, 15);
+  stroke("#666");
+  noFill();
+  rect(width - 110, 10, 100, 15);
+  pop();
+}
+
+function keyPressed() {
+  if (key === " ") {
+    grabMode = !grabMode;
+  }
+}
+
+function mouseMoved() {
+  bgColor = (mouseY / height) * 255;
+}
+
+```
