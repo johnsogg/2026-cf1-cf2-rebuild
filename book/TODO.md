@@ -23,6 +23,10 @@ Each entry: date added, priority, note.
   ("artisanal") code, or a student choice between the two. Needs a decision
   before fleshing out "What students are asked to build/do."
 
+- **2026-09-02 — P3** — Standardize "Javascript" → "JavaScript" book-wide.
+  Currently mixed (~22 "Javascript" vs ~7 "JavaScript" across `.mdx`). Do it in
+  one sweep so it doesn't churn individual sections.
+
 - **2026-07-11 — P2** — AI tools are very good at getting syntax right. It's
   still important for a programmer to understand and work with syntactically
   correct code, but the presence of AI relieves us of some of the ongoing

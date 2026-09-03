@@ -1,17 +1,773 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+import square from "./exercises/square/index.ts"
+import magnitude from "./exercises/magnitude/index.ts"
+import calcPosition from "./exercises/calc-position/index.ts"
+
 export const title = "Functions"
 
-_This section is a placeholder._
+# Functions
 
-{/*
-  Giving names to chunks of behavior so they can be reused. Goals:
-    - Defining a function with function keyword (and arrow function variant)
-    - Parameters and arguments
-    - Return values
-    - Variable scope: local vs. sketch-level
-    - Why functions matter: avoiding repetition, making code readable,
-      isolating a concern so it can be reasoned about independently
-  Practical context: writing a drawHouse(x, y, size) or drawCloud(x, y)
-  function and calling it several times — shows immediate payoff of
-  encapsulation. Connects to p5.js's setup/draw model, which students have
-  been using without fully understanding that they're defining functions.
-*/}
+We've used functions throughout this entire text, and I've shown how to define
+and use them, but we have not really gone deep.
+
+You'll be happy to know that functions will help you organize your code so it is
+easier to reason about, write, and troubleshoot.
+
+## What's a function?
+
+A function is a reusable routine that will accept optional input parameters,
+execute some code based on those inputs, and optionally yield a result.
+
+A quick recap of the function-definition syntax we first met in the syntax
+chapter:
+
+<CodeAnatomy
+  code={{
+    value: "function doMath(a, b, c) { }",
+    pos: { x: 20, y: 200 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={450}
+  progressive
+  labels={[
+    {
+      name: "function",
+      text: "Keyword that starts a function definition.",
+      pos: { x: 10, y: 10 },
+      target: { x: 113, y: 190 },
+      maxWidth: 160,
+    },
+    {
+      name: "doMath",
+      text: "The function's name — your choice",
+      pos: { x: 200, y: 10 },
+      target: { x: 300, y: 190 },
+      maxWidth: 160,
+    },
+    {
+      name: "Parentheses",
+      text: "Enclose the parameter list. Required even when there are no parameters.",
+      pos: { x: 340, y: 300 },
+      target: [
+        { x: 395, y: 250 },
+        { x: 580, y: 250 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: "Parameters",
+      text: "Comma-separated list of names to hold input values",
+      pos: { x: 430, y: 10 },
+      target: { x: 475, y: 190 },
+      maxWidth: 190,
+    },
+    {
+      name: "Curly braces",
+      text: "Enclose the code block",
+      pos: { x: 690, y: 10 },
+      target: [
+        { x: 635, y: 190 },
+        { x: 682, y: 190 },
+      ],
+      maxWidth: 190,
+    },
+  ]}
+/>
+
+This is the syntax for _defining_ a function. All these parts are needed, every
+time:
+
+- The `function` keyword kicks it all off. This tells you and the Javascript
+  interpreter that a new function definition is afoot.
+- The function _name_ (in this example, `doMath`). You can use any name you
+  like, but it pays to choose a good name so it stays legible.
+- _Parentheses_ to delimit a comma-separated list of _parameters_. Even if the
+  function doesn't take any arguments, you still need the parentheses. The
+  parameters that you list here will assume whatever values you pass in. They're
+  like private variables that only exist while your function is running.
+- Curly braces to delimit the code that will run when the function is invoked.
+  And this is also necessary, even if your function doesn't do anything yet.
+
+A function is like a little recipe for doing some specific computation that can
+be used by other code when it is needed. A function can be _used_ as many times
+as needed, but it is only _defined_ once. So if you've written tall blocks of
+code that repeats the same idea many times, now you can put that repetitive code
+in one spot (the function), and then simply refer to it by name.
+
+## Translating math to a code function
+
+I'll expand on the `doMath` example from above. Let's say that for whatever
+reason, we often need to do this computation:
+
+$$
+x = \begin{cases}
+3ab + 2c & \text{if } a < b \\
+b + c & \text{otherwise}
+\end{cases}
+$$
+
+This is the mathematical syntax that you'd see in a textbook, or off Wikipedia.
+One challenge is to convert that format into code. We can see that it involves
+variables `a`, `b`, and `c`, and what it does depends on their values. It
+returns the result of a computation.
+
+We can write the above math in Javascript like this:
+
+```js
+function doMath(a, b, c) {
+  let x
+  if (a < b) {
+    x = 3 * a * b + 2 * c
+  } else {
+    x = b + c
+  }
+  return x
+}
+```
+
+This lets us give a name to what we're doing. Admittedly, `doMath` is probably
+not a great name. This just illustrates how you'd define it and (in a moment)
+invoke it.
+
+In this function, if `a` is smaller than `b`, we'll compute `3ab + 2c` and store
+it in `x`. Otherwise, we'll store `b + c` in `x`. At the end, we _return_ `x`.
+
+## Returning values
+
+The `return` keyword does a couple things. First, it marks a place where the
+function's result is going to be handed back to whatever code called it. So, the
+`return x` becomes a _return statement_ (that's the keyword followed by an
+expression that boils down to a value that serves as our result). Second, it
+means that the function will be over the moment that value is returned. Once the
+_return_ statement executes, the function stops. No more code in that function
+will run.
+
+It just so happens that my code above has a single return value at the very
+bottom. This is a common pattern, but it isn't required. We could have written
+the function like this, and it would behave the same way:
+
+```js
+function doMath(a, b, c) {
+  if (a < b) {
+    return 3 * a * b + 2 * c
+  } else {
+    return b + c
+  }
+}
+```
+
+In this rendition, we're returning one of those two expressions on the line
+where they're computed. Notice also that we don't have an `x` variable declared
+anywhere, and we're not assigning to it. This code returns the result of the
+bare expression instead of the value contained in a variable.
+
+Sometimes a function doesn't actually return a value. We informally call this a
+"void function". Void functions are typically used for situations where the
+function had some side effects, like drawing graphics, but didn't need to
+calculate a value. Most void functions don't need an explicit `return`
+statement, because when execution gets to the end of the function's code, the
+function stops and it hands back control to whatever called it.
+
+But there are situations where you'd want a void function to return earlier than
+the end. In that case, you simply write `return` by itself, and the function
+will end and give back control to whoever called it, as no result is needed.
+
+```js
+function drawSnow() {
+  if (temperature >= freezing) {
+    return // early return in this case
+  }
+  // code for drawing snow here reached only if
+  // it is cold enough to freeze
+}
+```
+
+### Void functions for doing work like drawing graphics
+
+Functions that perform jobs for you instead of returning a computation are
+common. You'll likely use them for drawing graphics. Here's a void function that
+draws a circle at whatever `x, y` values we give it. Notice that this _always_
+draws the dot in white, with a 25 pixel diameter. The important thing here is
+that some details are up to the caller (providing x and y), and some details are
+baked into the function definition (fill color and diameter).
+
+```js
+function drawDot(x, y) {
+  push()
+  fill("white")
+  noStroke()
+  circle(x, y, 25)
+  pop()
+}
+```
+
+This is also a decent example of how you'd defensively write a function that
+doesn't change state persistently. It uses `push()` at the beginning to stash
+the incoming graphics state, then it modifies graphics state (by filling white
+and turning off drawing the stroke outline) and `pop()` at the end to restore
+graphics state to what it started out as. Since there is no `return` statement
+and we don't bail out halfway through, the push/pop pair both runs, and will
+protect other code from inadvertently getting our graphics state changes.
+
+## Calling the function
+
+Having defined a function, the next logical thing to talk about is how to make
+use of it. You can _invoke_ the function and send in arguments like this:
+
+```js
+drawDot(mouseX, mouseY)
+```
+
+For grins, here's a little sketch showing off this masterpiece:
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  drawDot(mouseX, mouseY)
+}
+
+function drawDot(x, y) {
+  push()
+  fill("white")
+  noStroke()
+  circle(x, y, 25)
+  pop()
+}
+```
+
+Earlier I showed the `doMath` function, which both provided inputs _and_ gave
+you a resulting value. Here's an explainer of the syntax for invoking a function
+and storing the result.
+
+<CodeAnatomy
+  code={{
+    value: "const x = doMath(3, 5, 2)",
+    pos: { x: 20, y: 220 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={460}
+  progressive
+  labels={[
+    {
+      name: "const x",
+      text: "Variable declaration to hold the result",
+      pos: { x: 10, y: 10 },
+      target: { x: 102, y: 210 },
+      maxWidth: 240,
+    },
+    {
+      name: "doMath",
+      text: "Name of function to call",
+      pos: { x: 300, y: 10 },
+      target: { x: 323, y: 210 },
+      maxWidth: 220,
+    },
+    {
+      name: "Parentheses",
+      text: "Required to delimit arguments",
+      pos: { x: 300, y: 340 },
+      target: [
+        { x: 420, y: 270 },
+        { x: 580, y: 270 },
+      ],
+      maxWidth: 280,
+    },
+    {
+      name: "Arguments",
+      text: "Comma-separated list of inputs",
+      pos: { x: 600, y: 10 },
+      target: { x: 487, y: 210 },
+      maxWidth: 260,
+    },
+  ]}
+/>
+
+One important thing that might not be obvious to everybody is that the order of
+function inputs matters. The `doMath` function was defined with parameters
+`a, b, c`, in that order.
+
+<CodeAnatomy
+  code={{
+    value: "doMath(3, 5, 2)\n       a  b  c",
+    pos: { x: 20, y: 30 },
+    fontSize: 40,
+    lineHeight: 110,
+  }}
+  width={700}
+  height={210}
+  labels={[
+    {
+      name: "Order matters",
+      text: "arguments are put into input parameters in the order they appear",
+      pos: { x: 400, y: 50 },
+      target: [
+        { from: { x: 203, y: 70 }, x: 203, y: 136 },
+        { from: { x: 273, y: 70 }, x: 273, y: 136 },
+        { from: { x: 343, y: 70 }, x: 343, y: 136 },
+      ],
+      maxWidth: 280,
+    },
+  ]}
+/>
+
+## Variable Scope
+
+Now that we've added functions to our programming tool belt, we need to talk
+about variable scope. Variables are only available within some range of code. In
+particular, variables that are defined inside functions are not available
+outside of that function.
+
+More generally, variables declared with `const` or `let` are only available in
+the code block where they were declared. For top-level variables, that means the
+whole file. For anything else, it means the code block, if-statement, or any
+other curly-brace delimited group that we haven't yet seen, like loops.
+
+<Callout intent="note">
+  In the early days of Javascript we declared variables with the `var` keyword.
+  This is still a valid but frowned-upon way to declare variables. A `var` is
+  scoped to the entire function — so even if you declare one inside some inner
+  curly braces, it will still be scoped to the entire function. This is a piece
+  of historical curiosity that could bite you, so be careful to avoid `var`.
+</Callout>
+
+For example:
+
+<Ask id="variable-scope-center-guide" mode="interacted" title="Variable scope">
+The code below starts out ❌ broken for a couple reasons. The `draw` function
+references the `midX` and `midY` variables, which only make sense inside the
+`drawCenterGuide` function. Also, in the `draw` function, there's an 
+if-statement that declares variable `c`, and then references that variable
+outside of that code block.
+
+See if you can modify this code so it draws a dot right at the center, by fixing
+the variable scope issues.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function drawCenterGuide() {
+  push()
+  stroke("#ffffff30")
+  const midX = (width / 2) // scoped to the function
+  const midY = (height / 2) // same
+  line(midX, 0, midX, height)
+  line(0, midY, width, midY)
+  pop()
+}
+
+function draw() {
+  background("black")
+  drawCenterGuide()
+  if (mouseIsPressed) {
+    const c = "red" // scoped to the if-statement's code block
+  }
+  fill(c) // error. c is not available here.
+  circle(midX, midY, 10)
+}
+```
+
+</Ask>
+
+This might seem strange to newcomers, because you can see with your eyeballs
+that, _clearly_, `midX` and `midY` have values. They're defined _right there_!
+But, those values only make sense in the scope where they're defined, which here
+is the `drawCenterGuide` function. If you want a function to be able to use
+values that are defined in some other function, you'll have to pass that data in
+as arguments. Similarly, if you compute data inside a function that must be used
+outside of that function, just `return` that data.
+
+You can also declare variables _outside_ of a function, which is common in p5
+sketches. For example, right at the top of a sketch you might define a bunch of
+variables, some with `const`, some with `let`, because that data must be used in
+several places. It seems very convenient! For example:
+
+```p5exercise autorun size="medium"
+// sketch-level variables
+const bg = "#202020"
+const dotColor = "#802020"
+let spot = 0
+
+function setup() {
+  createCanvas(150, 150)
+  spot = width / 2             // no problem
+}
+
+function draw() {
+  background(bg)               // no problem
+  spot = mouseX
+  fill(dotColor)               // no problem
+  circle(spot, height / 2, 30) // no problem
+}
+```
+
+Because `bg`, `dotColor`, and `spot` are all defined outside of any function,
+you can reference them (and in the case of `spot`, modify them) inside `setup`,
+`draw`, or any functions that you might define.
+
+It might seem counter-intuitive, but variable scoping helps you out by making it
+more clear what is available for use. When you have a bigger sketch, or even a
+program with multiple files involved, there could be hundreds of variables, and
+it would be confusing and overwhelming for them all to be available at all
+places. If you happen to have access to a variable, you might just write to it,
+thinking it harmless. But really you've just changed data that some other thing
+needs.
+
+You can think of function-scoped variables as holding your function's innermost
+thoughts. When the function is done, those thoughts vanish into the aether. If
+those variables were named things like `x` or `start` or other commonly used
+names, you won't need to worry about polluting the larger scope with variables
+that don't make sense in context, or would otherwise conflict. Feel free to name
+your function-scoped variables however you like, as they only exist there.
+
+With sketch-scoped variables you should be more careful, because they have more
+visibility, so you should choose their names thoughtfully.
+
+## Arrow functions
+
+There is a newer syntax for writing functions, and since it involves the `=>`
+token (equals sign followed by greater-than), we call them _arrow_ functions.
+They look like this:
+
+```js
+const drawCenterGuide = () => {
+  push()
+  stroke("#ffffff30")
+  const midX = width / 2 // scoped to the function
+  const midY = height / 2 // same
+  line(midX, 0, midX, height)
+  line(0, midY, width, midY)
+  pop()
+}
+
+const cube = (x) => x * x * x
+```
+
+Defining functions like this draws attention to the fact that functions
+themselves are just a special type of value, and assigned into a variable like
+any other value.
+
+<CodeAnatomy
+  code={{
+    value: "const doMath = (a, b, c) => { }",
+    pos: { x: 20, y: 248 },
+    fontSize: 40,
+  }}
+  width={900}
+  height={460}
+  progressive
+  labels={[
+    {
+      name: "const",
+      text: "declare a new variable to contain a value.",
+      pos: { x: 10, y: 10 },
+      target: { x: 78, y: 238 },
+      maxWidth: 150,
+    },
+    {
+      name: "doMath",
+      text: "Variable name.",
+      pos: { x: 175, y: 10 },
+      target: { x: 230, y: 238 },
+      maxWidth: 150,
+    },
+    {
+      name: "Equals sign",
+      text: "Assign value (a function expression) into variable on left",
+      pos: { x: 335, y: 10 },
+      target: { x: 343, y: 238 },
+      maxWidth: 150,
+    },
+    {
+      name: "Parameter list",
+      text: "Comma separated list in parens.",
+      pos: { x: 250, y: 328 },
+      target: [
+        { x: 382, y: 298 },
+        { x: 568, y: 298 },
+      ],
+      maxWidth: 260,
+    },
+    {
+      name: "Arrow",
+      text: "Separates parameter list from function body.",
+      pos: { x: 655, y: 10 },
+      target: { x: 646, y: 238 },
+      maxWidth: 150,
+    },
+    {
+      name: "Curly braces",
+      text: "Wrap the body. Optional if body is a single expression",
+      pos: { x: 630, y: 328 },
+      target: [
+        { x: 705, y: 298 },
+        { x: 751, y: 298 },
+      ],
+      maxWidth: 240,
+    },
+  ]}
+/>
+
+Arrow functions also have the curious ability to define a code block without
+curly braces, as long as there's only a single expression as in the `cube`
+definition above. In this case, don't use `return` - the expression's value will
+be resolved and returned implicitly. But the moment you need more than one
+expression, you're back to needing braces and using a return statement.
+
+## Example
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(260, 170)
+}
+
+function draw() {
+  background("#202020")
+
+  // same y for all three; only the size changes as we move right
+  //         x    y   w   h
+  drawRobot(45, 110, 38, 46)
+  drawRobot(130, 110, 38, 78)
+  drawRobot(215, 110, 38, 28)
+}
+
+// x, y  -> center of the robot's body
+// w, h  -> body width and height
+function drawRobot(x, y, w, h) {
+  push()
+  rectMode(CENTER)
+  stroke("#cfcfcf")
+  fill("#6a7a8a")
+
+  // body
+  rect(x, y, w, h)
+
+  // head sits on top of the body
+  const headH = w * 0.6
+  const headY = y - h / 2 - headH / 2
+  rect(x, headY, w * 0.7, headH)
+
+  // antenna
+  line(x, headY - headH / 2, x, headY - headH / 2 - 8)
+
+  // eyes
+  noStroke()
+  fill("#101010")
+  circle(x - w * 0.15, headY, 5)
+  circle(x + w * 0.15, headY, 5)
+
+  // legs
+  stroke("#cfcfcf")
+  line(x - w * 0.25, y + h / 2, x - w * 0.25, y + h / 2 + 10)
+  line(x + w * 0.25, y + h / 2, x + w * 0.25, y + h / 2 + 10)
+  pop()
+}
+```
+
+Given a single `drawRobot` function, we invoke it three times with different
+parameters, and it draws three unique robots. Examine the structure of this
+code, including how the function is defined, where the push/pop calls are made,
+and how it is used with different numbers. You can use the same strategy in the
+ask below.
+
+<Ask id="function-face-eyes" mode="interacted" title="Functionface">
+
+Now let's see if you can replicate the following static sketch. Study this, and
+ask yourself how you might make a `drawEye` function that would work. What
+parameters do you think you need? They're in different spots, and one of them is
+open, the other closed.
+
+```p5sketch autoplay width=150 height=150
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+
+  // head
+  push()
+  noStroke()
+  fill("#e8c9a0")
+  circle(75, 80, 120)
+  pop()
+
+  // one eye open, one winking
+  drawEye(55, 72, "#5b8bd0", 26, 18, true)
+  drawEye(97, 72, "#5b8bd0", 26, 18, false)
+
+  // nose
+  push()
+  noFill()
+  stroke("#b5906a")
+  strokeWeight(2)
+  line(75, 80, 70, 96)
+  line(70, 96, 79, 96)
+  pop()
+
+  // mouth
+  push()
+  noFill()
+  stroke("#a25b5b")
+  strokeWeight(3)
+  arc(75, 108, 44, 28, 0, PI)
+  pop()
+}
+
+// x, y   -> center of the eye
+// eyeColor -> iris color when the eye is open
+// w, h   -> overall eye width and height
+// isOpen -> true: draw an open eye; false: draw a closed eyelid
+function drawEye(x, y, eyeColor, w, h, isOpen) {
+  push()
+  if (isOpen) {
+    // white of the eye
+    noStroke()
+    fill("white")
+    ellipse(x, y, w, h)
+
+    // iris, then pupil
+    fill(eyeColor)
+    circle(x, y, h * 0.85)
+    fill("black")
+    circle(x, y, h * 0.4)
+  } else {
+    // closed eyelid: a downward curve
+    noFill()
+    stroke("#4a3b2f")
+    strokeWeight(2)
+    arc(x, y, w, h, 0, PI)
+  }
+  pop()
+}
+```
+
+Use this editor here, and see if you can draw a face. Define a `drawEye`
+function and call it twice with different parameters. As a stretch goal, make it
+interactive by letting the mouse position control if the nearby eye is open or
+not.
+
+```p5exercise autorun size="large"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+}
+```
+
+<Solution id="function-face-eyes">
+
+```p5exercise autorun size="large"
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+
+  // head
+  push()
+  noStroke()
+  fill("#e8c9a0")
+  circle(75, 80, 120)
+  pop()
+
+  // one eye open, one winking
+  //       x   y   eyeColor   w   h  isOpen
+  drawEye(55, 72, "#5b8bd0", 26, 18, true)
+  drawEye(97, 72, "#5b8bd0", 26, 18, false)
+
+  // nose
+  push()
+  noFill()
+  stroke("#b5906a")
+  strokeWeight(2)
+  line(75, 80, 70, 96)
+  line(70, 96, 79, 96)
+  pop()
+
+  // mouth
+  push()
+  noFill()
+  stroke("#a25b5b")
+  strokeWeight(3)
+  arc(75, 108, 44, 28, 0, PI)
+  pop()
+}
+
+// x, y   -> center of the eye
+// eyeColor -> iris color when the eye is open
+// w, h   -> overall eye width and height
+// isOpen -> true: draw an open eye; false: draw a closed eyelid
+function drawEye(x, y, eyeColor, w, h, isOpen) {
+  push()
+  if (isOpen) {
+    // white of the eye
+    noStroke()
+    fill("white")
+    ellipse(x, y, w, h)
+
+    // iris, then pupil
+    fill(eyeColor)
+    circle(x, y, h * 0.85)
+    fill("black")
+    circle(x, y, h * 0.4)
+  } else {
+    // closed eyelid: a downward curve
+    noFill()
+    stroke("#4a3b2f")
+    strokeWeight(2)
+    arc(x, y, w, h, 0, PI)
+  }
+  pop()
+}
+```
+
+</Solution>
+
+</Ask>
+
+## Functional Calisthenics
+
+In software engineering, we can write automated tests to check if functions do
+the expected work. Here are a few testable exercises for you and your brain to
+get in some practice. Write your function in the editor, press **Run**, and the
+tests will tell you whether it behaves.
+
+By the way, the `export` keyword that appears in the code below just lets the
+automated tests find your function — ignore it for now.
+
+If you are **feeling daring**, go ahead and open up the "View test code" item.
+We will cover testing much later, after we've introduced all the language
+basics.
+
+<Ask id={square.id} mode="graded" title={square.title} hints={square.hints}>
+  <CodeExercise exercise={square} />
+</Ask>
+
+<Ask
+  id={magnitude.id}
+  mode="graded"
+  title={magnitude.title}
+  hints={magnitude.hints}
+>
+  <CodeExercise exercise={magnitude} />
+</Ask>
+
+<Ask
+  id={calcPosition.id}
+  mode="graded"
+  title={calcPosition.title}
+  hints={calcPosition.hints}
+>
+  <CodeExercise exercise={calcPosition} />
+</Ask>
