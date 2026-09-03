@@ -36,7 +36,10 @@ import s from "./CodeAnatomy.module.css"
  * the fastest way to iterate). A common layout: labels in a row above the
  * code line, each `target` pointing down into the token it describes.
  * `target` may also be an array of points (e.g. both parens of a pair, or
- * both curly braces) to fan out multiple arrows from one label.
+ * both curly braces) to fan out multiple arrows from one label. A target
+ * point with a `from` draws its arrow between two snippet coordinates
+ * instead of from the label box (e.g. a value straight down to the
+ * parameter it fills on the next line).
  *
  * `code.value` may contain `\n` to break the snippet across multiple lines.
  * Each line starts at `code.pos.x` (so leading spaces indent it) and lines
@@ -53,6 +56,17 @@ export interface CodeAnatomyPoint {
   y: number
 }
 
+export interface CodeAnatomyTarget extends CodeAnatomyPoint {
+  /**
+   * Where the arrow starts. Omit and it starts at the label box (the usual
+   * case). Set it to draw the arrow between two points in the snippet
+   * instead - e.g. from a value on one line straight down to the parameter
+   * it lands in on the line below - with the label box acting only as a
+   * caption for the whole group.
+   */
+  from?: CodeAnatomyPoint
+}
+
 export interface CodeAnatomyLabel {
   /** Bold title line, e.g. "keyword" */
   name: string
@@ -61,11 +75,12 @@ export interface CodeAnatomyLabel {
   /** Corner of the label block that align hangs off of */
   pos: CodeAnatomyPoint
   /**
-   * Point(s) on the canvas the arrow points to, e.g. a spot inside the code.
-   * Pass an array (e.g. for a pair of parentheses or curly braces) to draw
-   * one arrow per point, all from the same label box.
+   * Point(s) the arrow points to, e.g. a spot inside the code. Pass an array
+   * (e.g. for a pair of parentheses or curly braces) to draw one arrow per
+   * point, all from the same label box. Give a point a `from` to start its
+   * arrow somewhere other than the label box.
    */
-  target: CodeAnatomyPoint | CodeAnatomyPoint[]
+  target: CodeAnatomyTarget | CodeAnatomyTarget[]
   /** Which side of `pos` the text block grows from. Default "left". */
   align?: "left" | "right"
   /** Max width in px before text wraps. Default 240. */
@@ -86,7 +101,8 @@ export interface CodeAnatomyProps {
   height: number
   /**
    * Reveal labels one at a time with forward/back navigation instead of
-   * showing them all at once. Off by default.
+   * showing them all at once. Off by default. Has no effect (and shows no
+   * nav) with a single label - there is nothing to step through.
    */
   progressive?: boolean
 }
@@ -264,6 +280,10 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
   const visibleLabels =
     progressive && !isAllStage ? labels.slice(0, clampedStep + 1) : labels
 
+  // A single label has nothing to step through (its only "steps" are the
+  // label and the visually-identical All stage), so skip the nav chrome.
+  const stepped = progressive && labels.length > 1
+
   // Forward/back cycle: stepping past the last ("All") stage wraps to the
   // first, and back at the first wraps to the last.
   const totalSteps = lastStep + 1
@@ -386,7 +406,8 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
         ? label.target
         : [label.target]
       for (const target of targets) {
-        const anchor = anchorTowards(labelBoxes[i], target, ARROW_GAP)
+        const anchor =
+          target.from ?? anchorTowards(labelBoxes[i], target, ARROW_GAP)
         drawArrow(ctx, anchor, target)
       }
     })
@@ -406,15 +427,15 @@ export const CodeAnatomy: React.FC<CodeAnatomyProps> = ({
     <div
       className={s.wrapper}
       style={{ maxWidth: width }}
-      onKeyDown={progressive ? handleKeyDown : undefined}
+      onKeyDown={stepped ? handleKeyDown : undefined}
     >
       <canvas
         ref={canvasRef}
         className={s.canvas}
         style={{ aspectRatio: `${width} / ${height}` }}
-        tabIndex={progressive ? 0 : undefined}
+        tabIndex={stepped ? 0 : undefined}
       />
-      {progressive && (
+      {stepped && (
         <div className={s.nav}>
           <IconButton
             aria-label="Previous label"
