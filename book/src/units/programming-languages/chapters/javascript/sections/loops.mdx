@@ -4,8 +4,54 @@ export const title = "Loops"
 
 # Loops
 
+```p5sketch autoplay width=600 height=60
+function setup() {
+  createCanvas(600, 60);
+}
+
+function draw() {
+  background("#0e003d")
+  fill("white")
+  const n = 7
+  const s = (2 * height) / 3
+  const pad = s
+  const usableWidth = width - (pad * 2)
+  const itemSpacing = usableWidth / n
+  for (let i=0; i <= n; i++) {
+    const x = pad + (itemSpacing * i)
+    const phase = i / n;
+    drawMoon(x, height / 2, s, phase)
+
+  }
+}
+
+function drawMoon(cx, cy, d, phase) {
+  push()
+  clip(() => moonPenumbraMask(cx, cy, d), {invert: false})
+  clip(() => moonPhaseMask(cx,cy, d, phase), { invert: true })
+  fill("#e8c500")
+  circle(cx, cy, d)
+  pop()
+}
+
+function moonPenumbraMask(cx, cy, d) {
+  circle(cx, cy, d)
+}
+
+function moonPhaseMask(cx, cy, d, phase) {
+  // map phase to an offset in range [-d, d]
+  const px = cx + map(phase, 0, 1, -d, d)
+  circle(px, cy, d)
+}
+
+```
+
 In software, a _loop_ is a structure that controls repeated execution of some
-body of code. For example, it would be stressful to write this:
+body of code. The sketch above uses a loop to draw different moon phases at
+different x locations.
+
+Loops can make your life easier. For example, it would be stressful to write
+this:
 
 ```js
 drawCircle(0, 0, 25)
