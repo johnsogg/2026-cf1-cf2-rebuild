@@ -310,6 +310,11 @@ Here is code that presents two similar for-loops. The first one (yellow squares)
 uses the loop's counting variable `i` to compute a different x-offset so the
 squares appear next to each other.
 
+See if you can fill in the "challenge for you" comment below. This gives you a
+chance to write your own for-loop that adjusts both x and y positions. You can
+crib from the rest of the code to get the x value, but you're on your own for
+computing a y value.
+
 ```p5exercise autorun size="medium"
 function setup() {
   createCanvas(150, 200)
@@ -681,7 +686,7 @@ function drawBuilding(x0, y0, rows, cols, cellSize) {
 
   noStroke()
   fill("#aaa")
-  rect(x0, top, bw, bh)
+  rect(x0, top, bw, bh, 2)
 
   // nested loop: for each row, for each col
   // compute the (x, y) position of that window
@@ -701,10 +706,10 @@ function drawBuilding(x0, y0, rows, cols, cellSize) {
       if (isDoor) {
         fill("saddlebrown")
         const doorHeight = cellSize - cellSize * 0.15
-        rect(x, y, size, doorHeight)
+        rect(x, y, size, doorHeight, 2)
       } else {
         fill("#404060")
-        square(x, y, size)
+        square(x, y, size, 2) // slightly rounded corners
       }
     }
   }
