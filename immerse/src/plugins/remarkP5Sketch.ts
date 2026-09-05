@@ -4,11 +4,13 @@ import type { Root, Code, Parent } from "mdast"
 function parseMeta(meta: string | null | undefined) {
   const str = meta ?? ""
   const autoplay = /\bautoplay\b/.test(str)
+  const allowReset = /\ballowReset\b/.test(str)
   const wide = /\bwide\b/.test(str)
   const widthMatch = str.match(/\bwidth=(\d+)\b/)
   const heightMatch = str.match(/\bheight=(\d+)\b/)
   return {
     autoplay,
+    allowReset,
     wide,
     width: widthMatch ? parseInt(widthMatch[1], 10) : undefined,
     height: heightMatch ? parseInt(heightMatch[1], 10) : undefined,
@@ -65,7 +67,7 @@ export function remarkP5Sketch() {
     visit(tree, "code", (node: Code, index: number | undefined, parent: Parent | undefined) => {
       if (node.lang !== "p5sketch" || !parent || index == null) return
 
-      const { autoplay, wide, width, height } = parseMeta(node.meta)
+      const { autoplay, allowReset, wide, width, height } = parseMeta(node.meta)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const attributes: any[] = [
@@ -75,6 +77,10 @@ export function remarkP5Sketch() {
 
       if (autoplay) {
         attributes.push({ type: "mdxJsxAttribute", name: "autoplay", value: null })
+      }
+
+      if (allowReset) {
+        attributes.push({ type: "mdxJsxAttribute", name: "allowReset", value: null })
       }
 
       if (width != null || height != null) {

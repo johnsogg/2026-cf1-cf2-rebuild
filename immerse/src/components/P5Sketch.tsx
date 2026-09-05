@@ -21,6 +21,7 @@ export type P5SketchProps = {
   code: string
   autoplay?: boolean
   allowStop?: boolean
+  allowReset?: boolean
   size?: "small" | "medium" | "large"
   title?: string
   dimensions?: { width: number; height: number }
@@ -32,12 +33,15 @@ export type P5SketchProps = {
  * examples inline in the text. Globally available in book `.mdx` sections,
  * no import needed. For short throwaway snippets with no source file, use a
  * ` ```p5sketch autoplay width=300 height=100 ` fenced code block instead —
- * it expands to this component at build time.
+ * it expands to this component at build time. `allowReset` (default false)
+ * overlays a refresh button on the canvas that restarts the sketch — useful
+ * for sketches whose `setup()` uses `random()` so each run looks different.
  **/
 export function P5Sketch({
   code,
   autoplay = false,
   allowStop = false,
+  allowReset = false,
   size = "medium",
   title = "p5 sketch",
   dimensions = undefined,
@@ -50,6 +54,7 @@ export function P5Sketch({
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
   const [error, setError] = useState<SketchError | null>(null)
   const [running, setRunning] = useState(false)
+  const [runId, setRunId] = useState(0)
   const workerRef = useRef<Worker | null>(null)
 
   useEffect(() => {
@@ -103,6 +108,11 @@ export function P5Sketch({
         return
       }
       setSrcdoc(buildSrcdoc(js ?? ""))
+      // Bump the key even when the code (and so the transpiled srcdoc) is
+      // unchanged, so re-running remounts the iframe instead of reusing the
+      // old one — needed for `allowReset` to actually restart sketches that
+      // look the same each time except for their random() calls.
+      setRunId((id) => id + 1)
       setRunning(true)
     }
 
@@ -146,7 +156,7 @@ export function P5Sketch({
         <div className={s.canvas}>
           {srcdoc ? (
             <iframe
-              key={srcdoc}
+              key={runId}
               srcDoc={srcdoc}
               sandbox="allow-scripts allow-same-origin"
               style={{
@@ -157,7 +167,21 @@ export function P5Sketch({
               }}
               title={title}
             />
-          ) : (
+          ) : null}
+
+          {allowReset && running && (
+            <div className={s.resetButton}>
+              <IconButton
+                onClick={runSketch}
+                aria-label="Reset sketch"
+                title="Reset"
+              >
+                <SvgIcon name="refresh" size={18} intent="muted" />
+              </IconButton>
+            </div>
+          )}
+
+          {!srcdoc && (
             <div
               className={s.placeholder}
               style={{ height }}
