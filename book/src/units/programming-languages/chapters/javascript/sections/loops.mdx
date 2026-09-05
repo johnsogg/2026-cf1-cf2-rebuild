@@ -1,16 +1,669 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+
 export const title = "Loops"
 
-_This section is a placeholder._
+# Loops
 
-{/*
-  Running the same code many times without typing it many times. Goals:
-    - for loop: initialization, condition, increment
-    - while loop (and when to prefer each)
-    - Loop variable as a counter and as a value fed into drawing commands
-    - Nested loops for grids
-    - Off-by-one errors and how to think about them
-  Practical context: drawing a row of circles, a grid of rectangles, a
-  repeating pattern. The city scene assignment naturally motivates loops
-  (many windows, many buildings, many people). Pairs with the functions
-  section — call a function inside a loop.
-*/}
+In software, a _loop_ is a structure that controls repeated execution of some
+body of code. For example, it would be stressful to write this:
+
+```js
+drawCircle(0, 0, 25)
+drawCircle(10, 0, 25)
+drawCircle(20, 0, 25)
+drawCircle(30, 0, 25)
+// ... do this sixteen more times ...
+```
+
+Instead, you could write a loop to get the same effect:
+
+```js
+for (let i = 0; i < 20; i++) {
+  drawCircle(i * 10, 0, 25)
+}
+```
+
+There are different kinds of loops, each with their own syntax and things that
+they're good at. The one above is called a for-loop. Regardless of which kind of
+loop you have, they share two qualities:
+
+- They have control logic that manages the loop's execution that determines if
+  the loop should run another round
+- They have a body of code to run per iteration
+
+I'm going to start with while-loops because they are a little simpler than
+for-loops.
+
+## While loops
+
+<CodeAnatomy
+  code={{
+    value: "while (someCondition) {\n  doSomething()\n}",
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+  }}
+  width={800}
+  height={580}
+  progressive
+  labels={[
+    {
+      name: "while",
+      text: "keyword signals a while-loop is starting",
+      pos: { x: 20, y: 10 },
+      target: { x: 78, y: 250 },
+      maxWidth: 200,
+    },
+    {
+      name: "someCondition",
+      text: "a true/false expression to say if we run the loop's code",
+      pos: { x: 280, y: 10 },
+      target: { x: 335, y: 250 },
+      maxWidth: 280,
+    },
+    {
+      name: "doSomething",
+      text: "this is a stand-in for the code to run per iteration",
+      pos: { x: 260, y: 394 },
+      target: { x: 195, y: 364 },
+      maxWidth: 220,
+    },
+  ]}
+/>
+
+A while-loop is most often used when you do not know in advance how many
+iterations it should run. In the syntax example above, the loop's boolean
+expression is simply the value of `someCondition`, and it will run _forever_
+unless the `doSomething()` function causes that variable to become false. And in
+this example, I don't see any way for that to happen. Here's a more realistic
+example:
+
+```js
+while (widgetsToDraw > 0) {
+  drawWidget()
+  widgetsToDraw = widgetsToDraw - 1
+}
+```
+
+In this example, our boolean expression that controls execution of the loop is
+the inequality, `widgetsToDraw > 0`. As long as it is positive, it will run the
+loop's body: draw a widget, and then decrease the number of widgets to draw by
+one. Eventually, that inequality will become false, and the while loop will
+stop.
+
+<Callout intent="note">
+Incrementing and decrementing (increasing or decreasing by one) integers is such 
+a common operation that we have special syntax for doing it. These three are the
+same:
+
+```js
+myCount = myCount + 1
+myCount += 1
+myCount++
+```
+
+As are these for decrementing a variable:
+
+```js
+widgetsToDraw = widgetsToDraw - 1
+widgetsToDraw -= 1
+widgetsToDraw--
+```
+
+</Callout>
+
+The most common cause of bugs with a while loop is that the stopping condition
+is never reached because the loop doesn't update the variables involved in its
+control expression.
+
+Rarely, and _in deliberate situations_, you might _want_ to create a while-loop
+that never ends. This is one example of what we call an _infinite loop_. p5.js
+itself uses this idea: it calls `setup()` one time, and then on a forever-basis,
+it calls `draw()`. Here is a simplified version of this:
+
+```js
+// p5 does something kind of like this
+setup()
+while (true) {
+  draw()
+}
+```
+
+You'd see this intentional infinite loop as the outer wrapper for many
+interactive systems, like what p5 supports, or any video game or interactive
+application. So while they are rare, they are occasionally indispensable.
+
+## Do-while loops
+
+A variant of a while-loop is a do-while loop. Here's some code to illustrate:
+
+```js
+let isMagic = false
+do {
+  isMagic = makeMagic()
+} while (isMagic)
+```
+
+In this form, we _always_ execute the block of code first, the stuff in curly
+braces between the `do` and `while` keywords. And then the condition is examined
+afterwards, which determines if the loop should execute again.
+
+The difference here is that a do-while loop will always execute the associated
+code at least one time. In the example here, it means we always run the
+`makeMagic` function, which produces a true/false value that is then used to
+determine if the loop runs again.
+
+## For-loops
+
+We saw a for-loop at the top. Here's the syntax:
+
+<CodeAnatomy
+  code={{
+    value: "for (let i = 0; i < 20; i++) {\n  drawCircle(i * 10, 0, 25)\n}",
+    pos: { x: 20, y: 260 },
+    fontSize: 40,
+    lineHeight: 160,
+  }}
+  width={950}
+  height={680}
+  progressive
+  labels={[
+    {
+      name: "for",
+      text: "keyword signals a for-loop",
+      pos: { x: 10, y: 10 },
+      target: { x: 55, y: 250 },
+      maxWidth: 170,
+    },
+    {
+      name: "parentheses",
+      text: "enclose 3 control expressions separated by semicolons",
+      pos: { x: 220, y: 310 },
+      target: [
+        { x: 139, y: 298 },
+        { x: 662, y: 298 },
+      ],
+      maxWidth: 420,
+    },
+    {
+      name: "initializer",
+      text: "runs first time only, used to initialize a control variable",
+      pos: { x: 210, y: 10 },
+      target: { x: 242, y: 250 },
+      maxWidth: 210,
+    },
+    {
+      name: "control expression",
+      text: "determines if we enter body, runs on every iteration",
+      pos: { x: 450, y: 10 },
+      target: { x: 463, y: 250 },
+      maxWidth: 210,
+    },
+    {
+      name: "increment",
+      text: "updates control variable, runs after each iteration",
+      pos: { x: 690, y: 10 },
+      target: { x: 615, y: 250 },
+      maxWidth: 190,
+    },
+    {
+      name: "body",
+      text: "code to run each time",
+      pos: { x: 140, y: 500 },
+      target: { x: 183, y: 470 },
+      maxWidth: 260,
+    },
+  ]}
+/>
+
+A for-loop gives us a lot of control over how a loop proceeds. They can be used
+in many ways, but the most appropriate use is in situations where we know how
+many iterations are needed.
+
+In the example above, the intent is to run `drawCircle` a total of 20 times,
+while sending in a different value for its first parameter each time based on
+which iteration we are running. The first time through, the variable `i` is `0`.
+The second time, `i` is `1`. This continues all the way through the last
+iteration, when `i` is `19`. So the first argument for `drawCircle` will be `0`,
+then `10`, then `20`, all the way up to `190`.
+
+The interactive thing above tersely covers the structure of a for-loop, but the
+control structure deserves more explanation. This is the three parts inside the
+parentheses, separated by semicolons. Syntactically you have a lot of room to
+put whatever you like in these three slots, so it helps to understand what
+they're for, and when they are used in the lifecycle of the loop.
+
+- `let i = 0` - the first element is generally used to initialize a variable. It
+  runs one time at the very beginning of the loop. Here, we're declaring a
+  variable `i` and initializing it to the value `0`. We declare it using `let`
+  because we intend to allow it to change every time the loop runs.
+- `i < 20` - this is the condition that must be true in order for the loop body
+  to run. It runs prior to every single iteration. If it evaluates to false, the
+  loop stops immediately. This expression can be anything you like - it will be
+  interpreted as a boolean expression.
+- `i++` - the expression in this last slot runs after each iteration. It usually
+  changes the variable we established in the first slot, but you could
+  theoretically do anything you like here. The safe thing to do here is to
+  ensure your loop eventually ends by updating this value.
+
+Importantly, the loop body will not actually run when the value of `i` is `20`.
+This is because `i < 20` (condition that tells us if the loop will keep going)
+becomes false at that point.
+
+<Callout intent="note">
+  Programmers often write bugs around confusion over `i < N` vs `i <= N`, and 
+  how many times a loop will actually run. This is called an off-by-one error, 
+  and it is every coder's birthright to get caught off-guard by this, no matter 
+  how much experience you have. Another name for it is the fencepost problem 
+  (because if you have N fenceposts, you have N-1 lengths of fence joining 
+  them).
+</Callout>
+
+<Ask id="loops-for" mode="interacted" title="For Loops">
+
+Here is code that presents two similar for-loops. The first one (yellow squares)
+uses the loop's counting variable `i` to compute a different x-offset so the
+squares appear next to each other.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 200)
+}
+
+function draw() {
+  background("black")
+  // number of shapes to draw
+  const n = 6
+  // distance between shapes
+  const gap = 150 / (n + 1)
+  // size so they fit before next shape
+  const s = gap / 2
+
+  // draw yellow squares in a row
+  fill("yellow")
+  for (let i=0; i < n; i++) {
+    const x = gap + gap * i
+    square(x, 50, s)
+  }
+
+  // fancier - draw red squares that get larger
+  fill("red")
+  for (let i=0; i < n; i++) {
+    const x = gap + gap * i
+    const mySize = s * (1 + i / n)
+    square(x, 100, mySize)
+  }
+
+  // challenge for you: use a for-loop to draw n
+  // green squares that are drawn in a slight diagonal
+  // as their y values increase dependent on i. use the
+  // red square example above for inspiration
+
+  // replace this with your code
+}
+```
+
+<Solution id="loops-for">
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(150, 200)
+}
+
+function draw() {
+  background("black")
+  // number of shapes to draw
+  const n = 6
+  // distance between shapes
+  const gap = 150 / (n + 1)
+  // size so they fit before next shape
+  const s = gap / 2
+
+  // draw yellow squares in a row
+  fill("yellow")
+  for (let i=0; i < n; i++) {
+    const x = gap + gap * i
+    square(x, 50, s)
+  }
+
+  // fancier - draw red squares that get larger
+  fill("red")
+  for (let i=0; i < n; i++) {
+    const x = gap + gap * i
+    const mySize = s * (1 + i / n)
+    square(x, 100, mySize)
+  }
+
+  // green squares drawn in a slight diagonal
+  fill("green")
+  for (let i=0; i < n; i++) {
+    const x = gap + gap * i
+    const myY = 150 + (i + 1) * 5
+    square(x, myY, s)
+  }
+}
+```
+
+</Solution>
+
+</Ask>
+
+## Nested loops
+
+Loops can appear inside one another. There's no practical limit for how many
+loops can nest, but for sanity's sake, try to keep it to two layers.
+
+Nested loops can be useful for forming grids. Check out this sweet building that
+shows a grid of windows, with one special case for the door. Try reloading the
+sketch with the button off to the side. Each building's size is picked randomly,
+to help reinforce that you don't need to hard-code numbers; you can leave things
+to chance!
+
+```p5sketch autoplay width=300 height=300 allowReset
+let r, c
+
+function setup() {
+  createCanvas(300, 300)
+  r = floor(random(2, 9)) // floors
+  c = floor(random(3, 6)) // windows per floor
+  noLoop() // non-interactive sketch can set noLoop
+}
+
+function draw() {
+  background("skyblue")
+  drawBuilding(r, c)
+}
+
+function drawBuilding(rows, cols) {
+  const cellSize = 30
+  const bw = cols * cellSize
+  const bh = rows * cellSize
+  const x0 = (width - bw) / 2
+  const y0 = height - bh - 20
+  const doorCol = ceil(cols / 2) - 1
+
+  noStroke()
+  fill("#aaa")
+  rect(x0, y0, bw, bh)
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = x0 + col * cellSize + cellSize * 0.15
+      const y = y0 + row * cellSize + cellSize * 0.15
+      const size = cellSize * 0.7
+      const isDoor = row === rows - 1 && col === doorCol
+
+      if (isDoor) {
+        fill("saddlebrown")
+        rect(x, y, size, cellSize - cellSize * 0.15)
+      } else {
+        fill("lightyellow")
+        rect(x, y, size, size)
+      }
+    }
+  }
+
+  fill("darkgreen")
+  rect(0, height - 20, width, 20)
+}
+```
+
+I'll show an editor with something like this in a minute. But for now I want to
+focus on the nested loops. They look something like this:
+
+```js
+for (let row = 0; row < rows; row++) {
+  for (let col = 0; col < cols; col++) {
+    // use row and col to determine position.
+    // also use them to determine of we're drawing a door
+    // then draw the window or door
+  }
+}
+```
+
+Take a minute to draw this out on paper - you've seen the boxy buildings this
+code draws, but you haven't seen the code. Rows and columns start at zero and
+are limited by some maximum (like, five rows, eight columns). Pick a couple
+numbers and ask yourself: how do you determine the `(x, y)` position of that
+particular item? Also, refresh a few times and see if you can intuit the logic
+around where the door appears. Can you figure out what that logic is? And can
+you write that in code?
+
+<Ask id="loops-nested" mode="interacted" title="Nested Loops">
+
+In the following sketch, I've set up most of the code, except for the nested
+loops. You'll need to fill in the rest. There's a solution below that which
+shows the original code.
+
+You will need to study the existing code, as it gives you lots of useful info in
+variables, like how many randomly chosen rows and columns there are, what the
+building width and height are, and how to find the building rectangle's position
+(which you'll use to place windows relative to the building).
+
+```p5exercise autorun size="medium"
+let r, c
+
+function setup() {
+  createCanvas(300, 300)
+  r = floor(random(2, 9)) // floors
+  c = floor(random(3, 6)) // windows per floor
+}
+
+function draw() {
+  background("skyblue")
+  drawBuilding(r, c)
+}
+
+function drawBuilding(rows, cols) {
+  const cellSize = 30
+  const bw = cols * cellSize
+  const bh = rows * cellSize
+  const x0 = (width - bw) / 2
+  const y0 = height - bh - 20
+  // you'll need this - can you see what it is for?
+  const doorCol = ceil(cols / 2) - 1
+
+  noStroke()
+  fill("#aaa")
+  rect(x0, y0, bw, bh)
+
+  // nested loop: for each row, for each col
+  // compute the (x, y) position of that window
+  // figure out if this is the door (last row, doorCol)
+  // draw a door or a window accordingly. remember to fill!
+
+  // your code goes here
+
+  fill("darkgreen")
+  rect(0, height - 20, width, 20)
+}
+```
+
+<Solution id="loops-nested">
+
+```p5exercise autorun size="medium"
+let r, c
+
+function setup() {
+  createCanvas(300, 300)
+  r = floor(random(2, 9)) // floors
+  c = floor(random(3, 6)) // windows per floor
+}
+
+function draw() {
+  background("skyblue")
+  drawBuilding(r, c)
+}
+
+function drawBuilding(rows, cols) {
+  const cellSize = 30
+  const bw = cols * cellSize
+  const bh = rows * cellSize
+  const x0 = (width - bw) / 2
+  const y0 = height - bh - 20
+  // compute the index for which column the door appears
+  const doorCol = ceil(cols / 2) - 1
+
+  noStroke()
+  fill("#aaa")
+  rect(x0, y0, bw, bh)
+
+  // nested loop: for each row, for each col
+  // compute the (x, y) position of that window
+  // figure out if this is the door (last row, doorCol)
+  // draw a brown door or a yellow window accordingly
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      fill("blue")
+      const x = x0 + col * cellSize + cellSize * 0.15
+      const y = y0 + row * cellSize + cellSize * 0.15
+      const size = cellSize * 0.7
+      // door appears on ground floor. since y grows downward,
+      // this happens when we are on the last row
+      const isLastRow = row === rows - 1
+      const isDoorCol = col === doorCol
+      const isDoor = isLastRow && isDoorCol
+      if (isDoor) {
+        fill("saddlebrown")
+        const doorHeight = cellSize - cellSize * 0.15
+        rect(x, y, size, doorHeight)
+      } else {
+        fill("#404060")
+        square(x, y, size)
+      }
+    }
+  }
+
+  fill("darkgreen")
+  rect(0, height - 20, width, 20)
+}
+```
+
+</Solution>
+
+</Ask>
+
+## Sketch in the city
+
+I'm not content to draw individual buildings. I want a whole city! In the last
+exercise, did you notice how just about all the work was done in the
+`drawBuilding` function? We can use that to our advantage for building a larger
+city scene.
+
+I'd like to be able to draw several buildings sitting next to each other on the
+ground, with a little gap between them. But looking at the `drawBuilding`
+solution from above, I can't help but notice that I've hard-coded the `cellSize`
+value. So my little hack to make life easier above is now making life harder. I
+want to draw buildings based on a number of rows and columns (it already
+supports this) and also a cell size. This will let me compute how wide each
+building will be, and I can use this to place the next building.
+
+Also, my original function helpfully placed the building in the center of the
+sketch. This is no longer helpful because I want to place it at a particular
+location! I will also need to give it the `x0` and `y0` starting position.
+
+So my new function signature will be like this:
+
+```js
+drawBuilding(x0, y0, rows, cols, cellSize)
+```
+
+(And this also illustrates the idea that it is _totally up to you_ how your code
+works, what functions are named, what inputs they take, all that. Choice, taste
+and judgement abound in programming.)
+
+Now I can compute that each building will be `cols * cellSize` wide, and use
+that to keep track of where the next building should be drawn. This "work until
+you're done" lends itself to either a while-loop or a a do-while loop. I'll use
+a do-while loop.
+
+The essence of our city building loop is like this:
+
+```js
+let xCursor = ...
+do {
+  // draw building at our given x location along with other values
+  drawBuilding(xCursor, ...)
+  // then update the cursor using this building's width and gap
+  xCursor = xCursor + buildingWidth + gap
+} while (xCursor < width) // stop when we're out of horizontal room
+```
+
+I'll also update the `drawBuilding` code to look a little nicer too.
+
+```p5exercise autorun size="large"
+function setup() {
+  createCanvas(windowWidth, 300)
+  noLoop()
+}
+
+function draw() {
+  background("skyblue")
+  // record cell size here as a variable
+  const cellSize = 30
+  // also, we need to separate buildings. mind the gap!
+  const buildingGap = 20
+
+  // example do-while loop. keep a 'cursor' pointing to
+  // the x position of the next building to draw. stop
+  // only when the cursor exceeds the width, because at
+  // that point, we've run out of canvas! Also, the number
+  // of rows/cols is random for each building.
+  let xCursor = 10
+  do {
+    const rows = floor(random(2, 9))
+    const cols = floor(random(2, 5))
+    drawBuilding(   // parameters, explained:
+      xCursor,      // x0 starting position
+      height - 20,  // y0 starting position (top of the ground strip)
+      rows,            // number of rows
+      cols,            // number of columns
+      cellSize)        // cell size (they are squares)
+      // update the cursor so it is ready for next round
+      xCursor = xCursor + cols * cellSize + buildingGap
+  } while(xCursor < width)
+
+}
+
+function drawBuilding(x0, y0, rows, cols, cellSize) {
+  const bw = cols * cellSize
+  const bh = rows * cellSize
+  // y0 is the ground line the building sits on, not its top-left
+  // corner, so the top of the building is bh above that
+  const top = y0 - bh
+  // compute the index for which column the door appears
+  const doorCol = ceil(cols / 2) - 1
+
+  noStroke()
+  fill("#aaa")
+  rect(x0, top, bw, bh)
+
+  // nested loop: for each row, for each col
+  // compute the (x, y) position of that window
+  // figure out if this is the door (last row, doorCol)
+  // draw a brown door or a yellow window accordingly
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      fill("blue")
+      const x = x0 + col * cellSize + cellSize * 0.15
+      const y = top + row * cellSize + cellSize * 0.15
+      const size = cellSize * 0.7
+      // door appears on ground floor. since y grows downward,
+      // this happens when we are on the last row
+      const isLastRow = row === rows - 1
+      const isDoorCol = col === doorCol
+      const isDoor = isLastRow && isDoorCol
+      if (isDoor) {
+        fill("saddlebrown")
+        const doorHeight = cellSize - cellSize * 0.15
+        rect(x, y, size, doorHeight)
+      } else {
+        fill("#404060")
+        square(x, y, size)
+      }
+    }
+  }
+
+  fill("darkgreen")
+  rect(0, height - 20, width, 20)
+}
+```
