@@ -2,12 +2,53 @@ export const title = "Description"
 
 # City Scene
 
-<Callout intent="danger">
-  This homework is not yet defined. Check back later.
-</Callout>
+This homework is about using functions, loops, objects, and lists to create an
+animated scene.
 
-- Topics (per calendar, same week): Functions, loops/repetition, objects, animation
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+## What to do
+
+Imagine a cartoon or science fiction city. What do you see? I see buildings, all
+lit up against a night sky, with stars twinkling in the background, and cars
+zipping around in the foreground.
+
+Feel free to come up with your own ideas, or implement what I just described.
+The important thing for this assignment is that it is **animated** - this means
+it changes from frame to frame, based on the clock.
+
+It is perfectly OK to use interactivity as well (click windows to turn on and
+off the lights), or click and drag to make buildings taller or shorter. But the
+point of the assignment is to make a time-based animation.
+
+For this, you'll likely want to use the `frameRate` function to set the number
+of frames that are drawn to screen each second. E.g. set it to `frameRate(1)` to
+draw one time per second. This can be useful for debugging. The corresponding
+value to read is `frameCount`, which just increments by one each time `draw` is
+called.
+
+As an alternative, you can use
+[deltaTime](https://p5js.org/reference/p5/deltaTime/) if you want a
+framerate-independent measure of time. p5 will update the `deltaTime` value to
+the number of milliseconds since the start of the previous `draw`.
+
+## Where to do it
+
+Again this is a p5 assignment, so fire up
+[editor.p5js.org](https://editor.p5js.org/), and give your sketch a good name.
+
+## How to turn it in
+
+Copy the sketch's share link (the version that shows your code) and paste it
+into the LMS for the assignment.
+
+## Rubric
+
+**Include the following in your code**
+
+- Canvas can be any size you like (e.g. use `windowWidth` and `windowHeight`, or
+  150x150, whatever you want)
+- Three animated features (examples: stars that twinkle, window lights that turn
+  on/off, UFOs that fly through the air, cars that move on a road)
+- Create at least two "draw" functions (e.g. `drawBuilding`, `drawUFO`, etc)
+- Use at least one list of items (can be objects)
+- Use a loop to iterate through your list, and draw something based on each item
+  in that list

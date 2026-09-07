@@ -2,5 +2,146 @@ export const title = "Worked Examples"
 
 # City Scene — Worked Examples
 
-- Example 1:
-- Example 2:
+- Example 1: Gabe's city scene
+- Example 2: A city scene by Claude (an AI), built from Gabe's description
+
+## Example 1: Gabe's city scene
+
+_Coming soon._
+
+## Example 2: A city scene by Claude
+
+<RobotText>
+
+_This section was written by Claude Sonnet 5._
+
+I didn't get to pick the concept here. Gabe asked me to build the exact scene
+he sketched at the top of the assignment — a cartoon/sci-fi city at night, with
+lit-up buildings, stars twinkling in the background, and cars zipping around in
+the foreground — and to follow the rubric while keeping the code at the level of
+someone three weeks into programming. So this is what an AI turns that prompt
+into. Gabe is showing it to you on purpose: he knows what this looks like.
+
+Here's how it hits the rubric:
+
+- **Canvas size**: 420×280
+- **Three animated features**: stars twinkle (brightness rides a `sin` wave off
+  `millis()`), window lights blink on and off, cars drive across and wrap back
+  around
+- **Two+ draw functions**: `drawStar`, `drawBuilding`, `drawCar`
+- **A list of items**: `stars`, `buildings`, and `cars` are each an array of
+  objects, built in `setup()`
+- **A loop over the list**: each feature is a `for` loop over its array; the
+  building windows are a nested loop
+
+The time-based effects read from `millis()` so they run at the same speed no
+matter the frame rate. The cars just add to their `x` each frame, which is the
+simplest thing that works.
+
+<Ask id="city-scene-worked-robot" mode="untracked" title="A city scene by Claude">
+
+```p5exercise autorun size="medium"
+// City Scene — a sci-fi city at night.
+// Twinkling stars, blinking window lights, and cars zipping by.
+
+let stars = []
+let buildings = []
+let cars = []
+
+function setup() {
+  createCanvas(420, 280)
+
+  // Scatter stars across the sky.
+  for (let i = 0; i < 70; i++) {
+    stars.push({
+      x: random(width),
+      y: random(height - 110),
+      rate: random(1, 4), // how fast this one twinkles
+    })
+  }
+
+  // A row of buildings along the bottom.
+  let x = 0
+  while (x < width) {
+    let w = random(40, 70)
+    buildings.push({ x: x, w: w, h: random(80, 180) })
+    x = x + w + 8
+  }
+
+  // A few cars on the road.
+  for (let i = 0; i < 4; i++) {
+    cars.push({
+      x: random(width),
+      y: random(height - 26, height - 12),
+      speed: random(1.5, 4),
+      col: color(random(255), random(255), random(255)),
+    })
+  }
+}
+
+function draw() {
+  background(10, 10, 40) // night sky
+
+  // Feature 1: twinkling stars
+  for (let i = 0; i < stars.length; i++) {
+    drawStar(stars[i])
+  }
+
+  // Feature 2: buildings with blinking windows
+  for (let i = 0; i < buildings.length; i++) {
+    drawBuilding(buildings[i])
+  }
+
+  // the road
+  noStroke()
+  fill(30)
+  rect(0, height - 32, width, 32)
+
+  // Feature 3: cars zipping by
+  for (let i = 0; i < cars.length; i++) {
+    drawCar(cars[i])
+    cars[i].x = cars[i].x + cars[i].speed
+    if (cars[i].x > width + 20) {
+      cars[i].x = -20 // wrap back around to the left
+    }
+  }
+}
+
+function drawStar(star) {
+  // Brightness rises and falls over time with sin().
+  let bright = 128 + 127 * sin((millis() / 1000) * star.rate)
+  noStroke()
+  fill(255, bright)
+  circle(star.x, star.y, 3)
+}
+
+function drawBuilding(b) {
+  noStroke()
+  fill(20, 20, 60)
+  rect(b.x, height - b.h, b.w, b.h)
+
+  // Grid of windows. Each one blinks on its own offset.
+  for (let wy = height - b.h + 10; wy < height - 40; wy += 16) {
+    for (let wx = b.x + 6; wx < b.x + b.w - 8; wx += 14) {
+      if (sin(millis() / 500 + wx + wy) > 0) {
+        fill(255, 220, 120) // light on
+      } else {
+        fill(40, 40, 70) // light off
+      }
+      rect(wx, wy, 6, 8)
+    }
+  }
+}
+
+function drawCar(car) {
+  noStroke()
+  fill(car.col)
+  rect(car.x, car.y, 22, 10, 3)
+  fill(255, 255, 150) // headlight
+  circle(car.x + 22, car.y + 5, 4)
+}
+```
+
+</Ask>
+
+</RobotText>
