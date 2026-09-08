@@ -2,12 +2,460 @@ export const title = "Worked Examples"
 
 # City Scene — Worked Examples
 
-- Example 1: Gabe's city scene
+- Example 1: Gabe's city scene in three iterations
 - Example 2: A city scene by Claude (an AI), built from Gabe's description
+
+These worked examples use many functions that we probably have not covered
+either in the book or in class. So if you are reading along and see something
+like `lerpColor` and it baffles you: you're not nuts, the code is just using API
+functions that come from either p5.js or are built-in Javascript features.
+
+If you see something that does confuse you, Google it. Or ask a chatbot to
+explain. Learning to code (and not just vibecode) involves a huge amount of
+reading and research, so this kind of "foraging" to find answers is a useful
+skill to develop.
 
 ## Example 1: Gabe's city scene
 
-_Coming soon._
+My worked solution to this is done in three rounds: first I add an animated
+sunset, then I add floating buildings, then I add flying cars. All of my
+thinking is documented as comments in each phase. I remove the comments from
+previous stages so you can see what is new as you move through them.
+
+### Take 1 - animated gradient sunset
+
+This first round is all about the sunset. Study the code and the comments to
+understand what my thinking was, and how I used the `lerpColor` function to
+create different colors. I use the `frameCount` along with the modulo operator
+to give me different interpolation values over time.
+
+```p5exercise autorun size="large"
+// Round 1 goals:
+//
+// I'm imagining a Couruscant-style city with flying cards everywhere,
+// just at sunset because that is how Coruscant is always portrayed.
+//
+// In this round I'm going to establish a perma-sunset that animates
+// between different warm sunset-ish colors. So in that sense this is
+// basically a simple screensaver.
+
+function setup() {
+  createCanvas(windowWidth, 400);
+}
+
+function draw() {
+  drawSunset();
+}
+
+function drawSunset() {
+  push(); // to avoid issues later, wrap all draw code in push/pop
+  noStroke(); // we will draw rectangles below and we only want fill
+
+  // establish four colors. Use to 'tween' between color pairs
+  const sunsetRed = color(191, 78, 78);
+  const sunsetOrange = color(191, 92, 31);
+  const sunsetPurple = color(78, 38, 133);
+  const sunsetIndigo = color(39, 39, 97);
+
+  // first color will be a combo of the two cooler/darker colors. The
+  // tween value is calculated as (frameCount % N) (to give us a number
+  // between 0 and N-1 inclusive), and then divide by N to give us a
+  // number between 0 and 1. N means how many renders it takes to cycle
+  // through the color tween range. I choose different N for the two
+  // tweens so it stays different for each render.
+  //
+  // the lerpColor function takes two colors, and then picks a 'middle'
+  // color based on the third argument. lerpColor(c1, c2, 0) just gives
+  // back c1, lerpColor(c1, c2, 1) gives c2, and lerpColor(c1, c2, 0.5)
+  // gives the average of the two. It works for any number in range 0..1.
+  // This is called interpolation. Since we are interpolating between
+  // two values in a linear fashion, this is "linear interpolation", and
+  // we conventionally prounounce this "lerp".
+  const darkTweenFactor = (frameCount % 1000) / 1000;
+  let c1 = lerpColor(sunsetIndigo, sunsetPurple, darkTweenFactor);
+  const lightTweenFactor = (frameCount % 600) / 600;
+  let c2 = lerpColor(sunsetRed, sunsetOrange, lightTweenFactor);
+
+  // sky will be rendered as stripes of rectangles stacked on top of
+  // one another. change the height to see more clearly what this does.
+  const stripeHeight = 1;
+  for (let y = 0; y < height; y += stripeHeight) {
+    let inter = y / height;
+    let c = lerpColor(c1, c2, inter);
+    fill(c);
+    rect(0, y, width, stripeHeight);
+  }
+  pop();
+}
+
+```
+
+### Take 2 - buildings
+
+Time to draw some buildings. I've chosen to allow them to float, because this is
+science fiction. No doors - I suppose you just dock your flying car to a port on
+the roof? Each building has its own building spec, which is established one time
+at the start of the sketch, with random position, size, and colors.
+
+```p5exercise autorun size="large"
+// Round 2 goals:
+//
+// A science fiction city should have floating buildings and platforms
+// and the like. Draw boxy buildings with windows. This will involve
+// creating some building definitions once (during setup) and then
+// using a list of those to render as needed.
+//
+// My new code is under the draw function to make it easier to scroll.
+// Comments from the first round are removed.
+
+let buildings; // uninitialized variable to store building list in
+
+function setup() {
+  createCanvas(windowWidth, 400);
+  buildings = initBuildings(); // create and assign buildings list
+}
+
+function draw() {
+  drawSunset();
+  drawBuildings(); // draw buildings after drawing sunset!
+}
+
+// give a random integer in the given inclusive range
+function randomInt(low, high) {
+  return floor(random(low, high + 1));
+}
+
+// give a random boolean with the given odds of being true.
+// if you call this with 0.5 it is a fair coin.
+function randomBool(v) {
+  // if a randomly picked number between 0 and 1 is less than v,
+  // return true. otherwise return false.
+  return random() < v;
+}
+
+// a color palette for buildings in the gray/brown/steel range, defined
+// in the format that paletteLerp wants it - as a list-of-lists.
+const buildingColorPalette = [
+  ["#6E6E6E", 0],
+  ["#5A4632", 0.5],
+  ["#4A6572", 1],
+];
+
+// same, but for the windows
+const windowColorPalette = [
+  ["#FFD37A", 0], // warm amber glow
+  ["#7FE3FF", 0.5], // cyan glow
+  ["#F2F6FF", 1], // cool white glow
+];
+
+// buildings are defined by number of floors and windows, but we also
+// need to know how large they are. for simplicity this is a single
+// number, so window cells are square.
+const buildingWindowCellSize = 25;
+
+function initBuildings() {
+  // Choose a random number of buildings to make
+  const numBuildings = randomInt(6, 12);
+  // initialize an empty list of building specs
+  const buildings = [];
+  // create each building
+  for (let i = 0; i < numBuildings; i++) {
+    // create a new building spec based random numbers. Note the
+    // syntax for making an object uses curlies, than a comma
+    // separated list of properties. Each property is name: val
+    // using a colon to separate them.
+    const building = {
+      numFloors: randomInt(3, 9),
+      numWindows: randomInt(2, 10),
+      x: randomInt(-50, width), // random x position can be offscreen
+      y: randomInt(-50, height), // and y position can also be offscreen
+      mainColor: paletteLerp(buildingColorPalette, random()),
+      windowColor: paletteLerp(windowColorPalette, random()),
+    };
+    // add building to list (otherwise we lose track of it)
+    buildings.push(building);
+  }
+  return buildings;
+}
+
+function drawBuildings() {
+  const s = buildingWindowCellSize; // save on typing down below
+  const pad = 4; // internal padding to let windows have definition
+  push();
+  // showing the 'newfangled' loop syntax to iterate through each
+  // item in a list. I'm defining a callback function, which is used
+  // to draw each building.
+  noStroke();
+  buildings.forEach((building) => {
+    // building primary rectangle
+    fill(building.mainColor);
+    rect(
+      building.x, // left
+      building.y, // top
+      building.numWindows * s, // width
+      building.numFloors * s
+    ); // height
+    // now draw the windows using a nested for-loop. all squares!
+    fill(building.windowColor);
+    for (let i = 0; i < building.numWindows; i++) {
+      for (let j = 0; j < building.numFloors; j++) {
+        // window cells are positioned relative to the building's
+        // x and y values. Within a building, the window cell's
+        // location is offset by which column (i) and row (j) we
+        // happen to be rendering, and we have to inset it by the
+        // padding amount. For the window glass to appear centered
+        // it starts inset (by pad) and is (s - pad *2) wide/tall.
+        const x0 = building.x + (i * s + pad);
+        const y0 = building.y + (j * s + pad);
+        rect(x0, y0, s - pad * 2, s - pad * 2, 2);
+      }
+    }
+  });
+  pop();
+}
+
+function drawSunset() {
+  push();
+  noStroke();
+
+  const sunsetRed = color(191, 78, 78);
+  const sunsetOrange = color(191, 92, 31);
+  const sunsetPurple = color(78, 38, 133);
+  const sunsetIndigo = color(39, 39, 97);
+
+  const darkTweenFactor = (frameCount % 1000) / 1000;
+  let c1 = lerpColor(sunsetIndigo, sunsetPurple, darkTweenFactor);
+  const lightTweenFactor = (frameCount % 600) / 600;
+  let c2 = lerpColor(sunsetRed, sunsetOrange, lightTweenFactor);
+
+  const stripeHeight = 1;
+  for (let y = 0; y < height; y += stripeHeight) {
+    let inter = y / height;
+    let c = lerpColor(c1, c2, inter);
+    fill(c);
+    rect(0, y, width, stripeHeight);
+  }
+  pop();
+}
+
+```
+
+### Take 3 - Flying cars
+
+For my final iteration, I add flying cars. This has an example of setting up a
+color palette that I choose from at random. No interpolation - I just use
+`random(someList)` to get a randomly chosen item from my list of colors.
+
+This is an example of a dynamic list. The `cars` list is established during the
+setup phase, but after that it changes. When a car flies too far offscreen (by
+50 pixels, I arbitrarily chose) it is removed from the list, and a new one is
+added.
+
+```p5exercise autorun size="large"
+
+// Round 3 goals:
+//
+// Flying cars everywhere! I'll keep them on a single layer, which will
+// be in front of the buildings. To start with, each car has a position
+// (x,y), and a velocity (dx, 0) so they move left/right but not up/down.
+//
+// When a car flies off the screen too far, we'll remove it from the list
+// and add another car to the list - offscreen and heading onto the screen
+// so it has a chance to grace our sight.
+
+let buildings;
+let cars; // landing spot for flying cars
+
+function setup() {
+  createCanvas(windowWidth, 400);
+  buildings = initBuildings();
+  cars = initCars(); // build some cars, store the list
+}
+
+function draw() {
+  drawSunset();
+  drawBuildings();
+  drawCars(); // draw all the cars
+  updateCars(); // move car positions, replace offscreen ones with new ones
+}
+
+function initCars() {
+  const cars = [];
+  const numCars = randomInt(30, 70);
+  for (let i = 0; i < numCars; i++) {
+    cars.push(makeRandomCar());
+  }
+  return cars;
+}
+
+const carColors = [
+  "#00E5FF", // electric cyan
+  "#FF2E88", // hot magenta for true rock stars
+  "#7C4DFF", // ultraviolet
+  "#39FF14", // laser green
+  "#FFB300", // amber signal
+  "#FF5252", // plasma red
+  "#18FFD5", // mint chrome chocolate chip
+  "#E0E0E0", // brushed silver
+]
+
+function makeRandomCar() {
+  // build an object with position, size, heading and return it
+  const onLeft = randomBool(0.5);
+  // by default make a car that is just offscreen
+  // on the right side, heading left
+  const car = {
+    x: randomInt(width + 20, width + 50),
+    y: randomInt(0, height),
+    w: randomInt(10, 20),
+    h: randomInt(5, 10),
+    dx: -1 * randomInt(1, 5), // negative speed = move to left
+    carColor: random(carColors), // pick a random color from our palette
+  };
+  // if car should be on the left, update its x and dx values
+  if (onLeft) {
+    car.x = randomInt(-50, -20);
+    car.dx = randomInt(1, 5); // positive speed = move to right
+  }
+  // having built a car, now return it
+  return car;
+}
+
+
+
+function drawCars() {
+  push();
+  // like the drawBuildings function, the idea here is to
+  // draw individual cars with a callback function. We could use
+  // a loop, but since we don't actually care about each car's
+  // position (using a counting variable) this form is arguably
+  // easier to work with.
+  noStroke();
+  cars.forEach((car) => {
+    fill(car.carColor);
+    rect(car.x, car.y, car.w, car.h, 2);
+  });
+  pop();
+}
+
+function updateCars() {
+  // we're not drawing here, even though this is called from the draw
+  // loop. Instead, we're updating each car's position to give movement.
+  // then, after updating position, we check to see which cars are far
+  // off screen and remove them. For each removed car, we add a new one
+  // just offscreen that is heading towards the center of the screen.
+
+  // first, update position by adding the delta-x
+  cars.forEach((car) => (car.x += car.dx));
+
+  // then, notice which cars are 'far' offscreen (more than 50px off),
+  // and when we find one, add it to a removal list
+  const doomed = []
+  cars.forEach(car => {
+    if (car.x < -50 || car.x > width + 50) {
+      // car is way out of bounds, so add to the remove list
+      doomed.push(car)
+    }
+  })
+
+  // now filter out our cars list to only include valid cars
+  cars = cars.filter(c => !doomed.includes(c))
+
+  // then for every removed car, add a new rando one to the list
+  for (let i=0; i < doomed.length; i++) {
+    cars.push(makeRandomCar())
+  }
+}
+
+function randomInt(low, high) {
+  return floor(random(low, high + 1));
+}
+
+function randomBool(v) {
+  return random() < v;
+}
+
+const buildingColorPalette = [
+  ["#6E6E6E", 0],
+  ["#5A4632", 0.5],
+  ["#4A6572", 1],
+];
+
+const windowColorPalette = [
+  ["#FFD37A", 0],
+  ["#7FE3FF", 0.5],
+  ["#F2F6FF", 1],
+];
+
+const buildingWindowCellSize = 25;
+
+function initBuildings() {
+  const numBuildings = randomInt(6, 12);
+  const buildings = [];
+  for (let i = 0; i < numBuildings; i++) {
+    const building = {
+      numFloors: randomInt(3, 9),
+      numWindows: randomInt(2, 10),
+      x: randomInt(-50, width),
+      y: randomInt(-50, height),
+      mainColor: paletteLerp(buildingColorPalette, random()),
+      windowColor: paletteLerp(windowColorPalette, random()),
+    };
+    buildings.push(building);
+  }
+  return buildings;
+}
+
+function drawBuildings() {
+  const s = buildingWindowCellSize;
+  const pad = 4;
+  push();
+  noStroke();
+  buildings.forEach((building) => {
+    fill(building.mainColor);
+    rect(
+      building.x,
+      building.y,
+      building.numWindows * s,
+      building.numFloors * s
+    );
+    fill(building.windowColor);
+    for (let i = 0; i < building.numWindows; i++) {
+      for (let j = 0; j < building.numFloors; j++) {
+        const x0 = building.x + (i * s + pad);
+        const y0 = building.y + (j * s + pad);
+        rect(x0, y0, s - pad * 2, s - pad * 2, 2);
+      }
+    }
+  });
+  pop();
+}
+
+function drawSunset() {
+  push();
+  noStroke();
+
+  const sunsetRed = color(191, 78, 78);
+  const sunsetOrange = color(191, 92, 31);
+  const sunsetPurple = color(78, 38, 133);
+  const sunsetIndigo = color(39, 39, 97);
+
+  const darkTweenFactor = (frameCount % 1000) / 1000;
+  let c1 = lerpColor(sunsetIndigo, sunsetPurple, darkTweenFactor);
+  const lightTweenFactor = (frameCount % 600) / 600;
+  let c2 = lerpColor(sunsetRed, sunsetOrange, lightTweenFactor);
+
+  const stripeHeight = 1;
+  for (let y = 0; y < height; y += stripeHeight) {
+    let inter = y / height;
+    let c = lerpColor(c1, c2, inter);
+    fill(c);
+    rect(0, y, width, stripeHeight);
+  }
+  pop();
+}
+
+```
 
 ## Example 2: A city scene by Claude
 
@@ -15,8 +463,8 @@ _Coming soon._
 
 _This section was written by Claude Sonnet 5._
 
-I didn't get to pick the concept here. Gabe asked me to build the exact scene
-he sketched at the top of the assignment — a cartoon/sci-fi city at night, with
+I didn't get to pick the concept here. Gabe asked me to build the exact scene he
+sketched at the top of the assignment — a cartoon/sci-fi city at night, with
 lit-up buildings, stars twinkling in the background, and cars zipping around in
 the foreground — and to follow the rubric while keeping the code at the level of
 someone three weeks into programming. So this is what an AI turns that prompt
