@@ -52,6 +52,15 @@ Each entry: date added, priority, note.
   save battery. Press Run to re-activate." or something to that effect - be sure
   the text fits in the available space.
 
+- **2026-09-12 — P2** — Once there's a section on Objects, revisit the
+  animation.mdx `millis()`/trig examples (`orbiting-planets-millis`, the
+  star/planet orbit sketch): each planet is currently a handful of loose
+  variables (`angle1`/`r1`/`x1`/`y1`, `angle2`/`rx2`/`ry2`/`x2`/`y2`, etc.).
+  Rewriting each planet as one object (e.g. `{ angleSpeed, rx, ry, color }`)
+  would cut the variable count and make the parallel structure between
+  planets clearer. Good candidate example for introducing objects as a way to
+  group related state, once that section exists.
+
 - **2026-08-15 — P2** — Add a "Beyond this Book" chapter: a sci-fi
   starscape-themed parking lot for curiosity-driven topics that come up while
   drafting but don't belong in the main teaching path (e.g. OKLCH/perceptual

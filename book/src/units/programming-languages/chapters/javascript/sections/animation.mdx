@@ -1,18 +1,313 @@
 export const title = "Animation"
 
-_This section is a placeholder._
+# Animation
 
-{/*
-  Making things move over time. Goals:
-    - Two ways to mark the passage of time in p5.js:
-        1. frameCount — an integer that increments each draw() call
-        2. millis() — wall-clock milliseconds since the sketch started
-    - Using time to drive position, size, color, rotation
-    - The pattern: compute a property as a function of time (e.g., sin/cos
-      for oscillation, linear interpolation for smooth movement)
-    - Storing state across frames with sketch-level variables
-    - background() at the top of draw() to clear the previous frame
-      (vs. intentionally not clearing for trail effects)
-  Practical context: bouncing ball, sunrise/sunset, breathing circle —
-  any change that unfolds over time without user input.
-*/}
+So far we've drawn scenes that either stay the same forever, or change based on
+user input. In this section I'll show how you can animate scenes by having them
+render differently based on the passage of time.
+
+## Marking time
+
+There are two main ways of keeping track of time in p5:
+
+- **Render Count**: Use the `frameCount` variable. It represents how many times
+  the library has drawn your sketch. It is an integer that increments by one
+  each time.
+- **Wall Clock**: Use the computer's understanding of the passage of time.
+
+Either approach works. If your use case is to create realistic animations that
+unfold in real time (e.g. using simulated gravity), you'll get better results
+with the wall clock approach. But if real time doesn't matter and you're just
+creating a sequence of images, then `frameCount` might be better.
+
+If you do choose to use wall clock time, here are some of your many options:
+
+- **`millis()`** is a p5 helper function that tells you how many _milliseconds_
+  have elapsed since your sketch began. This is a relative time unit, like
+  `frameCount`, except it is based on the clock.
+- **`deltaTime`** is a p5 variable that tells you the number of milliseconds
+  since the previous `draw` function started. This is also a relative time unit.
+- **Absolute Clock**:
+  - **p5-built in functions** `second()`, `minute()`, `hour()`, `day()`,
+    `month()`, `year()` — gives numbers representing the system clock directly,
+    no milliseconds
+  - **Raw JavaScript time** using `Date.now()` for the current time in
+    milliseconds
+  - Related: `new Date()` gives you a full date and time like
+    `"Sat Sep 12 2026 09:24:13 GMT-0600 (Mountain Daylight Time)"`
+    [Check out Dates on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
+    if you want to go deep.
+
+## Using `frameCount`
+
+<Ask id="framecount-x-position" mode="interacted">
+
+The only thing that makes this dot render in a different location is the fact
+that `frameCount` changes on every render.
+
+Notice the calculation of the circle's `x` position. It involves `frameCount`
+(which changes) and `width` (which doesn't), and `diameter` (which we just
+invent).
+
+Try changing this line to read `const x = frameCount` and see what happens. Then
+add in the `% width` and see how that changes things. Do you see why the
+diameter matters? Why do you think I subtract `(diameter / 2)` from the modulo
+part?
+
+```p5exercise autoplay width=150 height=150
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  background("black")
+  // draw a circle moving across the screen at dx=1 per tick,
+  // being careful to wrap around the full width
+  fill("#ffd51a")
+  const diameter = 50
+  // calc x offset - stare at this line & explain it to yourself
+  // or your friend if they're into that kind of thing
+  const x = (frameCount % (width + diameter)) - (diameter / 2)
+  circle(x, height/2, 50)
+}
+```
+
+</Ask>
+
+To answer my own questions: the modulo with the `width` is to keep the x value
+constrained within the $x \in [0, width)$ range. But that doesn't look right
+because the dot seems to disappear the moment it bumps the edge, so I want it to
+actually continue a full diameter beyond the canvas edge. So by using modulo
+against `width + diameter` I'm constraining it to $x \in [0, width + diameter)$.
+That makes things better, but that only fixes the problem on the right edge. I
+want to make the circle appear just offscreen so it looks like a new circle is
+coming on stage. So to do that, I _subtract_ the x position by the radius,
+constraining it to be $x \in [-radius, width+radius)$.
+
+I'm not personally smart enough to get it right the first time - I am happy to
+make it directionally right, use my eyeballs to see what it actually does, and
+then iteratively fix things. You might want to think your way through these
+things from the start, and that's OK too. But you'll eventually come up with
+problems where you have to build something, see how it works, then adjust.
+
+Think of this as being playful, combining math, art, and whatever ideas you're
+trying to express. Groovy, no?
+
+## Using wall clock
+
+Now let's take a look at using real time to make animations. I'll show both the
+`deltaTime` and `millis()` options to show how they work.
+
+### `deltaTime` and acceleration
+
+Here's a fun fact: on Earth, at sea level, objects experience gravity at
+$g \approx 9.8 m/s^2$. This is an _acceleration_ value. If you've taken
+Calculus, you might understand this as the second derivative of position.
+(Velocity is the first derivative).
+
+If that doesn't make sense to you, think of it like a car's position. When
+you're stopped, your position, velocity, and acceleration are all zero. The
+moment the light turns green, you start accelerating at a constant rate, say 3
+meters per second per second ($3 m/s^2$). In this case, after one second your
+velocity is 3 meters per second. After two seconds, you're going 6 meters per
+second. After three, 9 meters per second. All of this is based on a constant
+acceleration of $3 m/s^2$. (Another fun fact: this is zero to 60 miles per hour
+in 8.9 seconds, so what a grocerymobile might do.)
+
+<Ask id="falling-ball-deltatime" mode="interacted">
+
+Click into the canvas here. You'll see a yellow ball appear at the top of the
+canvas, and then falls at a constant acceleration. Click the canvas to reset the
+ball's position after it falls through the floor. The code uses `deltaTime` to
+track passage of time so the ball's velocity and acceleration can be calculated.
+You could get the same effect using `millis()`, but then you'd also have to
+record the last turn's value and find the difference. `deltaTime` does that for
+you. The ball's position and velocity, along with the elapsed time and constant
+acceleration are all we need.
+
+Try experimenting with different acceleration values.
+
+```p5exercise autoplay width=200 height=300
+function setup() {
+  createCanvas(200, 300)
+}
+
+let y = 0
+let velocity = 0
+const acceleration = 200 // pixels per second per second
+
+function draw() {
+  background("black")
+  fill("#ffd51a")
+
+  // deltaTime is milliseconds since the last draw() call.
+  // we want to reason about things in terms of seconds, so
+  // divide by one thousand.
+  const dt = deltaTime / 1000
+  velocity += acceleration * dt
+  y += velocity * dt
+
+  circle(width / 2, y, 30)
+}
+
+function mousePressed() {
+  y = 0
+  velocity = 0
+}
+```
+
+</Ask>
+
+### Using `millis()` and trig
+
+Here's a little star/planet example. The star is fixed in the middle, and never
+moves. There are three planets flying around the sun in different orbits. The
+first uses a pure circle, which is just an ellipse with its two radii values
+being the same. The other two have more eccentric orbits - so these use
+different radius values. The trig is slightly more complex, but not terribly so.
+
+Each planet's position is calculated with something like:
+
+$$
+\begin{aligned}
+x &= cx + r \cos(\theta) \\
+y &= cy + r \sin(\theta)
+\end{aligned}
+$$
+
+... where $cx$ and $cy$ are the sun's position, and $\theta$ is that planet's
+angle. The planets are all positioned relative to the sun, so we add its
+position. Otherwise we'd have planets orbiting the origin, not the sun. And the
+angle is computed based on `millis()`, and _not_ `frameCount` or `deltaTime`, so
+movement is based on wall clock time, and not frame rate.
+
+<Ask id="orbiting-planets-millis" mode="interacted">
+
+Try tweaking the values - where the sun is and each planet's elliptical radii.
+Also, notice that the angles are calculated by using time _and_ a multiplier,
+which represents angular speed. Tweak those - can you make this look more like a
+fast-moving atom instead of a slow-moving solar system?
+
+Can you add additional planets with weird orbits?
+
+```p5exercise autoplay width=300 height=300
+function setup() {
+  createCanvas(300, 300)
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  // star: fixed at the center
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  // Want to do math in terms of seconds, so divide millis by 1000
+  const t = millis() / 1000
+  const planetDiameter = 20
+
+  // planet 1: BLUE - pure circle - same radius for both x and y
+  const angle1 = t * 1
+  const r1 = 80
+  const x1 = cx + r1 * cos(angle1)
+  const y1 = cy + r1 * sin(angle1)
+  fill("#6ec6ff")
+  circle(x1, y1, planetDiameter)
+
+  // planet 2: ORANGE - eccentric orbit - different radius in x vs y
+  const angle2 = t * 0.6
+  const rx2 = 120
+  const ry2 = 60
+  const x2 = cx + rx2 * cos(angle2)
+  const y2 = cy + ry2 * sin(angle2)
+  fill("#ff8a65")
+  circle(x2, y2, planetDiameter)
+
+  // planet 3: PINKY - even more eccentric
+  const angle3 = t * 0.4
+  const rx3 = 140
+  const ry3 = 40
+  const x3 = cx + rx3 * cos(angle3)
+  const y3 = cy + ry3 * sin(angle3)
+  fill("#ce93d8")
+  circle(x3, y3, planetDiameter)
+}
+```
+
+</Ask>
+
+## Why `background()` matters
+
+I want to address one more important thing with any dynamic sketch. Our `draw()`
+function typically calls `background()` right away. Have you ever forgotten to
+do that? You end up with something like the following. (Click the canvas to have
+it draw the background one time.)
+
+```p5sketch autoplay width=150 height=150
+function setup() {
+  createCanvas(150, 150)
+}
+
+function draw() {
+  noFill()
+  stroke("green")
+  circle(frameCount % width, height / 2, 50)
+}
+
+function mousePressed() {
+  background("black")
+}
+```
+
+That's drawing a circle (unfilled) without filling the background color before
+each draw. This means that whatever you drew previously is still on the canvas.
+Usually that's not what you want, but sometimes it can give a cool effect.
+
+Here's an example that uses the missing-`background()` effect on purpose. A
+circle chases the mouse, but only ever moves by 1 pixel per frame in `x` and in
+`y`, so it trails behind when you move the mouse quickly. Its color also changes
+over time, using `frameCount` and modulo to cycle the red, green, and blue
+components independently. Since `background()` is never called, every frame's
+circle stays on the canvas, leaving a trail of colored dots behind the one
+actively chasing the mouse.
+
+<Ask id="mouse-chase-trail" mode="interacted">
+
+Move your mouse around inside the canvas and watch the trail build up. Try slow,
+small movements versus big, fast ones - what's different about the trail?
+
+```p5exercise autoplay width=300 height=300
+function setup() {
+  createCanvas(300, 300)
+}
+
+let x = 150
+let y = 150
+
+function draw() {
+  stroke("#888")
+  noFill()
+  rect(0, 0, width, height)
+  noStroke()
+  // cycle each color channel at a different rate using frameCount
+  const r = frameCount % 256
+  const g = (frameCount * 2) % 256
+  const b = (frameCount * 3) % 256
+  fill(r, g, b)
+
+  // move at most 1 pixel per frame toward the mouse, in x and y separately.
+  // this is an apt use of if-statements without curlies because there is
+  // only a single statement like y++.
+  if (x < mouseX) x++
+  if (x > mouseX) x--
+  if (y < mouseY) y++
+  if (y > mouseY) y--
+
+  circle(x, y, 20)
+}
+```
+
+</Ask>
