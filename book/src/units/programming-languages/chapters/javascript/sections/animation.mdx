@@ -175,9 +175,11 @@ y &= cy + r \sin(\theta)
 \end{aligned}
 $$
 
-... where $cx$ and $cy$ are the sun's position, and $\theta$ is that planet's
-angle. The planets are all positioned relative to the sun, so we add its
-position. Otherwise we'd have planets orbiting the origin, not the sun. And the
+... where $cx$ and $cy$ are the sun's position, $r$ is one of the two ellipse
+radii, and $\theta$ is that planet's angle. The planets are all positioned
+relative to the sun, so we add its position. Otherwise we'd have planets
+orbiting the origin, not the sun. Also each orbit is elliptical, and ellipses
+have a minor and major radius, so I could have written $r_1$ and $r_2$. And the
 angle is computed based on `millis()`, and _not_ `frameCount` or `deltaTime`, so
 movement is based on wall clock time, and not frame rate.
 
