@@ -1,20 +1,444 @@
 export const title = "Repetition with Variation"
 
-_This section is a placeholder._
+import lerp from "./exercises/lerp/index.ts"
 
-{/*
-  Loops as a creative tool — using systematic variation to make visually
-  rich outputs. Goals:
-    - Using the loop counter to vary more than just position
-      (size, color, opacity, rotation, spacing)
-    - random() for unpredictable variation — and how randomSeed() makes
-      randomness reproducible
-    - noise() (Perlin noise) for organic-feeling variation
-    - map() for translating a counter range into a useful value range
-    - The distinction between "repetition" (sameness) and "repetition
-      with variation" (pattern and rhythm)
-  Practical context: a field of flowers that vary in size and color, a
-  skyline where buildings have different heights, a generative texture.
-  This is where coding starts to feel like a design tool rather than a
-  math exercise.
-*/}
+# Repetition with Variation
+
+We first saw loops a few sections back - structures like for-loops and
+while-loops. They let you repeatedly execute some code while having the ability
+to change data that can make that code run differently each time. In this
+section we're going a little deeper on some tools for creating smarter
+variation.
+
+## Variation with a counter
+
+Atop the loops chapter we saw this:
+
+```p5sketch autoplay width=600 height=60
+function setup() {
+  createCanvas(600, 60);
+}
+
+function draw() {
+  background("#0e003d")
+  fill("white")
+  const n = 7
+  const s = (2 * height) / 3
+  const pad = s
+  const usableWidth = width - (pad * 2)
+  const itemSpacing = usableWidth / n
+  for (let i=0; i <= n; i++) {
+    const x = pad + (itemSpacing * i)
+    const phase = i / n;
+    drawMoon(x, height / 2, s, phase)
+  }
+}
+
+function drawMoon(cx, cy, d, phase) {
+  push()
+  clip(() => moonPenumbraMask(cx, cy, d), {invert: false})
+  clip(() => moonPhaseMask(cx,cy, d, phase), { invert: true })
+  fill("#e8c500")
+  circle(cx, cy, d)
+  pop()
+}
+
+function moonPenumbraMask(cx, cy, d) {
+  circle(cx, cy, d)
+}
+
+function moonPhaseMask(cx, cy, d, phase) {
+  // map phase to an offset in range [-d, d]
+  const px = cx + map(phase, 0, 1, -d, d)
+  circle(px, cy, d)
+}
+
+```
+
+At the heart of that code is a for-loop:
+
+```js
+for (let i = 0; i <= n; i++) {
+  const x = pad + itemSpacing * i
+  const phase = i / n
+  drawMoon(x, height / 2, s, phase)
+}
+```
+
+The body of the loop uses `i`, and _only_ `i` to vary what is drawn. The `x` and
+`phase` values are calculated based on some constants (`itemSpacing`, `pad`,
+`n`) and the `i` that is incremented as part of the loop. The `drawMoon` call
+uses those and other constants `height` and `s`.
+
+This is extremely common, and you can do many if not most forms of variation
+using this. But this variation is highly predictable - we're just iterating
+through phases of an electric moon.
+
+## Variation with random numbers
+
+What if instead we want to show several moons next to each other in random,
+unrelated phases? How would we even get random numbers?
+
+JavaScript gives you a built-in source of pseudo-random numbers with the
+`Math.random` function. If you call it a few time's you'd get numbers that are
+in the range $[0..1)$ with no discernible pattern:
+
+```
+> Math.random()
+<  0.40335375051539457
+> Math.random()
+<  0.20026424845985802
+> Math.random()
+<  0.2904358791397046
+> Math.random()
+<  0.3688544080249774
+```
+
+This seems like what we want! However, there's one thing missing. We don't have
+a way to control the randomness using `Math.random`. Most programming languages
+give the programmer the ability to _seed_ the random number generator, so that
+it produces the _same sequence_ of random numbers every time. If you've ever
+played a game where it lets you enter a seed value, this is what that's about. A
+randomly generated game map (or any other item) is built step-by-step using
+random numbers, and by fixing the seed, you get the same random sequence every
+time. This is often what we actually want, but JavaScript doesn't provide this
+for you.
+
+Fortunately, p5 provides its own `random` function which _does_ respect a seed
+value that can be set at runtime. Here it is in action, creating a simplified
+city skyline where each building's height is different:
+
+<Ask id="city-skyline-seed" mode="untracked" title="A Random City Skyline">
+
+Try changing the `seed` value in this code, and re-running it. Notice how the
+same `seed` yields the same result, even though it looks to us as being random.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(400, 200)
+}
+
+function draw() {
+  // try these seeds and compare: 1, 42, 2024
+  const seed = 1
+  randomSeed(seed)
+
+  background("skyblue")
+
+  const buildingWidth = 40
+  const n = width / buildingWidth
+
+  fill("green")
+  noStroke()
+  rect(0, height - 20, width, 20)
+
+  fill("gray")
+  for (let i = 0; i < n; i++) {
+    const x = i * buildingWidth
+    const h = random(40, 200)
+    rect(x, height - 20 - h, buildingWidth, h)
+  }
+
+  fill("black")
+  text(`Seed: ${seed}`, 10, 20)
+}
+```
+
+</Ask>
+
+At the heart of this sketch is another for-loop that feels very similar to the
+phase-of-moon thing from above. The important difference is that this loop's
+execution depends on both `i` _and_ a random number summoned up with `random()`:
+
+```js
+const h = random(40, 200)
+```
+
+This will give a random number that is linearly distributed between 40 and 200.
+This means there's an equal chance of any number in that range being chosen.
+
+## Variation with Perlin noise
+
+The city skyline just above is very spiky. Each building is its own random
+height, without any relationship between them. It would be neat if there was a
+way to have random numbers that still had some sense of order, where buildings
+nearby one another are about the same height, but the overall effect is to have
+unpredictable variation.
+
+Fortunately, there are ways to do this. I'm going to show one particular
+approach here, but be aware there are many others.
+
+I'll show you p5's `noise` function, which gives you random variation that feels
+natural or organic. The implementation is
+[Perlin noise](https://en.wikipedia.org/wiki/Perlin_noise), named after Ken
+Perlin who developed this technique in the 1980s and eventually won an Academy
+Award for it.
+
+<Ask id="city-skyline-noise" mode="untracked" title="A Smoother Skyline">
+
+This is the same skyline, but building heights come from `noise()` instead of
+`random()`. Try changing `noiseScale` to see how it affects the smoothness of
+the skyline.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(400, 200)
+}
+
+function draw() {
+  // try these seeds and compare: 1, 42, 2024
+  const seed = 1
+  noiseSeed(seed)
+
+  background("skyblue")
+
+  const buildingWidth = 40
+  const n = width / buildingWidth
+  const noiseScale = 0.3
+
+  fill("green")
+  noStroke()
+  rect(0, height - 20, width, 20)
+
+  fill("gray")
+  for (let i = 0; i < n; i++) {
+    const x = i * buildingWidth
+    const h = map(noise(i * noiseScale), 0, 1, 40, 200)
+    rect(x, height - 20 - h, buildingWidth, h)
+  }
+
+  fill("black")
+  text(`Seed: ${seed}`, 10, 20)
+}
+```
+
+</Ask>
+
+## Mapping numbers
+
+The Perlin noise code above used a function called `map`, and it addresses a
+common problem. If you _have_ a number from one range like $(0..1)$, and you
+_want_ a number from another range $(low..high)$, you can use the `map` function
+to get there.
+
+{/* prettier-ignore-start */}
+
+<svg viewBox="0 0 1000 300" width="100%" style={{ maxWidth: 700, display: "block", margin: "0 auto" }}>
+  <defs>
+    <marker
+      id="map-diagram-arrowhead"
+      markerWidth="8"
+      markerHeight="8"
+      refX="6"
+      refY="4"
+      orient="auto"
+      markerUnits="userSpaceOnUse"
+    >
+      <path d="M0,0 L8,4 L0,8 Z" style={{ fill: "var(--text)" }} />
+    </marker>
+  </defs>
+
+  {/* number line ruler, shared by both ranges below */}
+  {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+    <text
+      key={n}
+      x={330 + n * 92}
+      y="60"
+      textAnchor="middle"
+      fontSize="28"
+      style={{ fill: "var(--text)" }}
+    >
+      {n}
+    </text>
+  ))}
+
+  {/* have: v in range 0..1 */}
+  <text x="15" y="112" fontSize="24" style={{ fill: "var(--text)" }}>
+    {"I have a value "}
+    <tspan fontWeight="700">{"v"}</tspan>
+    {" in"}
+  </text>
+  <text x="15" y="140" fontSize="24" style={{ fill: "var(--text)" }}>
+    {"range 0 to 1"}
+  </text>
+  <rect x="330" y="112" width="92" height="22" style={{ fill: "var(--border)" }} />
+  <rect
+    x="391"
+    y="100"
+    width="6"
+    height="46"
+    style={{ fill: "var(--accent)" }}
+  />
+
+  {/* the map() call */}
+  <text
+    x="660"
+    y="128"
+    textAnchor="middle"
+    fontSize="24"
+    fontFamily="Fira Mono, ui-monospace, Menlo, monospace"
+    style={{ fill: "var(--text)" }}
+  >
+    {"t = map(v, 0, 1, 2, 5)"}
+  </text>
+
+  {/* the transformation, arcing from v's marker to t's marker */}
+  <path
+    d="M394,148 C430,192 650,202 706,196"
+    fill="none"
+    style={{ stroke: "var(--text)" }}
+    strokeWidth="2"
+    markerEnd="url(#map-diagram-arrowhead)"
+  />
+
+  {/* want: t in range 2..5 */}
+  <text x="15" y="217" fontSize="24" style={{ fill: "var(--text)" }}>
+    {"I want a transformed value "}
+    <tspan fontWeight="700">{"t"}</tspan>
+    {" in"}
+  </text>
+  <text x="15" y="245" fontSize="24" style={{ fill: "var(--text)" }}>
+    {"some other range like from 2 to 5"}
+  </text>
+  <rect x="514" y="207" width="276" height="22" style={{ fill: "var(--border)" }} />
+  <rect
+    x="713"
+    y="195"
+    width="6"
+    height="46"
+    style={{ fill: "var(--accent)" }}
+  />
+</svg>
+
+{/* prettier-ignore-end */}
+
+The `map` function works by determining what fraction an input value is in the
+source range, and then using that fraction to scale up a value into the target
+range. This is a process called _linear interpolation_. It is so common in
+graphics programming that we often abbreviate it as _lerp_, which is both a verb
+and a noun (with a [gerund](https://en.wikipedia.org/wiki/Gerund) to boot).
+Here's the logic for lerping value $v \in (0..1)$ to a scaled version
+$t \in (low..high)$.
+
+```js
+const v = random() // gives a number in range 0..1
+const scale = (v - 0) / (1 - 0) // gives fraction of v in the source range 0..1
+// if our target range is low..high, find t like this:
+const t = low + scale * (high - low)
+```
+
+<Ask id={lerp.id} mode="graded" title={lerp.title} hints={lerp.hints}>
+
+The above linear interpolation code shows how you can map a value from a source
+range into another target range, but it used 0 and 1 as hard coded values to
+define that range.
+
+Generalize that into a `lerp` function that takes the source and target ranges
+as arguments, instead of assuming the source range is always 0 to 1.
+
+<CodeExercise exercise={lerp} />
+
+</Ask>
+
+## Practice!
+
+I'll close down this section on repetition-with-variation by showing a finished
+p5 sketch, and then ask you to replicate what you see.
+
+The first thing you need to do, and this might actually be the hardest part at
+all, is to really _understand_ what you see. Characterize what this sketch
+shows, and 'see' how it might be built. What are the domain objects? How are
+they put together? Would it make sense to write helper functions? What
+repetition is there, and how would you implement it?
+
+Here's the sketch - a field of flowers, each a line for the stem and an ellipse
+for the bloom, with size and color varying from flower to flower:
+
+```p5sketch autoplay width=400 height=250
+function setup() {
+  createCanvas(400, 250)
+}
+
+function draw() {
+  randomSeed(3)
+  background("skyblue")
+
+  fill("#8b5a2b")
+  noStroke()
+  rect(0, height - 40, width, 40)
+
+  const n = 14
+  for (let i = 0; i < n; i++) {
+    const x = random(20, width - 20)
+    const groundY = random(height - 40, height - 15)
+    const stemHeight = random(40, 100)
+    const flowerSize = random(15, 35)
+
+    stroke("green")
+    strokeWeight(3)
+    line(x, groundY, x, groundY - stemHeight)
+
+    noStroke()
+    fill(random(150, 255), random(50, 220), random(150, 255))
+    ellipse(x, groundY - stemHeight, flowerSize, flowerSize)
+  }
+}
+```
+
+<Ask id="flower-field" mode="interacted" title="Build a Field of Flowers">
+
+Try to recreate the sketch above. The starter code below has the sky and ground
+in place. Your job is to use a loop of some sort to add the flowers.
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(400, 250)
+}
+
+function draw() {
+  background("skyblue")
+
+  fill("#8b5a2b")
+  noStroke()
+  rect(0, height - 40, width, 40)
+
+  // TODO: loop to draw a field of flowers here
+}
+```
+
+</Ask>
+
+<Solution id="flower-field">
+
+```p5exercise autorun size="medium"
+function setup() {
+  createCanvas(400, 250)
+}
+
+function draw() {
+  randomSeed(3)
+  background("skyblue")
+
+  fill("#8b5a2b")
+  noStroke()
+  rect(0, height - 40, width, 40)
+
+  const n = 14
+  for (let i = 0; i < n; i++) {
+    const x = random(20, width - 20)
+    const groundY = random(height - 40, height - 15)
+    const stemHeight = random(40, 100)
+    const flowerSize = random(15, 35)
+
+    stroke("green")
+    strokeWeight(3)
+    line(x, groundY, x, groundY - stemHeight)
+
+    noStroke()
+    fill(random(150, 255), random(50, 220), random(150, 255))
+    ellipse(x, groundY - stemHeight, flowerSize, flowerSize)
+  }
+}
+```
+
+</Solution>
