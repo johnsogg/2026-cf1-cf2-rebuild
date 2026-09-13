@@ -5,14 +5,12 @@ import lerp from "./exercises/lerp/index.ts"
 # Repetition with Variation
 
 We first saw loops a few sections back - structures like for-loops and
-while-loops. They let you repeatedly execute some code while having the ability
-to change data that can make that code run differently each time. In this
-section we're going a little deeper on some tools for creating smarter
-variation.
+while-loops. They let you change behavior on every iteration. In this section
+we're going a little deeper on some tools for creating smarter variation.
 
 ## Variation with a counter
 
-Atop the loops chapter we saw this:
+At the top of the [chapter on loops](./loops) we saw this:
 
 ```p5sketch autoplay width=600 height=60
 function setup() {
@@ -80,8 +78,8 @@ What if instead we want to show several moons next to each other in random,
 unrelated phases? How would we even get random numbers?
 
 JavaScript gives you a built-in source of pseudo-random numbers with the
-`Math.random` function. If you call it a few time's you'd get numbers that are
-in the range $[0..1)$ with no discernible pattern:
+`Math.random` function. If you call it a few times you'd get numbers that are in
+the range $[0..1)$ with no discernible pattern:
 
 ```
 > Math.random()
@@ -100,7 +98,7 @@ give the programmer the ability to _seed_ the random number generator, so that
 it produces the _same sequence_ of random numbers every time. If you've ever
 played a game where it lets you enter a seed value, this is what that's about. A
 randomly generated game map (or any other item) is built step-by-step using
-random numbers, and by fixing the seed, you get the same random sequence every
+random numbers, and by fixing the seed, you get the same generated outcome every
 time. This is often what we actually want, but JavaScript doesn't provide this
 for you.
 
@@ -154,7 +152,7 @@ execution depends on both `i` _and_ a random number summoned up with `random()`:
 const h = random(40, 200)
 ```
 
-This will give a random number that is linearly distributed between 40 and 200.
+This will give a random number that is uniformly distributed between 40 and 200.
 This means there's an equal chance of any number in that range being chosen.
 
 ## Variation with Perlin noise
@@ -345,11 +343,11 @@ as arguments, instead of assuming the source range is always 0 to 1.
 I'll close down this section on repetition-with-variation by showing a finished
 p5 sketch, and then ask you to replicate what you see.
 
-The first thing you need to do, and this might actually be the hardest part at
-all, is to really _understand_ what you see. Characterize what this sketch
-shows, and 'see' how it might be built. What are the domain objects? How are
-they put together? Would it make sense to write helper functions? What
-repetition is there, and how would you implement it?
+The first thing you need to do, and this might actually be the hardest part, is
+to really _understand_ what you see in a way that is actionable. Characterize
+what this sketch shows, and 'see' how it might be built. What are the domain
+objects? How are they put together? Would it make sense to write helper
+functions? What repetition is there, and how would you implement it?
 
 Here's the sketch - a field of flowers, each a line for the stem and an ellipse
 for the bloom, with size and color varying from flower to flower:
