@@ -2,5 +2,138 @@ export const title = "Worked Examples"
 
 # Simple Graphics Editor — Worked Examples
 
-- Example 1:
-- Example 2:
+Here is a starting point for a simple graphics editor.
+
+- <Kbd>r</Kbd> = draw rectangles
+- <Kbd>c</Kbd> = draw circles
+- <Kbd>p</Kbd> = print geometry to console (open dev tools to see it!)
+
+Dev Tools is something your browser gives you. On Chrome, use
+`View -> Developer -> Developer Tools` to see it. You'll want the Console tab.
+
+```p5exercise autorun size="large"
+// This can hold either 'rect' or 'circle', depending on key presses. Defaults
+// to 'rect' for rectangle editing.
+let mode = "rect";
+
+// Array of graphic items, in order of when they were produced. Each must have
+// a 'type' property ("rect", "circle") that says what it is. Rectangles have
+// x0, y0, x1, y1 values for the mouse down and mouse up locations. Circles have
+// cx, cy for center, and d for the diameter.
+let things = [];
+
+// Reference to the currently focused item, or null if nothing is selected.
+let current = null;
+
+// recent mouse down info, useful for testing if mouse travelled or not
+let mouseDownX;
+let mouseDownY;
+
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+  stroke("black");
+  // This is a modern loop syntax that we did not cover in class, but it is
+  // a useful speedup, and we don't have to mess around with counting variables.
+  for (const t of things) {
+    // Each thing 't' should have a type, and we can draw it according to the
+    // geometry data we've recorded, even if we're in mid-edit.
+    if (t.type === "rect") {
+      rect(t.x0, t.y0, t.x1 - t.x0, t.y1 - t.y0);
+    }
+    if (t.type === "circle") {
+      circle(t.cx, t.cy, t.d);
+    }
+  }
+}
+
+function outputThings() {
+  // this is some arcane Javascript magic. It will convert our 'things' array
+  // into text and print it to the console. So, you have to open the console
+  // in order to see it. From there you can copy it and use it in another
+  // sketch, or even some other program.
+  console.log(JSON.stringify(things));
+}
+
+function keyPressed() {
+  // react to keystrokes by either changing the editor mode, or printing out
+  // the geometry that we've accumulated.
+  if (key === "r") mode = "rect";
+  if (key === "c") mode = "circle";
+  if (key === "p") outputThings();
+}
+
+function mousePressed() {
+  // Depending on what mode we are in, create a new rectangle or circle with
+  // decent default info, and add it to the things list.
+  if (mode === "rect") {
+    const r = {
+      type: "rect",
+      x0: mouseX,
+      y0: mouseY,
+      x1: mouseX,
+      y1: mouseY,
+    };
+    things.push(r);
+    current = r;
+  }
+  if (mode === "circle") {
+    const c = {
+      type: "circle",
+      cx: mouseX,
+      cy: mouseY,
+      d: 0,
+    };
+    things.push(c);
+    current = c;
+  }
+
+  // store mouse down info
+  mouseDownX = mouseX;
+  mouseDownY = mouseY;
+}
+
+function mouseReleased() {
+  // if the mouse was just clicked - up and down with no drag, we can remove
+  // current item from the things list
+  if (current && mouseX === mouseDownX && mouseY === mouseDownY) {
+    things = things.filter((t) => t !== current);
+  }
+  // in any event, now forget the mouse down info
+  mouseDownX = null;
+  mouseDownY = null;
+  // and also the current item
+  current = null;
+}
+
+function mouseDragged() {
+  // When we get a mouse drag, it means we're editing the item on top. Need to
+  // check which mode we're in (because things have different properties, but
+  // they all have 'type'). Also need to be careful that when we access an item
+  // that it actually is what we think it should be.
+  //
+  // We edit the object in-place, since it is already in the 'things' list, we
+  // don't need to do anything beyond update its new properties based on the
+  // current mouse position.
+  if (current == null) {
+    // early return in case we don't have a current item to update
+    return;
+  }
+  // down here we can be sure that current is valid
+  if (mode === "rect" && current.type === "rect") {
+    // in this scope we know current is definitely a rectangle
+    current.x1 = mouseX;
+    current.y1 = mouseY;
+  }
+  if (mode === "circle" && current.type === "circle") {
+    // in this scope we know current is definitely a circle
+    const dx = mouseX - current.cx;
+    const dy = mouseY - current.cy;
+    current.d = 2 * Math.hypot(dx, dy);
+  }
+}
+
+```

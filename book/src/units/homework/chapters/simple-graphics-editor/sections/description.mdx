@@ -2,12 +2,83 @@ export const title = "Description"
 
 # Simple Graphics Editor
 
-<Callout intent="danger">
-  This homework is not yet defined. Check back later.
-</Callout>
+When you write application code, you'll encounter little problems along the way,
+and you'll (hopefully) think, "I know, the solution to my software problem is
+_more software_!"
 
-- Topics (per calendar, same week): Lists, debugging, tooling
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+OK, I'm being a little cheeky.
+
+You will find yourself wishing there was a way to (say) write Bezier curves more
+easily by using an editor. You could use Adobe Illustrator or Figma or some
+such, and export graphics as SVG, then bring them into your p5 sketch. But by
+that point, you have an SVG, and not a p5 graphics primitive, which is what you
+were trying to make.
+
+In this homework, we're going to scratch this itch that I think many of you have
+by now encountered. We're going to make a little graphics editor that lets you
+build scenes (or parts of scenes) with a graphical user interface (a GUI). And
+you're going to write that GUI!
+
+## What to do
+
+Write a sketch that lets you edit geometry in some way. I give a starting point
+in the worked examples. It is also OK if you pick a different editor topic.
+
+The goal here is to build a UI that lets you take on a tedious or error-prone
+task and do it more easily. We've spent a few weeks squinting at pixels, and
+typing in different numbers to make things appear on the screen at the right
+place. But with a UI to let us work with geometry in a graphical way, we can
+likely get what we want more easily.
+
+If you do extend my starter code, add support for:
+
+- Color: let the user pick a color (pressing keys 1–9 would be easy) to set the
+  current fill color, then when the user draws something, record that color on
+  the geometric object along with its other data.
+- Selecting: Let the user click on items to move or delete them:
+  - Delete the `current` item by responding to the delete or backspace key and
+    removing it from the `things` list. Also remember to set `current = null`.
+  - Move the `current` item by dragging the mouse and changing that object's
+    data to something new. Circles are likely easier to manage than rectangles.
+
+If you go your own route, be sure to provide a way to output something to the
+console (as in my starter code), or provide some other way to get at the JSON -
+you can steal from my code. `JSON.stringify(things)` gives you the text, and you
+can do with that what you need.
+
+Some ideas for going your own way:
+
+- Editor for drawing circle arcs - [`arc`](https://p5js.org/reference/p5/arc/)
+- Editor for drawing Bezier curves -
+  [`bezier`](https://p5js.org/reference/p5/bezier/)
+- Editor for drawing splines - [`spline`](https://p5js.org/reference/p5/spline/)
+- Editor for drawing arbitrary polygons -
+  [`beginShape` and friends](https://p5js.org/reference/p5/beginShape/)
+- Editor for drawing arbitrary quads -
+  [`quad`](https://p5js.org/reference/p5/quad/)
+
+## Where to do it
+
+Use the p5 editor. Its built-in console should suffice for reading the text that
+you print to the console.
+
+## How to turn it in
+
+Use the p5 editor's `File -> Share` dialog and copy the editor option. Paste
+that into the LMS for the assignment.
+
+## Rubric
+
+If you are clearly going above and beyond, we won't really consult the rubric.
+But in case you want guidelines:
+
+- Store editor state (like the `current` and `mouseDownX` variables in the
+  example)
+- The user must be able to create geometry
+- User should also be able to edit that geometry in some way (deleting, moving,
+  updating width/height, etc - any of these count)
+- The editor is intended to be useful for other purposes, so it should output
+  JSON text. The easiest way to do this is
+  `console.log(JSON.stringify(myData))`.
+- It should be clear for somebody reading the code how to make it work (like,
+  what keyboard keys does it respond to?)
