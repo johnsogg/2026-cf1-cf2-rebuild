@@ -1,16 +1,236 @@
 export const title = "Strings"
 
-_This section is a placeholder._
+# Strings
 
-{/*
-  Working with text as data. Goals:
-    - String literals, template literals (`${...}`) for building text from
-      values — already used informally in earlier sections, formalize it here
-    - Common string properties/methods: length, indexOf, includes, slice,
-      toUpperCase/toLowerCase, split, trim
-    - Concatenation vs. template literals — when to reach for each
-    - Strings as sequences of characters (indexing, iteration) as a bridge
-      toward the Lists section
-  Practical context: labeling a sketch, building a message from live values
-  (score, timer, coordinates), parsing simple user-typed input.
-*/}
+A string is text. We call it a "string" because we are stringing together a
+sequence of symbols to form a long run of letters, numbers, punctuation, emoji -
+whatever fits into a the language's notion of text.
+
+You can use strings to display on screen (like with p5's `text` function), or to
+print to the developer console (JavaScript's built-in `console.log` function),
+or simply as data to use in memory, disk, or the network.
+
+## String literals
+
+We've seen string literals before, and even talked about them a little bit.
+They're the things that are enclosed in quotes (single or double), and they look
+like this:
+
+```jsconsole size="small"
+console.log("This is a string")
+console.log("I'm a fan of double quotes")
+console.log('I\'m not a fan of single quotes but they\'re OK too')
+console.log("You owe Mr. Dîåçrïtíçäl $10.50 for pizza 🍕💰🍕")
+console.log("The value of π is ≠ 2")
+```
+
+It is valid in JS to use double quotes `"like this"`, or single quotes
+`'like this'`.
+
+At some point you'll need to include a quote character inside a string, so what
+do you do then? Well, if you need to include a double quote, just use single
+quotes to enclose it, e.g. `'Duane "The Rock" Johnson'`. Similarly, use double
+quotes to wrap a string that includes single quotes: `"Miles O'Brian"`.
+
+The troublemakers among you will now be thinking, what if you need both in the
+same string? The stubborn among you demand to use your preferred quote
+character. It's all good. You can use an _escape sequence_ to write a string
+that contains special characters including the quote characters.
+
+```jsconsole size="small"
+// escape double quotes
+console.log("Duane \"The Rock\" Johnson")
+
+// escape single quotes
+console.log('Miles O\'Brian')
+
+// Escape single and double quotes
+console.log('Wouldn\'t it be cool if Duane \"The Rock\" Johnson played Miles O\'Brian?')
+
+// Escape newline characters with \n
+console.log("This\ntakes\nfour\nlines")
+```
+
+## Combining text and variables
+
+Often you'll want to use text that includes a static part with a data-driven
+part, like `"Your bill is: $12.34"`. You can combine any value with the `+`
+operator, and if one of the operands is a string, JavaScript will _coerce_ the
+other value into a string as well.
+
+So, even though `2 + 2` is `4` (we're adding two numbers), `"2" + 2` is `"22"`
+(adding a string and a number), and `"2" + "2"` is `"22"` as well (adding two
+strings). If you have variables, it will coerce those too:
+
+```jsconsole size="small"
+console.log(2 + 2)
+console.log("2" + 2)
+console.log("2" + "2")
+
+const customerName = "Elton"
+const amount = 0.1 * 0.2
+console.log("Dear " + customerName + ", you owe me $" + amount)
+```
+
+What is going on with that last example? Shouldn't that be `0.02` and not
+`0.020000000000000004`? Explaining that would mean going into the IEEE754
+floating point standard (the most common way for computers to represent
+numbers), and that would be a long digression. Suffice it to say that not every
+real number is exactly encodable in IEEE754 — even ones that seem
+straightforward like `0.1` and `0.2`. You get very, very close, but it is not
+_exact_.
+
+If you are converting numbers into text and you want it to be rendered with a
+certain precision, you can use `myNumber.toFixed(n)` where `n` is the number of
+digits after the decimal point. Example:
+
+```jsconsole size="small"
+const customerName = "Elton"
+const amount = 0.1 * 0.2
+console.log("Dear " + customerName + ", you owe me $" + amount.toFixed(2))
+```
+
+## Template literals (aka string templates)
+
+There is also a newer syntax called a _template literal_ that is often used to
+create strings that contain variables. Most people call this a _string template_
+because of how it is used.
+
+Just enclose the string in backticks instead of quotes. The useful thing here is
+that you can _interpolate_ data inside your string using the special
+`${someVar}` syntax: dollar sign, then an expression enclosed in curly braces.
+With this, you don't need to do the string concatenation gymnastics with the `+`
+operator.
+
+<Ask id="template-billing" mode="interacted" title="Add the dollar sign">
+
+This shows the string template doing (almost) exactly the same thing as above.
+But the dollar sign is missing. And, since the dollar sign is special syntax
+inside the template, you have to escape it. Can you figure out how to get the
+dollar sign to appear?
+
+```jsconsole size="small"
+const customerName = "Elton"
+const amount = 0.1 * 0.2
+console.log(`Dear ${customerName}, you owe me ${amount.toFixed(2)}.`)
+```
+
+</Ask>
+
+<Solution id="template-billing">
+
+Just add `\$` in front of the dollar sign.
+
+```jsconsole size="small"
+const customerName = "Elton"
+const amount = 0.1 * 0.2
+console.log(`Dear ${customerName}, you owe me \$${amount.toFixed(2)}.`)
+```
+
+</Solution>
+
+## Strings are list-like
+
+A string is a sequence of characters, and JavaScript lets you treat it like it
+was an array:
+
+```jsconsole size="small"
+const name = "Billy"
+for(let i=0; i < name.length; i++) {
+    console.log(`Character ${i} = ${name[i]}`);
+}
+console.log(`String length: ${name.length}`)
+```
+
+## Strings have methods
+
+Strings are special objects that have functions attached to them that let you
+transform or manipulate them in some way. The
+[MDN String documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+has more than you probably want to read, but some highlights are shown in the
+example below.
+
+```jsconsole size="medium"
+const name = "Mr. Jones"
+
+console.log(`Does it end in 's'? ${name.endsWith("s")}`)
+console.log(`Does it begin with 'Dr.'? ${name.startsWith("Dr.")}`)
+console.log(`Does it contain (include) 'Jones'? ${name.includes('Jones')}`)
+
+// replace one string with another
+const frau = name.replace("Mr.", "Mrs.")
+console.log(`Do you think ${name} and ${frau} are related?`)
+
+const sentence = "This is a sentence with some words in it"
+const words = sentence.split(" ") // gives an Array
+console.log(`There are ${words.length} words in "${sentence}"`)
+```
+
+## Strings in graphics
+
+We almost got out of this section without showing any p5 graphics! Almost.
+
+In the following sketch, it displays how many times you've typed, and what the
+most recent character was.
+
+<Ask id="recent-chars-substring" mode="interacted" title="Show the last 5 characters">
+
+Right now `lastChar` only remembers one character. Can you change this sketch so
+it shows the 5 most recent characters instead of just the last one? Build up a
+string of everything typed, then use the
+[`substring`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/substring)
+method to trim it down to the last 5 characters.
+
+```p5exercise autorun size="small"
+let typedCount = 0
+let lastChar = ""
+
+function setup() {
+  createCanvas(300, 100)
+  textSize(20)
+}
+
+function draw() {
+  background(30)
+  fill(240)
+  text(`Times typed: ${typedCount}`, 10, 30)
+  text(`Last character: ${lastChar}`, 10, 60)
+}
+
+function keyTyped() {
+  typedCount++
+  lastChar = key
+}
+```
+
+</Ask>
+
+<Solution id="recent-chars-substring">
+
+```p5exercise autorun size="small"
+let typedCount = 0
+let recentChars = ""
+
+function setup() {
+  createCanvas(300, 100)
+  textSize(20)
+}
+
+function draw() {
+  background(30)
+  fill(240)
+  text(`Times typed: ${typedCount}`, 10, 30)
+  text(`Last 5 characters: ${recentChars}`, 10, 60)
+}
+
+function keyTyped() {
+  typedCount++
+  recentChars += key
+  // keep only the last 5 characters
+  if (recentChars.length > 5) {
+    recentChars = recentChars.substring(recentChars.length - 5)
+  }
+}
+```
+
+</Solution>
