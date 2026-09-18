@@ -1,22 +1,77 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+
 export const title = "Objects"
 
-_This section is a placeholder._
+# Objects
 
-{/*
-  Grouping related values under a single name. Goals:
-    - Object literals: { x: 10, y: 20, radius: 5, color: 'red' }
-    - Reading and writing properties with dot notation
-    - Passing objects to functions
-    - Arrays of objects (natural bridge to the Lists section)
-    - Why objects help: instead of parallel arrays (xs[], ys[], radii[]),
-      one array of objects keeps related data together
-  This section stays at the level of plain data objects (no classes yet).
-  The motivating example is a "thing" in the sketch — a ball, a particle,
-  a character — that has multiple properties that need to travel together.
-  Classes and constructors are out of scope here; the concept is "a bundle
-  of named values."
+In programming languages, an object is a structure that groups data together.
+You could have an object representing a person, so you'd need things like their
+first name, last name, home address, social security number, job title, date of
+birth, favorite music, ... whatever you need! Objects are a powerful way to
+design with code.
 
-  TODO: revisit animation.mdx's orbiting-planets-millis example here -
-  each planet is loose vars (angle1/r1/x1/y1, etc.); rewrite as one object
-  per planet to cut variable count and clarify parallel structure.
-*/}
+## Object literals
+
+In JavaScript, an object is defined with curlies, and lets you define as many
+'properties' as you like, separated by commas. Each property has a name, then a
+colon, then a value.
+
+<CodeAnatomy
+  code={{
+    value:
+      'const rick = {\n  firstName: "Rick",\n  address: null,\n  age: 44,\n}',
+    pos: { x: 40, y: 60 },
+    fontSize: 32,
+    lineHeight: 55,
+  }}
+  width={900}
+  height={500}
+  progressive
+  labels={[
+    {
+      name: "Curly braces",
+      text: "Encloses all of the object's properties, between the opening and closing curly.",
+      pos: { x: 480, y: 15 },
+      target: { x: 310, y: 76 },
+      maxWidth: 380,
+    },
+    {
+      name: "Property",
+      text: "A name/value pair. The value can be anything - text, a number, null, even another object.",
+      pos: { x: 480, y: 160 },
+      target: { x: 343, y: 176 },
+      maxWidth: 380,
+    },
+    {
+      name: "Comma",
+      text: "Separates one property from the next.",
+      pos: { x: 480, y: 340 },
+      target: { x: 239, y: 246 },
+      maxWidth: 380,
+    },
+    {
+      name: "Colon",
+      text: "Separates a property's name from its value.",
+      pos: { x: 100, y: 340 },
+      target: { x: 147, y: 267 },
+      maxWidth: 360,
+    },
+  ]}
+/>
+
+> Grouping related values under a single name. Goals:
+>
+> - Object literals: `{ x: 10, y: 20, radius: 5, color: 'red' }`
+> - Reading and writing properties with dot notation
+> - Passing objects to functions
+> - Arrays of objects (natural bridge to the Lists section)
+> - Why objects help: instead of parallel arrays (xs[], ys[], radii[]), one
+>   array of objects keeps related data together This section stays at the level
+>   of plain data objects (no classes yet). The motivating example is a "thing"
+>   in the sketch — a ball, a particle, a character — that has multiple
+>   properties that need to travel together. Classes and constructors are out of
+>   scope here; the concept is "a bundle of named values."
+>
+> TODO: revisit animation.mdx's orbiting-planets-millis example here - each
+> planet is loose vars (angle1/r1/x1/y1, etc.); rewrite as one object per planet
+> to cut variable count and clarify parallel structure.
