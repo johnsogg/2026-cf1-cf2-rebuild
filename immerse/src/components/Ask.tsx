@@ -184,9 +184,11 @@ export function Ask({ id, mode, title, hints, children }: AskProps) {
 
   return (
     <div
+      id={id}
+      data-scrollspy-anchor
       className={`${s.ask} ${mode === "untracked" ? s.untracked : stateClass}`}
     >
-      <div className={s.header}>
+      <div className={`${s.header} ask-header`}>
         <div className={s.questionContainer}>
           {mode === "interacted" && (
             <label className={s.checkboxLabel}>
@@ -221,6 +223,9 @@ export function Ask({ id, mode, title, hints, children }: AskProps) {
             </div>
           )}
           {number !== undefined && <div className={s.question}>{number}</div>}
+          <a href={`#${id}`} className="heading-anchor" aria-label="Link to this exercise">
+            #
+          </a>
         </div>
         <IconButton onClick={handleReset} aria-label="Reset">
           <SvgIcon name="refresh" size={18} intent="muted" />

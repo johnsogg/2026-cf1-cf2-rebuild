@@ -212,17 +212,28 @@ const AppLayout = ({
         notifyExerciseChange()
       }
 
-      // Scrollspy: keep the URL fragment pointed at whichever heading is
-      // currently at the top of the content area. This uses raw history
+      // Scrollspy: keep the URL fragment pointed at whichever heading or Ask
+      // is currently at the top of the content area. This uses raw history
       // (not react-router navigation) so it doesn't trigger a re-render or
       // add history entries — its only job is making sure a dev-server full
-      // reload on save lands back where you were instead of at the top.
-      const headings = el.querySelectorAll<HTMLElement>("h2[id], h3[id]")
+      // reload on save lands back where you were instead of at the top, and
+      // that scrolling near an Ask produces a shareable page-and-anchor link
+      // to that specific exercise.
+      const anchors = el.querySelectorAll<HTMLElement>(
+        "h2[id], h3[id], [data-scrollspy-anchor]",
+      )
+      // Guard against the transient "Loading…" placeholder shown between
+      // sections: swapping it in shrinks the content area and clamps
+      // scrollTop, which fires this same scroll handler against a DOM with
+      // no headings/Asks yet. Without this guard that spuriously clears the
+      // just-navigated-to hash (via the replaceState below) before the new
+      // section's own scroll-to-anchor effect gets a chance to read it.
+      if (anchors.length === 0) return
       const containerTop = el.getBoundingClientRect().top
       let current: string | null = null
-      for (const heading of headings) {
-        if (heading.getBoundingClientRect().top - containerTop <= 96) {
-          current = heading.id
+      for (const anchor of anchors) {
+        if (anchor.getBoundingClientRect().top - containerTop <= 96) {
+          current = anchor.id
         } else {
           break
         }

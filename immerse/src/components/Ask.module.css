@@ -9,6 +9,10 @@
   grid-column: full;
 }
 
+.ask[id] {
+  scroll-margin-top: 1.5rem;
+}
+
 /* Plain prose inside an Ask (unlike exercise widgets) should read at the
  * same width as top-level lesson content, not stretch across the full
  * grid column the Ask itself occupies. */
