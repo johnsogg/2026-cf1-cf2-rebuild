@@ -1,4 +1,5 @@
 import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+import { Link } from "react-router-dom"
 
 export const title = "Objects"
 
@@ -19,7 +20,7 @@ colon, then a value.
 <CodeAnatomy
   code={{
     value:
-      'const rick = {\n  firstName: "Rick",\n  address: null,\n  age: 44,\n}',
+      'const who = {\n  firstName: "Avril",\n  address: null,\n  age: 44,\n}',
     pos: { x: 40, y: 60 },
     fontSize: 32,
     lineHeight: 55,
@@ -59,19 +60,477 @@ colon, then a value.
   ]}
 />
 
-> Grouping related values under a single name. Goals:
->
-> - Object literals: `{ x: 10, y: 20, radius: 5, color: 'red' }`
-> - Reading and writing properties with dot notation
-> - Passing objects to functions
-> - Arrays of objects (natural bridge to the Lists section)
-> - Why objects help: instead of parallel arrays (xs[], ys[], radii[]), one
->   array of objects keeps related data together This section stays at the level
->   of plain data objects (no classes yet). The motivating example is a "thing"
->   in the sketch — a ball, a particle, a character — that has multiple
->   properties that need to travel together. Classes and constructors are out of
->   scope here; the concept is "a bundle of named values."
->
-> TODO: revisit animation.mdx's orbiting-planets-millis example here - each
-> planet is loose vars (angle1/r1/x1/y1, etc.); rewrite as one object per planet
-> to cut variable count and clarify parallel structure.
+JavaScript objects are an extremely common way to write out complex information.
+In fact, the internet essentially runs on what we call _JavaScript Object
+Notation_, or _JSON_. JSON is a stricter format that is based on the JavaScript
+object syntax.
+
+<Callout intent="note">
+  **JSON**: When your browser gets data from a server, there's a good chance
+  that information is traveling over the network in this format. It is even
+  useful for writing files. So even if JavaScript ends up not being your jam,
+  JSON is so ubiquitous that you'll use it elsewhere. From within Javascript,
+  you can convert just about any data to JSON by using `JSON.stringify(mydata)`,
+  which will write `mydata` in this stricter JSON format for writing to disk or
+  sharing over a network. Then, to read that strict JSON data, use `JSON.parse`.
+</Callout>
+
+Below is an example of a more complex JS object. I want to draw attention to two
+aspects about this code. First, the data here has multiple layers to it: objects
+can contain objects (or lists, or any other data).
+
+Second, some of the property names are enclosed in quotes. This is because
+property names don't have to obey the JavaScript rules for variable names.
+Property names can start with numbers, include spaces or other punctuation, and
+so on. To be safe you _can_ use double quotes around all property names, not
+just the ones that aren't valid JS identifiers (many auto-formatters do this for
+you). In this case, `id` and `firstName` and others are unquoted because they
+don't need to be. `"street number"` is enclosed in quotes because the space
+character is not allowed in an identifier. `"street"` is in quotes because I'm
+being consistent - some of the other property names are in quotes, and it
+aesthetically looks weird to me to see a mix of quoted and non-quoted property
+names for the same object. This is entirely a matter of taste.
+
+{/* prettier-ignore-start */}
+
+```js
+const joe = {
+  id: 723429342,
+  firstName: "Joe",
+  lastName: "Smith",
+  address: {
+    "street number": 605,
+    "street": "Pine",
+    "city": "Treeville",
+    "postal code": "A7B 8C9",
+  },
+  isMarried: false,
+  jobHistory: ["Dishwasher", "Software Engineer"],
+}
+```
+
+{/* prettier-ignore-end */}
+
+This shows a mix of different kinds of data: the `id` field is a number, the
+name fields are strings, `address` is another object, `isMarried` is a boolean,
+and `jobHistory` is an array (we will see those in a later section).
+
+## Defining objects
+
+If you need to record something like "how many times the user clicked", you only
+need a single number. But if you want to record something that is more complex,
+like the position and heading of an object in motion, there's more work
+involved. Until now, you might have needed to do something like this:
+
+```js
+let xPosition = 50
+let yPosition = 100
+let xDelta = 5
+let yDelta = -3
+```
+
+These variables are all independent from one another, even though we intend to
+_use_ them as a team. And if you have more than one such item, you'd need to do
+something unclean like `item3xPosition = 23` or whatever. Soon, your code is a
+mess, and coming up with new names for things becomes a burden.
+
+Using objects, recording an object's position and heading becomes something like
+this:
+
+```js
+const ball = {
+  x: 50,
+  y: 100,
+  dx: 5,
+  dy: -3,
+}
+```
+
+In the common case where you have several similar items, now you only need to
+make `ball1`, `ball2` and so on. The property names are still just `x`, `y`,
+etc. Much easier - we only have to come up with names for the top-level things
+that are meaningful to us as programmers:
+
+```js
+const ball1 = {
+  x: 50,
+  y: 100,
+  dx: 5,
+  dy: -3,
+}
+const ball2 = {
+  x: 20,
+  y: 200,
+  dx: 0,
+  dy: 8,
+}
+```
+
+Now, `ball1` and `ball2` are the two variables, and all the position and heading
+data is _inside_ those structures. Much cleaner to reason about and program
+with!
+
+## Reading and writing objects with dot notation
+
+If we already have `ball1` and `ball2` from above, we can read and write
+property values like this:
+
+```js
+// read values
+if (ball1.x < ball2.x) {
+  // ball 1 is to the left of ball 2
+}
+// write values
+ball1.dx = 3
+ball2.dx = 4
+// read and write values on the same line
+ball1.x = ball1.x + ball1.dx
+```
+
+This is called _dot notation_. `ball1.dx` means "reach into the `ball1` object,
+and use the `dx` property."
+
+## Objects in action
+
+Enough talk - let's take a look at how objects are used.
+
+```p5sketch autoplay width=400 height=300
+let particle1, particle2, particle3
+let paused = false
+
+function setup() {
+  createCanvas(400, 300)
+  textAlign(CENTER)
+  particle1 = newParticle(random(width), random(height))
+  particle2 = newParticle(random(width), random(height))
+  particle3 = newParticle(random(width), random(height))
+}
+
+function newParticle(x, y) {
+  const angle = random(TWO_PI)
+  const speed = random(0.5, 1.5)
+  return {
+    x: x,
+    y: y,
+    dx: cos(angle) * speed,
+    dy: sin(angle) * speed,
+    color: color(random(255), random(255), random(255)),
+    diameter: random(20, 50),
+  }
+}
+
+function draw() {
+  background("black")
+
+  if (!paused) {
+    moveParticle(particle1)
+    moveParticle(particle2)
+    moveParticle(particle3)
+  }
+
+  drawParticle(particle1)
+  drawParticle(particle2)
+  drawParticle(particle3)
+
+  if (
+    !paused &&
+    isOffscreen(particle1) &&
+    isOffscreen(particle2) &&
+    isOffscreen(particle3)
+  ) {
+    particle1 = newParticle(
+      width / 2 + random(-20, 20),
+      height / 2 + random(-20, 20),
+    )
+    particle2 = newParticle(
+      width / 2 + random(-20, 20),
+      height / 2 + random(-20, 20),
+    )
+    particle3 = newParticle(
+      width / 2 + random(-20, 20),
+      height / 2 + random(-20, 20),
+    )
+  }
+
+  noStroke()
+  fill("gray")
+  text("click to pause", width / 2, height - 10)
+}
+
+function mousePressed() {
+  paused = !paused
+}
+
+function moveParticle(particle) {
+  particle.x += particle.dx
+  particle.y += particle.dy
+}
+
+function drawParticle(particle) {
+  noStroke()
+  fill(particle.color)
+  circle(particle.x, particle.y, particle.diameter)
+}
+
+function isOffscreen(particle) {
+  const r = particle.diameter / 2
+  return (
+    particle.x + r < 0 ||
+    particle.x - r > width ||
+    particle.y + r < 0 ||
+    particle.y - r > height
+  )
+}
+```
+
+In this example, we've got three particles with different positions, headings,
+colors, and sizes. Each of these particles is an object, and they have the same
+_shape_ (they use the same properties), so we can treat them as different
+instances of the same kind of thing.
+
+Because we can treat them all the same, we can write functions like
+`drawParticle` or `moveParticle` that take a single input - the particle
+object - rather than six independent values for position, heading, and all that.
+There are fewer moving parts, because all those parts are bundled together and
+move as a group.
+
+## Try it
+
+<Ask id="particle-objects" mode="interacted" title="Particles as objects">
+
+Try to write a simpler version of the sketch above. Use objects to define three
+particles with different colors, positions, and headings. Then write functions
+that take a single `particle` argument to draw and move each particle. Then,
+inside your `draw` function, all you'll need to do is draw each one, and then
+move each one. As a stretch goal, implement the logic that tests if the
+particles are off screen, and if so, resets them to re-appear.
+
+```p5exercise autorun size="large"
+// hint: declare particle variables at the top using 'let'.
+//       but assign them in setup so 'random' works.
+function setup() {
+  createCanvas(400, 300)
+}
+
+function draw() {
+  background("black")
+}
+
+// hint: make a drawParticle function that takes a single
+//       particle argument. Use push/pop for good hygiene.
+
+// hint: make a moveParticle function that also takes a
+//       particle. To move it, set both its x and y
+//       properties to the previous x and y values, plus the
+//       dx and dy values.
+```
+
+<Solution id="particle-objects">
+
+```p5exercise autorun size="large"
+let particle1, particle2, particle3
+
+function setup() {
+  createCanvas(400, 300)
+  particle1 = newParticle(random(width), random(height))
+  particle2 = newParticle(random(width), random(height))
+  particle3 = newParticle(random(width), random(height))
+}
+
+function newParticle(x, y) {
+  const angle = random(TWO_PI)
+  const speed = random(0.5, 1.5)
+  return {
+    x: x,
+    y: y,
+    dx: cos(angle) * speed,
+    dy: sin(angle) * speed,
+    color: color(random(255), random(255), random(255)),
+    diameter: random(20, 50),
+  }
+}
+
+function draw() {
+  background("black")
+
+  moveParticle(particle1)
+  moveParticle(particle2)
+  moveParticle(particle3)
+
+  drawParticle(particle1)
+  drawParticle(particle2)
+  drawParticle(particle3)
+
+  // stretch goal: once every particle has drifted off screen, reset them
+  if (
+    isOffscreen(particle1) &&
+    isOffscreen(particle2) &&
+    isOffscreen(particle3)
+  ) {
+    particle1 = newParticle(width / 2, height / 2)
+    particle2 = newParticle(width / 2, height / 2)
+    particle3 = newParticle(width / 2, height / 2)
+  }
+}
+
+function moveParticle(particle) {
+  // we could also use particle.x += particle.dx
+  particle.x = particle.x + particle.dx
+  // or particle.y += particle.dy
+  particle.y = particle.y + particle.dy
+}
+
+function drawParticle(particle) {
+  push()
+  noStroke()
+  fill(particle.color)
+  circle(particle.x, particle.y, particle.diameter)
+  pop()
+}
+
+function isOffscreen(particle) {
+  // Can you explain this code? Try drawing a picture.
+  const r = particle.diameter / 2
+  return (
+    particle.x + r < 0 ||
+    particle.x - r > width ||
+    particle.y + r < 0 ||
+    particle.y - r > height
+  )
+}
+```
+
+</Solution>
+
+</Ask>
+
+## Planets as objects
+
+{/* prettier-ignore-start */}
+
+In the Animation section there was a <Link to="/programming-languages/javascript/animation#orbiting-planets-millis">part where you saw a solar system</Link>. That
+code used the approach we had available at the time, using several independent
+variables (`x1, x2, x3`) for planet 1, 2, and 3's `x` position, and many more.
+
+{/* prettier-ignore-end */}
+
+But now we have a better tool for bundling related data together by way of
+objects. As another exercise, re-write that code (provided as the starter below)
+to use objects instead of loose variables.
+
+<Ask id="planet-objects" mode="interacted">
+
+Rewrite the sketch below so each planet is a single object instead of separate
+loose variables, then draw them with a `drawPlanet` function that takes one
+planet.
+
+```p5exercise autorun size="medium"
+// hint: bundle each planet's ellipse radii, angular speed, and color
+//       into a single object. Declare planet1, planet2, and planet3
+//       with 'let' at the top, then create them in setup() using a
+//       newPlanet(...) helper - similar to newParticle() from the
+//       exercise above.
+
+function setup() {
+  createCanvas(300, 300)
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  // star: fixed at the center
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  const t = millis() / 1000
+  const planetDiameter = 20
+
+  // planet 1: BLUE - pure circle - same radius for both x and y
+  const angle1 = t * 1
+  const r1 = 80
+  const x1 = cx + r1 * cos(angle1)
+  const y1 = cy + r1 * sin(angle1)
+  fill("#6ec6ff")
+  circle(x1, y1, planetDiameter)
+
+  // planet 2: ORANGE - eccentric orbit - different radius in x vs y
+  const angle2 = t * 0.6
+  const rx2 = 120
+  const ry2 = 60
+  const x2 = cx + rx2 * cos(angle2)
+  const y2 = cy + ry2 * sin(angle2)
+  fill("#ff8a65")
+  circle(x2, y2, planetDiameter)
+
+  // planet 3: PINKY - even more eccentric
+  const angle3 = t * 0.4
+  const rx3 = 140
+  const ry3 = 40
+  const x3 = cx + rx3 * cos(angle3)
+  const y3 = cy + ry3 * sin(angle3)
+  fill("#ce93d8")
+  circle(x3, y3, planetDiameter)
+}
+```
+
+<Solution id="planet-objects">
+
+```p5exercise autorun size="medium"
+let planet1, planet2, planet3
+
+function setup() {
+  createCanvas(300, 300)
+  planet1 = newPlanet(80, 80, 1, "#6ec6ff")
+  planet2 = newPlanet(120, 60, 0.6, "#ff8a65")
+  planet3 = newPlanet(140, 40, 0.4, "#ce93d8")
+}
+
+function newPlanet(rx, ry, speed, planetColor) {
+  return {
+    rx: rx,
+    ry: ry,
+    speed: speed,
+    color: planetColor,
+    diameter: 20,
+  }
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  // star: fixed at the center
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  const t = millis() / 1000
+
+  drawPlanet(planet1, cx, cy, t)
+  drawPlanet(planet2, cx, cy, t)
+  drawPlanet(planet3, cx, cy, t)
+}
+
+function drawPlanet(planet, cx, cy, t) {
+  const angle = t * planet.speed
+  const x = cx + planet.rx * cos(angle)
+  const y = cy + planet.ry * sin(angle)
+  fill(planet.color)
+  circle(x, y, planet.diameter)
+}
+```
+
+</Solution>
+
+</Ask>
+
+## Your new world order
+
+Now that you have learned about objects you will probably start thinking about
+all the places where using them will make your life easier. There's one more
+main tool that will make for happy coding: lists. We'll cover that in the next
+section, and build on what we just started here.
