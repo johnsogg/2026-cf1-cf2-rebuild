@@ -1,14 +1,294 @@
+import { CodeAnatomy } from "immerse/components/CodeAnatomy"
+
 export const title = "Lists"
 
-_This section is a placeholder._
+# Lists (aka Arrays)
 
-> Collections of values — the foundation of every interesting program. Goals:
->
-> - Array syntax: [], indexing with [], .length
-> - Creating arrays: literal, push(), and initialized with a loop
-> - Iterating with for loops and forEach
-> - Common patterns: draw-everything loop, update-everything loop,
->   remove-dead-things loop (filter or splice)
+So far when we've needed to make more than one item in some logical set, we've
+written code with variables like `tempA, tempB, tempC` or `ball1, ball2, ball3`.
+In this section we're going to cover lists of data that give us first class
+language support for creating sequences of arbitrary length, without the need to
+awkwardly name things `1`, `2`, etc.
+
+Given the two approaches below, which would you rather use?
+
+```js
+// fixed number of named variables
+const tempA = 48
+const tempB = 51
+const tempC = 47
+
+// the same data, collected as a sequential list
+const temperatures = [48, 51, 47]
+```
+
+In JavaScript the formal name for this is `Array` - so if you look on the web
+for documentation (like the
+[Array docs on Mozilla Developer Network](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)),
+that's the term you should use.
+
+Programmers often call these _lists_, which is technically imprecise, but as a
+general term, it applies to most other programming languages for talking about
+how we can store an ordered sequence of data.
+
+Throughout this text I will likely use the term 'List' and 'Array'
+interchangeably. This is a common but inexact convention. Just keep it in mind
+as you work your way through the book.
+
+## Array syntax
+
+A JavaScript array uses square brackets to delimit a comma-separated list of
+values. These values can be anything - a list can contain numbers, text,
+objects, or even other lists.
+
+<CodeAnatomy
+  code={{ value: '["Hello", 42, true]', pos: { x: 150, y: 270 }, fontSize: 48 }}
+  width={800}
+  height={380}
+  progressive
+  labels={[
+    {
+      name: "Square brackets",
+      text: "Delimit the list.",
+      pos: { x: 20, y: 10 },
+      target: { x: 164, y: 260 },
+      maxWidth: 200,
+    },
+    {
+      name: "Comma",
+      text: "Separates entries.",
+      pos: { x: 340, y: 10 },
+      target: { x: 388, y: 260 },
+      maxWidth: 200,
+    },
+    {
+      name: "true",
+      text: "One entry. They can be the same type or mixed, like they are here.",
+      pos: { x: 570, y: 10 },
+      target: { x: 598, y: 260 },
+      maxWidth: 210,
+    },
+  ]}
+/>
+
+## Array literals
+
+We already saw this in the intro:
+
+```js
+const temperatures = [48, 51, 47]
+```
+
+That creates a list of numbers. There happen to be three of them, but it could
+have three thousand. Or it could be empty. Here's an empty array:
+
+```js
+const todoList = []
+```
+
+Arrays can have the same kind of thing in them (like our `temperatures` list),
+and they also let you put a mix of things in there. Mixing types is
+syntactically valid, but if you're doing that, you _might_ consider redesigning
+your approach. When all of a list's items are of the same kind, you can rely on
+that to easily do work on each item.
+
+## Array access & length
+
+We can access an individual item from a list using square brackets and a number:
+
+```js
+const firstValue = temperatures[0]
+```
+
+An index refers to the _distance from the beginning_ - so here we're accessing
+the first item. The second item is (probably confusingly) index with `1`, the
+third item is index `2`, and so on. This is baffling to new coders, but as long
+as you think of the index as meaning the _offset from the start_, it makes more
+sense.
+
+In JavaScript, our arrays are "smart" objects that give you additional
+abilities. For example you can use the `length` property to see how many values
+it contains:
+
+```jsconsole size="small"
+const temperatures = [48, 51, 47]
+console.log("Item 0: ", temperatures[0])
+console.log("Item 1: ", temperatures[1])
+console.log("Item 2: ", temperatures[2])
+console.log("Length of the temperature list: ", temperatures.length)
+console.log("The last item is: ", temperatures[temperatures.length - 1])
+```
+
+That final line shows how to get the _last_ item in an array. It is terse, but
+`myList[myList.length - 1]` works. I'll show another way to do it later on down
+the page with `at`.
+
+## Using lists in loops
+
+Marching through lists is extremely common. You can use indices and `.length`
+with a traditional for-loop to process each element:
+
+```js
+for (let i = 0; i < myData.length; i++) {
+  const d = myData[i]
+  // now do something with item i (in variable d) from myData
+}
+```
+
+That approach has been in JavaScript since the very first version in the 90s.
+But recently we've gained other approaches to iterate over a list. The `for-of`
+approach maps nicely to what you often want, but without involving a counter or
+index:
+
+```js
+for (const d of myData) {
+  // do something with variable d from myData
+}
+```
+
+## Array methods
+
+A JavaScript array has a lot of additional behaviors attached to them, in the
+form of methods that you can invoke. This is just a quick survey to give a
+cursory sense of what is possible. Check out the
+[MDN documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+for more.
+
+### [`push`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push) and [`pop`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
+
+You can add something to the end of a list with `push`, and remove the last
+thing in the list with `pop`. This lets you add/remove to a list without needing
+to be concerned with indices.
+
+```jsconsole size="medium"
+const todos = [] // empty to start with
+console.log("At beginning, my todo list is: ", todos)
+todos.push("Mow lawn")
+console.log("After adding one item it is now: ", todos)
+todos.push("Do laundry")
+todos.push("Get groceries")
+todos.push("Make dinner")
+console.log("After adding three more, it is now: ", todos)
+todos.pop()
+console.log("After removing the last item it is:", todos)
+todos.pop()
+todos.pop()
+console.log("Then I popped two more, giving: ", todos)
+```
+
+### [`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+
+If you have a list and want to trim it down in some way, you can use the
+`filter` method. This takes a _callback function_, and until you've used these
+for a while they can seem like dark magic. A callback is just a function that
+you pass around as an argument to another function, and it can use that callback
+to do some custom work.
+
+Filtering is a good example of this. Say we want to filter a list of numbers, so
+we only have those that are larger than some `target` value. You'd do this:
+
+```jsconsole size="small"
+const target = 100
+const data = [59, 104, 84, 100, 106, 102, 66]
+const lessThanTarget = data.filter(t => t < target)
+console.log("I started with: ", data)
+console.log("And my threshold target is: ", target)
+console.log("My filtered data is: ", lessThanTarget)
+```
+
+The callback we passed in is the function expression `t => t < target`. This is
+a function that takes a parameter `t`, and returns the expression `t < target`,
+which is a boolean. The `filter` method uses this callback with every value in
+the array, and the callback yields `true` if the value should be included in the
+resulting filtered list, or `false` if the value should be omitted.
+
+The `filter` function doesn't modify the original list - it just gives you a new
+list.
+
+To make this hit a little closer to our p5 home: you could use it to create a
+filtered list of items that are still on screen, and store the updated list in
+place:
+
+```js
+items = items.filter((item) => isOnScreen(item))
+```
+
+### [`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map) to create a new 1:1 list
+
+Use the `map` method when you want to create a new thing based on every item in
+a source list. For example, say we've got an array of circles and we want to
+make an array of squares at the same location. You could use `map` with a
+callback function that takes a circle and gives a square:
+
+```js
+const squares = circles.map((c) => ({
+  left: c.x - c.r,
+  top: c.y - c.r,
+  side: c.r * 2,
+}))
+```
+
+The resulting list `squares` has a one-to-one mapping to each circle in the
+source list.
+
+### [`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) as an alternative to for-loops
+
+Earlier I showed the vanilla for-loop and the newer `for..of` syntax. The
+`forEach` method is yet another way to iterate over a list that uses callbacks:
+
+```js
+// just print out the value of each item
+myData.forEach((d) => console.log(d))
+```
+
+### [`at`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at) for array access
+
+We already saw how we could use square brackets to index into a list. You can
+also use `at`, which supports negative numbers. This is interpreted as 'distance
+from the end'. So earlier when we used `myData[myData.length - 1]` to reference
+the last item, we could also use `at`:
+
+```jsconsole size="small"
+const temperatures = [48, 51, 47]
+const last = temperatures.at(-1)
+console.log("My list is: ", temperatures)
+console.log("The last value is: ", last)
+```
+
+### More helpful Array methods
+
+Mozilla documents everything you can do with JS lists, but here's a short
+version of the ones that I have found most useful.
+
+- **[`shift`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)**:
+  removes and returns the first item, shifting everything else down. The
+  correlary to `pop`, but at the front of the list.
+- **[`unshift`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)**:
+  adds one or more items to the front of a list. The correlary to `push`, but at
+  the front of the list.
+- **[`slice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)**:
+  returns a copy of a portion of a list, without modifying the original.
+- **[`splice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)**:
+  inserts, removes, or replaces items in place at any index.
+- **[`includes`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)**:
+  returns `true`/`false` for whether a value is in the list.
+- **[`indexOf`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)**:
+  returns the index of the first matching value, or `-1` if not found.
+- **[`find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)**:
+  returns the first item matching a callback condition (like `filter`, but stops
+  at the first match).
+- **[`some`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)**:
+  returns `true` if at least one item satisfies a callback condition.
+- **[`every`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)**:
+  returns `true` if all items satisfy a callback condition.
+- **[`join`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)**:
+  combines all items into a single string, with a separator you choose (e.g.
+  `", "`).
+
+## Arrays in action
+
+### Use arrays to store items to draw
+
 > - Arrays of objects (connecting back to the Objects section) Practical
 >   context: a sketch with many independently-moving particles, a simple "paint"
 >   program that records strokes, collecting mouse positions to draw a trail.
