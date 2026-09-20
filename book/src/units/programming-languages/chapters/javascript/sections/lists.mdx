@@ -27,13 +27,11 @@ for documentation (like the
 [Array docs on Mozilla Developer Network](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)),
 that's the term you should use.
 
-Programmers often call these _lists_, which is technically imprecise, but as a
-general term, it applies to most other programming languages for talking about
-how we can store an ordered sequence of data.
-
-Throughout this text I will likely use the term 'List' and 'Array'
-interchangeably. This is a common but inexact convention. Just keep it in mind
-as you work your way through the book.
+Throughout this text I will likely use the terms 'List' and 'Array'
+interchangeably. This is a common but inexact convention. 'List' is a generic
+term that just means 'sequence of data', while 'Array' means the specific data
+structure in use (here, a JavaScript Array). Just keep it in mind as you work
+your way through the book.
 
 ## Array syntax
 
@@ -101,10 +99,10 @@ const firstValue = temperatures[0]
 ```
 
 An index refers to the _distance from the beginning_ - so here we're accessing
-the first item. The second item is (probably confusingly) index with `1`, the
-third item is index `2`, and so on. This is baffling to new coders, but as long
-as you think of the index as meaning the _offset from the start_, it makes more
-sense.
+the first item. The second item is (probably confusingly) indexed with `1`, the
+third item is indexed with `2`, and so on. This is baffling to new coders, but
+as long as you think of the index as meaning the _offset from the start_, it
+makes more sense.
 
 In JavaScript, our arrays are "smart" objects that give you additional
 abilities. For example you can use the `length` property to see how many values
@@ -112,16 +110,16 @@ it contains:
 
 ```jsconsole size="small"
 const temperatures = [48, 51, 47]
-console.log("Item 0: ", temperatures[0])
-console.log("Item 1: ", temperatures[1])
-console.log("Item 2: ", temperatures[2])
-console.log("Length of the temperature list: ", temperatures.length)
-console.log("The last item is: ", temperatures[temperatures.length - 1])
+console.log("Item 0:", temperatures[0])
+console.log("Item 1:", temperatures[1])
+console.log("Item 2:", temperatures[2])
+console.log("Length of the temperature list:", temperatures.length)
+console.log("The last item is:", temperatures[temperatures.length - 1])
 ```
 
 That final line shows how to get the _last_ item in an array. It is terse, but
-`myList[myList.length - 1]` works. I'll show another way to do it later on down
-the page with `at`.
+`myList[myList.length - 1]` works. I'll soon show another way to do it with
+`at`.
 
 ## Using lists in loops
 
@@ -162,18 +160,18 @@ to be concerned with indices.
 
 ```jsconsole size="medium"
 const todos = [] // empty to start with
-console.log("At beginning, my todo list is: ", todos)
+console.log("At beginning, my todo list is:", todos)
 todos.push("Mow lawn")
-console.log("After adding one item it is now: ", todos)
+console.log("After adding one item it is now:", todos)
 todos.push("Do laundry")
 todos.push("Get groceries")
 todos.push("Make dinner")
-console.log("After adding three more, it is now: ", todos)
+console.log("After adding three more, it is now:", todos)
 todos.pop()
 console.log("After removing the last item it is:", todos)
 todos.pop()
 todos.pop()
-console.log("Then I popped two more, giving: ", todos)
+console.log("Then I popped two more, giving:", todos)
 ```
 
 ### [`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
@@ -185,15 +183,15 @@ you pass around as an argument to another function, and it can use that callback
 to do some custom work.
 
 Filtering is a good example of this. Say we want to filter a list of numbers, so
-we only have those that are larger than some `target` value. You'd do this:
+we only have those that are less than some `target` value. You'd do this:
 
 ```jsconsole size="small"
 const target = 100
 const data = [59, 104, 84, 100, 106, 102, 66]
 const lessThanTarget = data.filter(t => t < target)
-console.log("I started with: ", data)
-console.log("And my threshold target is: ", target)
-console.log("My filtered data is: ", lessThanTarget)
+console.log("I started with:", data)
+console.log("And my threshold target is:", target)
+console.log("My filtered data is:", lessThanTarget)
 ```
 
 The callback we passed in is the function expression `t => t < target`. This is
@@ -251,20 +249,20 @@ the last item, we could also use `at`:
 ```jsconsole size="small"
 const temperatures = [48, 51, 47]
 const last = temperatures.at(-1)
-console.log("My list is: ", temperatures)
-console.log("The last value is: ", last)
+console.log("My list is:", temperatures)
+console.log("The last value is:", last)
 ```
 
 ### More helpful Array methods
 
-Mozilla documents everything you can do with JS lists, but here's a short
-version of the ones that I have found most useful.
+Mozilla documents everything you can do with JS lists, but here's a short list
+of Array methods that I have found most useful.
 
 - **[`shift`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)**:
   removes and returns the first item, shifting everything else down. The
-  correlary to `pop`, but at the front of the list.
+  corollary to `pop`, but at the front of the list.
 - **[`unshift`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)**:
-  adds one or more items to the front of a list. The correlary to `push`, but at
+  adds one or more items to the front of a list. The corollary to `push`, but at
   the front of the list.
 - **[`slice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)**:
   returns a copy of a portion of a list, without modifying the original.
@@ -287,15 +285,401 @@ version of the ones that I have found most useful.
 
 ## Arrays in action
 
+Now that we've seen how to work with lists of data, let's put them to use with
+interactive graphics.
+
 ### Use arrays to store items to draw
 
-> - Arrays of objects (connecting back to the Objects section) Practical
->   context: a sketch with many independently-moving particles, a simple "paint"
->   program that records strokes, collecting mouse positions to draw a trail.
->   The key insight is that you can have an arbitrary number of things without
->   writing an arbitrary amount of code.
->
-> Revisit the animated planets example one more time, this time forming a list
-> for an arbitrary number of planets. Increase particle count to six to show
-> that the code itself is shorter, while seemingly having more going on in the
-> graphics.
+If we have only a few things to draw, we can get by with writing `thingA`,
+`thingB`, but this only works up to some limit before it becomes hard to manage.
+If you have an arbitrary number of things, or just too many to deal with, lists
+are the right tool to work with them.
+
+Study this sketch. Move your mouse around and ask yourself how this might be
+built. Take a minute to draw it out on physical paper. Spoiler after the jump!
+
+<Ask id="mouse-trail-demo" mode="untracked">
+
+```p5sketch autoplay width=400 height=300
+let trail = []
+let lastCaptureTime = 0
+
+function setup() {
+  createCanvas(400, 300)
+}
+
+function draw() {
+  background("black")
+
+  if (millis() - lastCaptureTime > 100) {
+    trail.push({ x: mouseX, y: mouseY })
+    if (trail.length > 20) {
+      trail.shift()
+    }
+    lastCaptureTime = millis()
+  }
+
+  noFill()
+  stroke("white")
+  for (let i = 0; i < trail.length; i++) {
+    const diameter = map(i, 0, trail.length - 1, 1, 20)
+    circle(trail[i].x, trail[i].y, diameter)
+  }
+}
+```
+
+</Ask>
+
+<Ask id="mouse-trail-approach" mode="interacted" title="Write your approach">
+
+Before reading on, write out your approach in plain English or pseudocode. What
+do you need to store? When do you capture a new point? How do you decide each
+circle's size?
+
+<Solution id="mouse-trail-approach" exposeText="Show a documented solution">
+
+```p5exercise autorun size="medium"
+// Keep a list of recent mouse positions, and draw one circle per position.
+// Newer positions get bigger circles, so the trail looks like it's fading
+// out as it gets older.
+let trail = []
+
+// millis() counts up in milliseconds since the sketch started. Remember
+// the last time we captured a point so we can tell how much time has
+// passed since then.
+let lastCaptureTime = 0
+
+function setup() {
+  createCanvas(400, 300)
+}
+
+function draw() {
+  background("black")
+
+  // Only grab a new point every 100ms, not every frame - otherwise the
+  // trail would fill up almost instantly.
+  if (millis() - lastCaptureTime > 100) {
+    trail.push({ x: mouseX, y: mouseY })
+    lastCaptureTime = millis()
+
+    // Once we have more than 20 points, remove the oldest one (the one
+    // at the front of the list) so the trail doesn't grow forever.
+    if (trail.length > 20) {
+      trail.shift()
+    }
+  }
+
+  noFill()
+  stroke("white")
+  for (let i = 0; i < trail.length; i++) {
+    // trail[0] is the oldest point, trail[trail.length - 1] is the
+    // newest. map() turns that index into a diameter: 1px for the
+    // oldest point, 20px for the newest, evenly spaced in between.
+    const diameter = map(i, 0, trail.length - 1, 1, 20)
+    circle(trail[i].x, trail[i].y, diameter)
+  }
+}
+```
+
+Some points I want to draw out from the solution code:
+
+- The mouse position history is stored in a `trail` list. Did you see what
+  _shape_ the items of that list had? They were objects that represent points,
+  and had the shape `{x, y}`.
+- To add to the end of the list, we used `trail.push(pt)`
+- To remove from the beginning of the list (oldest items) we used
+  `trail.shift()`
+- Each trail bubble seems to get smaller over time, but this effect is done by
+  looking at the bubble's position in the list. So we use an old-school for-loop
+  so we can check its index. The resulting circle's diameter is dependent on the
+  index value, which is an apt proxy for age since each point is sampled on a
+  regular basis.
+
+</Solution>
+
+</Ask>
+
+### Planets again, this time with lists
+
+In the animation section we first saw a little solar system animation, but it
+was implemented using a bunch of loose variables that were only related by a
+"clever" naming convention. Then in the objects section, we cleaned that up so
+the planets were all modeled with objects - but we still had to keep track of
+each planet individually.
+
+This is a great place to use lists. By placing planets in a list, we can
+add/remove them, and have an arbitrary number of planets flying around a sun.
+
+<Ask id="planets-with-lists" mode="interacted">
+
+Revisit the animated planets example one more time, this time forming a list for
+an arbitrary number of planets. Bump the starting count up to six planets to
+show that the code itself is shorter, while seemingly having more going on in
+the graphics. Then let the user press the up/down arrow keys to add/remove a
+planet, keeping the count between 0 and 40. Each new planet should get
+reasonable-looking values chosen with `random()` - orbit radii (and thus
+eccentricity), diameter, color, and speed.
+
+```p5exercise autorun size="medium"
+// hint: put your planets in an array instead of separate planet1, planet2,
+//       planet3 variables. Fill it with 6 planets in setup(), then draw them
+//       with a single for-of loop over the array. Add a keyPressed()
+//       callback that pushes a new planet (UP_ARROW) or pops the last one
+//       (DOWN_ARROW), clamped between 0 and 40. When creating a planet, use
+//       random() to pick its own orbit radii, speed, diameter, and color
+//       instead of hardcoding them.
+//
+//       p5 v2 gotcha: UP_ARROW/DOWN_ARROW are now strings, so compare them
+//       against `code`, not `keyCode` (which is still a number).
+
+let planet1, planet2, planet3
+
+function setup() {
+  createCanvas(300, 300)
+  planet1 = newPlanet(80, 80, 1, "#6ec6ff")
+  planet2 = newPlanet(120, 60, 0.6, "#ff8a65")
+  planet3 = newPlanet(140, 40, 0.4, "#ce93d8")
+}
+
+function newPlanet(rx, ry, speed, planetColor) {
+  return {
+    rx: rx,
+    ry: ry,
+    speed: speed,
+    color: planetColor,
+    diameter: 20,
+  }
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  // star: fixed at the center
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  const t = millis() / 1000
+
+  drawPlanet(planet1, cx, cy, t)
+  drawPlanet(planet2, cx, cy, t)
+  drawPlanet(planet3, cx, cy, t)
+}
+
+function drawPlanet(planet, cx, cy, t) {
+  const angle = t * planet.speed
+  const x = cx + planet.rx * cos(angle)
+  const y = cy + planet.ry * sin(angle)
+  fill(planet.color)
+  circle(x, y, planet.diameter)
+}
+```
+
+<Solution id="planets-with-lists">
+
+```p5exercise autorun size="medium"
+let planets = []
+
+function setup() {
+  createCanvas(300, 300)
+  for (let i = 0; i < 6; i++) {
+    planets.push(newPlanet())
+  }
+}
+
+// picks reasonable-looking random values for one new planet
+function newPlanet() {
+  const rx = random(30, 140)
+  return {
+    rx: rx,
+    ry: random(0.3, 1) * rx, // keep ry <= rx, so eccentricity stays sane
+    speed: random(0.2, 1.2),
+    diameter: random(10, 30),
+    color: color(random(80, 255), random(80, 255), random(80, 255)),
+  }
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  // star: fixed at the center
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  const t = millis() / 1000
+
+  for (const planet of planets) {
+    drawPlanet(planet, cx, cy, t)
+  }
+}
+
+function drawPlanet(planet, cx, cy, t) {
+  const angle = t * planet.speed
+  const x = cx + planet.rx * cos(angle)
+  const y = cy + planet.ry * sin(angle)
+  fill(planet.color)
+  circle(x, y, planet.diameter)
+}
+
+function keyPressed() {
+  // UP_ARROW/DOWN_ARROW are strings in p5 v2 ("ArrowUp"/"ArrowDown"), so
+  // compare against `code`, not the numeric `keyCode`.
+  if (code === UP_ARROW) {
+    addPlanet()
+    return false // stop the arrow key from also scrolling the page
+  } else if (code === DOWN_ARROW) {
+    removePlanet()
+    return false
+  }
+}
+
+function addPlanet() {
+  if (planets.length < 40) {
+    planets.push(newPlanet())
+  }
+}
+
+function removePlanet() {
+  if (planets.length > 0) {
+    planets.pop()
+  }
+}
+```
+
+A few things worth noticing in the solution:
+
+- All dots live in one `planets` array instead of separate
+  `planet1, planet2, planet3` variables. Drawing them takes a single `for..of`
+  loop no matter how many there are - that's the "shorter code, more going on"
+  payoff I promised.
+- `newPlanet()` no longer takes arguments. It calls `random()` itself to pick
+  the new planet's configuration, so every added planet still looks reasonable
+  but different from the others.
+- `keyPressed()` only pushes/pops the `planets` array - it doesn't draw anything
+  itself. That follows the rule from the interactivity section: callbacks update
+  state, and `draw()` does the rendering.
+- `addPlanet`/`removePlanet` are small helpers that enforce the 0-40 bounds, so
+  `keyPressed()` doesn't need to repeat that logic for both arrow keys.
+
+</Solution>
+
+</Ask>
+
+### Challenge: Combine these two
+
+Earlier we gave the mouse a trail, and just above we extended the planet sketch
+to use lists. Now see if you can combine these two ideas.
+
+Starting from the planet solution code (or your own!), add the ability to draw a
+trail behind each planet. It is up to you what this looks like - the dots could
+be the same color as the planet that left the trail, or they could be white
+circles, or filled dots that fade over time -- whatever you feel like doing.
+
+<Ask id="planet-trails-demo" mode="untracked">
+
+```p5sketch autoplay width=300 height=300
+let planets = []
+
+function setup() {
+  createCanvas(300, 300)
+  for (let i = 0; i < 6; i++) {
+    planets.push(newPlanet())
+  }
+}
+
+function newPlanet() {
+  const rx = random(30, 140)
+  return {
+    rx: rx,
+    ry: random(0.3, 1) * rx,
+    speed: random(0.2, 1.2),
+    diameter: random(10, 30),
+    color: color(random(80, 255), random(80, 255), random(80, 255)),
+    trail: [],
+    lastCaptureTime: 0,
+  }
+}
+
+function draw() {
+  background("black")
+
+  const cx = width / 2
+  const cy = height / 2
+
+  fill("#ffd51a")
+  circle(cx, cy, 50)
+
+  const t = millis() / 1000
+
+  for (const planet of planets) {
+    updateTrail(planet, t)
+    drawTrail(planet, cx, cy)
+    drawPlanet(planet, cx, cy, t)
+  }
+}
+
+function updateTrail(planet, t) {
+  if (millis() - planet.lastCaptureTime > 80) {
+    planet.trail.push(t * planet.speed)
+    planet.lastCaptureTime = millis()
+    if (planet.trail.length > 15) {
+      planet.trail.shift()
+    }
+  }
+}
+
+function drawTrail(planet, cx, cy) {
+  noStroke()
+  for (let i = 0; i < planet.trail.length; i++) {
+    const angle = planet.trail[i]
+    const x = cx + planet.rx * cos(angle)
+    const y = cy + planet.ry * sin(angle)
+    const diameter = map(i, 0, planet.trail.length - 1, 1, planet.diameter * 0.6)
+    fill(planet.color)
+    circle(x, y, diameter)
+  }
+}
+
+function drawPlanet(planet, cx, cy, t) {
+  const angle = t * planet.speed
+  const x = cx + planet.rx * cos(angle)
+  const y = cy + planet.ry * sin(angle)
+  fill(planet.color)
+  circle(x, y, planet.diameter)
+}
+
+function keyPressed() {
+  if (code === UP_ARROW) {
+    addPlanet()
+    return false
+  } else if (code === DOWN_ARROW) {
+    removePlanet()
+    return false
+  }
+}
+
+function addPlanet() {
+  if (planets.length < 40) {
+    planets.push(newPlanet())
+  }
+}
+
+function removePlanet() {
+  if (planets.length > 0) {
+    planets.pop()
+  }
+}
+```
+
+</Ask>
+
+Modifying code to do "one more thing" is an important skill, whether you're
+doing some exploratory art (like this), or you're doing serious business
+engineering. In my experience, writing something new is rare, but incremental
+work is common. So being able to start from some existing state and bending it
+into some new shape is a good skill to develop.
