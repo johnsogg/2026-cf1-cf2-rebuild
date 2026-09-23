@@ -25,5 +25,7 @@
     "noUncheckedSideEffectImports": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
-  "include": ["src"]
+  "include": ["src"],
+  // Monaco-only declarations that expect to sit next to p5's own types.
+  "exclude": ["src/vendor/*.d.ts"]
 }

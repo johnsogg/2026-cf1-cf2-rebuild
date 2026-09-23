@@ -7,6 +7,7 @@ import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
 import { IconButton } from "./IconButton"
 import { SvgIcon } from "./SvgIcon"
 import s from "./P5Exercise.module.css"
+import p5SoundTypes from "../vendor/p5.sound-0.4.1.d.ts?raw"
 
 const AUTOSTOP_SECONDS = 120
 
@@ -94,6 +95,13 @@ const beforeMount: BeforeMount = (monaco) => {
       `file://${virtualPath}`,
     )
   }
+  // p5.sound ships no types, so ours are hand-written. Registered for every
+  // editor (Monaco shares one TS service across the page), not just
+  // exercises with the `sound` flag.
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    p5SoundTypes,
+    "file:///node_modules/p5/types/p5.sound.d.ts",
+  )
 }
 
 export type P5ExerciseProps = {
@@ -101,6 +109,8 @@ export type P5ExerciseProps = {
   size?: "small" | "medium" | "large"
   autorun?: boolean
   hoverInfo?: boolean
+  /** Also load p5.sound into the sketch iframe (loadSound, p5.Oscillator, …). */
+  sound?: boolean
 }
 
 type TranspilerResponse = {
@@ -123,7 +133,7 @@ type SketchError = {
  * which owns identity, numbering, and completion tracking.
  **/
 export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
-  const { initialCode, hoverInfo = true } = exercise
+  const { initialCode, hoverInfo = true, sound = false } = exercise
   const height = { small: "200px", medium: "400px", large: "80vh" }[
     exercise.size ?? "medium"
   ]
@@ -184,7 +194,7 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
         return
       }
 
-      setSrcdoc(buildSrcdoc(js ?? ""))
+      setSrcdoc(buildSrcdoc(js ?? "", { sound }))
       setRunning(true)
     }
 
@@ -196,7 +206,7 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
     }
 
     worker.postMessage({ code })
-  }, [code, stopSketch])
+  }, [code, sound, stopSketch])
 
   // Countdown timer: starts fresh whenever sketch starts in eco mode
   useEffect(() => {

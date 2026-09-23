@@ -8,6 +8,7 @@ function parseMeta(meta: string | null | undefined) {
   return {
     size: sizeMatch?.[1] as "small" | "medium" | "large" | undefined,
     autorun: /\bautorun\b/.test(str),
+    sound: /\bsound\b/.test(str),
     hoverInfo: hoverInfoMatch ? hoverInfoMatch[1] !== "false" : undefined,
     hasObsoleteAttrs: /\b(id|title|solutionTo)="/.test(str),
   }
@@ -42,11 +43,13 @@ function makeExerciseAttr(
   size?: string,
   autorun?: boolean,
   hoverInfo?: boolean,
+  sound?: boolean,
 ) {
   const properties = [
     ...(size != null ? [makeStringProp("size", size)] : []),
     ...(autorun ? [makeBoolProp("autorun")] : []),
     ...(hoverInfo != null ? [makeBoolProp("hoverInfo", hoverInfo)] : []),
+    ...(sound ? [makeBoolProp("sound")] : []),
     makeStringProp("initialCode", initialCode),
   ]
 
@@ -89,9 +92,8 @@ export function makeExerciseFencePlugin(lang: string, componentName: string) {
         (node: Code, index: number | undefined, parent: Parent | undefined) => {
           if (node.lang !== lang || !parent || index == null) return
 
-          const { size, autorun, hoverInfo, hasObsoleteAttrs } = parseMeta(
-            node.meta,
-          )
+          const { size, autorun, hoverInfo, sound, hasObsoleteAttrs } =
+            parseMeta(node.meta)
           if (hasObsoleteAttrs) {
             console.warn(
               `[${lang}] id=/title=/solutionTo= on the fence are ignored — wrap it in <Ask id="..." mode="..." title="..."> instead`,
@@ -100,7 +102,7 @@ export function makeExerciseFencePlugin(lang: string, componentName: string) {
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const attributes: any[] = [
-            makeExerciseAttr(node.value, size, autorun, hoverInfo),
+            makeExerciseAttr(node.value, size, autorun, hoverInfo, sound),
           ]
 
           parent.children.splice(index, 1, {

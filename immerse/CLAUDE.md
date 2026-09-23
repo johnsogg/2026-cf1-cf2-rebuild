@@ -73,7 +73,9 @@ import** — noted per component below. The rest need the explicit
   `useAsk()`, not from their own props. No import needed. The
   `p5exercise`/`jsconsole` fenced code blocks are shorthand for
   `P5Exercise`/`ConsoleExercise` inline — they carry no
-  `id`/`title`/`solutionTo` of their own.
+  `id`/`title`/`solutionTo` of their own. Add `sound` to a `p5exercise`
+  fence to also load p5.sound (`loadSound`, `p5.Oscillator`, …); files it
+  loads go in `book/public/sketch-assets/<sketch>/`.
 
 - **Term** (from `Glossary.tsx`) - Marks an inline term
   (`<Term>recursion</Term>`) that pops up its glossary definition on
