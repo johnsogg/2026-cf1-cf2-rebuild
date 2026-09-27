@@ -1,0 +1,291 @@
+.wrapper {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  accent-color: var(--accent);
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin-bottom: 10px;
+}
+
+.viewToggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.viewToggle button {
+  padding: 4px 12px;
+  border: none;
+  background: var(--bg);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.viewToggle button + button {
+  border-left: 1px solid var(--border);
+}
+
+.viewToggle .viewActive {
+  background: var(--accent-subtle);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.canvasWrapper {
+  flex: 0 1 var(--tp-width);
+  max-width: var(--tp-width);
+  min-width: 240px;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--tp-aspect-ratio);
+  border: 1px solid var(--border-light);
+  cursor: none;
+}
+
+.side {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.heading {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.stack {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.row,
+.identityRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 4px;
+}
+
+.identityRow {
+  gap: 8px;
+  padding: 3px 6px;
+  color: var(--text-muted);
+}
+
+.selected {
+  background: var(--accent-subtle);
+}
+
+.entry {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  cursor: pointer;
+}
+
+.matrixIcon {
+  flex: none;
+  fill: var(--text-muted);
+  opacity: 0.6;
+}
+
+.iconButton {
+  display: flex;
+  padding: 2px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--border-light);
+}
+
+.iconButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.readoutItem {
+  white-space: nowrap;
+}
+
+/* fixed width, right-aligned, so labels don't shift as the digits change;
+   fits "-123.45" */
+.coord {
+  display: inline-block;
+  width: 7ch;
+  text-align: right;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.hint {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.kinds {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.options {
+  display: flex;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldLabel {
+  min-width: 4.5em;
+  color: var(--text-muted);
+}
+
+.number {
+  width: 6em;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.preset {
+  min-width: 3em;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 1px;
+  font-size: 0.7em;
+  line-height: 1.1;
+  vertical-align: middle;
+}
+
+.numerator {
+  border-bottom: 1px solid currentColor;
+}
+
+.preset:hover {
+  border-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  padding: 4px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:hover {
+  border-color: var(--accent);
+}
+
+/* holds the generated p5 code as a copy fallback; off-screen rather than
+   display: none, so its text can still be selected */
+.hiddenCode {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.narration {
+  margin: 16px 0 0;
+  max-width: 60ch;
+  color: var(--text-muted);
+}

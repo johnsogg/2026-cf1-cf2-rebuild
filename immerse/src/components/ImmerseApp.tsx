@@ -36,6 +36,7 @@ import { Kbd, KbdProvider } from "./Kbd"
 import { Swatch } from "./Swatch"
 import { ExpectedReadTime } from "./ExpectedReadTime"
 import { RobotText } from "./RobotText"
+import { ZoomImage } from "./ZoomImage"
 
 export type ImmerseAppProps = {
   bookSlug: string
@@ -159,6 +160,7 @@ const defaultComponents = {
   KbdProvider,
   Swatch,
   RobotText,
+  ZoomImage,
 }
 
 const AppLayout = ({

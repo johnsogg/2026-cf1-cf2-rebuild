@@ -32,6 +32,14 @@ import** — noted per component below. The rest need the explicit
   dragging moves whichever of A/B is closest to the mouse. Same
   theme-color approach as CoordinatePlane. Needs an import.
 
+- **TransformPlayground** - Canvas sandbox for stacking 2D affine
+  transforms (translate / rotate / scale, applied top to bottom like p5
+  calls) with the Space Junk Magpie drawn in object space. Toggles between
+  an object-space view (camera locked to the object, so the world moves)
+  and a world-space view. New transforms preview live and commit on "Add";
+  selected ones edit live with "Revert". Crosshair readout gives the mouse
+  position in both spaces. Needs an import.
+
 - **Callout** - Colored aside box (`<Callout intent="note">...</Callout>`)
   for warnings, fun facts, or questions posed to the reader. Registered
   globally on the MDXProvider in `book/src/App.tsx`, so no import needed
