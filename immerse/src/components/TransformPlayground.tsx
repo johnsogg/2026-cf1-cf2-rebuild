@@ -38,8 +38,8 @@ export interface TransformPlaygroundProps {
   height?: number
   /** screen px per unit, applied by the camera in both views */
   zoom?: number
-  /** start with the space background shown in place of the grids (the reader can toggle it) */
-  background?: boolean
+  /** what's drawn behind the object to start with (the reader can switch it) */
+  backdrop?: Backdrop
 }
 
 // [a, b, c, d, e, f] is the canvas/DOMMatrix convention for
@@ -60,6 +60,13 @@ type Transform =
 
 type Kind = Transform["kind"]
 type View = "world" | "object"
+type Backdrop = "space" | "grids" | "both"
+
+const BACKDROPS: { value: Backdrop; label: string }[] = [
+  { value: "space", label: "Show space" },
+  { value: "grids", label: "Show grids" },
+  { value: "both", label: "Show both" },
+]
 
 const CANVAS_SCALE = 2
 const WORLD_GRID = 20
@@ -825,7 +832,7 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
   width = 480,
   height = 360,
   zoom = 2,
-  background = true,
+  backdrop: initialBackdrop = "both",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const nextId = useRef(1)
@@ -841,7 +848,9 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
   // what the selected transform looked like when it was tapped, for Revert
   const [snapshot, setSnapshot] = useState<Transform | null>(null)
   const [mouse, setMouse] = useState<Point | null>(null)
-  const [showSpace, setShowSpace] = useState(background)
+  const [backdrop, setBackdrop] = useState<Backdrop>(initialBackdrop)
+  const showSpace = backdrop !== "grids"
+  const showGrids = backdrop !== "space"
   const [copied, setCopied] = useState(false)
   const codeRef = useRef<HTMLPreElement>(null)
   const copiedTimer = useRef<number | undefined>(undefined)
@@ -894,9 +903,7 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
       drawSpace(ctx, worldToScreen, text, bg, width, height)
     }
 
-    // the space scene replaces the grids; it's one frame of reference or
-    // the other, not both
-    if (!showSpace && worldToScreen) {
+    if (showGrids && worldToScreen) {
       drawGrid(
         ctx,
         worldToScreen,
@@ -907,7 +914,7 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
         height,
       )
     }
-    if (!showSpace) {
+    if (showGrids) {
       drawGrid(
         ctx,
         objectToScreen,
@@ -1046,23 +1053,17 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
             </button>
           ))}
         </div>
-        <div className={s.readout} aria-label="At mouse">
-          <span className={s.readoutItem}>
-            <span
-              className={s.swatch}
-              style={{ background: "var(--text-muted)" }}
-            />
-            World space
-            {coords(mouseWorld)}
-          </span>
-          <span className={s.readoutItem}>
-            <span
-              className={s.swatch}
-              style={{ background: "var(--accent)" }}
-            />
-            Object space
-            {coords(mouseObject)}
-          </span>
+        <div className={s.backdrops} role="radiogroup" aria-label="Backdrop">
+          {BACKDROPS.map(({ value, label }) => (
+            <label key={value}>
+              <input
+                type="radio"
+                checked={backdrop === value}
+                onChange={() => setBackdrop(value)}
+              />
+              {label}
+            </label>
+          ))}
         </div>
       </div>
 
@@ -1082,6 +1083,24 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setMouse(null)}
           />
+          <div className={s.readout} aria-label="At mouse">
+            <span className={s.readoutItem}>
+              <span
+                className={s.swatch}
+                style={{ background: "var(--text-muted)" }}
+              />
+              World space
+              {coords(mouseWorld)}
+            </span>
+            <span className={s.readoutItem}>
+              <span
+                className={s.swatch}
+                style={{ background: "var(--accent)" }}
+              />
+              Object space
+              {coords(mouseObject)}
+            </span>
+          </div>
         </div>
 
         <div className={s.side}>
@@ -1174,15 +1193,6 @@ export const TransformPlayground: React.FC<TransformPlaygroundProps> = ({
           )}
         </div>
       </div>
-
-      <label className={s.toggle}>
-        <input
-          type="checkbox"
-          checked={showSpace}
-          onChange={(e) => setShowSpace(e.target.checked)}
-        />
-        Show space background instead of grids
-      </label>
 
       <p className={s.narration}>{narrate(view, stack)}</p>
     </div>

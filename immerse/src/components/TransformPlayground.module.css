@@ -133,10 +133,17 @@
   cursor: default;
 }
 
+.backdrops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
 .readout {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 12px;
+  margin-top: 6px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -275,13 +282,6 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-}
-
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
 }
 
 .narration {
