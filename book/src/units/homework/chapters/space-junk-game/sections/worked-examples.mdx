@@ -2,5 +2,65 @@ export const title = "Worked Examples"
 
 # Space Junk Game — Worked Examples
 
-- Example 1:
-- Example 2:
+- Framing: these are from my implementation. Try each phase first; come here
+  when you're stuck or to compare.
+- Each example: what I wrote, why, and the one thing that tripped me up
+
+## Phase 1: Drawing around the origin
+
+- Source: `Magpie.drawMagpie` + `drawWindow`, `Mothership.drawMothership`
+- Why shapes draw at (0, 0) and only rotate: the caller already translated.
+  Static "shape" draw vs. instance `draw()` that places it.
+- `rectMode(CENTER)` for the dome; `rectMode(CORNER)` for the window, and why
+  the window helper has its own push/pop
+- Porthole spacing: n portholes → n + 1 gaps, `(i + 1) * gap` from the left
+  edge
+- Runnable idea: single-file `p5exercise` with just `drawMagpie` and a slider
+  or mouse-controlled rotation, so students can see the rotate-then-draw order
+
+## Phase 2: delta, thrust, and drift
+
+- Source: `Physics.move`, `rotate`, `thrust`; `Inputs.handleKeyDown`
+- Units walk-through: px/s × (ms / 1000) = px. Why per-second rates beat
+  per-frame (frame rates vary)
+- Why forward is `(sin r, -cos r)` when rotation 0 faces up (tie to the
+  transform playground)
+- Velocity is in screen coordinates; rotation only aims the thrust, which is
+  what gives the drift
+- `keyIsDown()` every frame vs. `keyPressed()` once
+- Runnable idea: single-file ship with thrust and debug velocity line
+
+## Phase 3: The beam and charge-and-drain timers
+
+- Source: beam triangle in `drawMagpie`, `enableBeam`, `Game.resolveBeam`
+- The beam triangle: point at (0, 0), so it pivots with the ship for free
+- Alpha in hex colors (`#f5f37040`)
+- `beamTime` up/down with a floor of 0: `Math.max(0, ...)`. Why drain
+  instead of reset.
+- Picking the junk with the most `beamTime` (the "find the best" loop)
+- How `beamContains` works (given code): `screenToWorld` turns the junk's
+  canvas position into the ship's frame, then the triangle test is simple.
+  Explain at a "what it does" level only.
+
+## Phase 4: Two positions that must agree
+
+- Source: `captureJunk`, cargo drawing in `Magpie.draw`, `resolveDropoff`,
+  `updateScore`
+- Why `enableBeam` checks `capturedJunk`, and why the beam comes back on its
+  own after delivery if Space is still held
+- Drawing the cargo: rotate, translate `(0, CARGO_Y)`, `Junk.drawJunk()`,
+  and why not `capturedJunk.draw()` (it would translate a second time)
+- The drawn position vs. the logic position: the given `worldToScreen` sync in
+  `Magpie.move`, and why both use `Magpie.CARGO_Y`
+- `resolveDropoff` reuses the Phase 3 charge-and-drain pattern
+
+## Phase 5: The HUD
+
+- Source: `Level.draw` HUD, `Level.timeLeft`, `timeToStringParts`
+- Game time (sum of `delta`) vs. wall-clock `millis()`: pausing stops the
+  timer for free
+- `timeToStringParts`: `Math.ceil`, `Math.trunc`, `%`, `padStart`
+- Candidate graded `CodeExercise`: `timeToStringParts` with tests (e.g.
+  125000 → "2", "05"; 0 → "0", "00"; 59001 → "1", "00")
+- `textAlign(RIGHT, TOP)` for the score
+- Lives loop: push/pop _inside_ the loop; `lives - 1` icons

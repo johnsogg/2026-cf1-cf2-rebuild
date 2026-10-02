@@ -1,13 +1,358 @@
 export const title = "Description"
 
+import spaceJunk from "./assets/space-junk.png"
+import spaceJunkUI from "./assets/space-junk-ui.png"
+
+<img src={spaceJunk} alt="Space Junk game concept art" width={400} />
+
 # Space Junk Game
 
-<Callout intent="danger">
-  This homework is not yet defined. Check back later.
-</Callout>
+Unlike most of the previous homework assignments, this one has a definite
+description of what I want you to do. The point is to build something to
+somebody else's arguably bad specification, with a clear, testable rubric.
 
-- Topics (per calendar, same week): Tooling: git, CLI, local editing
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+It is also quite AI-friendly.
+
+The thing that makes this well-defined for a human programmer is exactly the
+quality that makes it easy for an AI: unambiguous, clear English language. I
+don't claim to have written the perfect specification; only that it is good
+enough to one-shot a playable video game.
+
+- Outline: does the AI-friendly framing still fit now that students fill in
+  stubs phase by phase? Could keep it, or move it to "Beyond full credit" as
+  "hand the full spec to an AI and compare."
+
+## Overview
+
+This is a game where you control a little space ship (the "Magpie") charged with
+the unenviable task of keeping space clean. Pilot your ship to the area near a
+piece of floating space junk, capture it, and return it to a waiting cargo ship
+(the "Mothership"). Once you've captured all the junk on the board, Magpie
+rejoins the Mothership and they zip off to the next area with space junk. You
+get points for collecting junk, with a bonus for doing it faster. You also get
+points for completing levels. On some levels, there are hazards that will cause
+the untimely end of the Magpie. Fortunately the Mothership keeps spares around,
+so you have several ships to ruin.
+
+- Outline: the paragraph above describes the full game. Say that this homework
+  builds one level of it: fly, catch, deliver, score, against the clock. No
+  hazards, no lost lives, no next level.
+
+## How this homework works
+
+- I've written the game already; you get the starter code with the important
+  parts missing
+- Starter code runs from minute one: placeholders (white outlined rectangles
+  with a "nose" line, at each object's real size) stand in for anything you
+  haven't drawn yet
+- Five phases; each one is a rubric item worth 2 points (10 total)
+- Every missing piece is marked with a `TODO (Phase N)` comment. Search for
+  them.
+- Do phases in order. Each one builds on the last, and the game gets more
+  playable as you go.
+- Each phase has a worked example showing how I did it — read it after you've
+  tried, or when you're stuck
+- Classes, static members, transforms: all things we did in class. The starter
+  uses them a lot.
+
+## Getting started
+
+- Open the starter sketch in the p5.js web editor (link TBD), then
+  File → Duplicate so you have your own copy (requires being logged in)
+- Tour of the files: one class per file, `sketch.js` is the entry point
+  - `sketch.js` — setup/draw; each frame is input → move → draw
+  - `game.js` — `Game` ties it all together; owns the Magpie, Mothership,
+    level, score, lives
+  - `level.js` — the junk, the timer, and the on-screen display
+  - `magpie.js`, `mothership.js`, `junk.js` — the game objects
+  - `physics.js` — position, velocity, rotation for anything that moves
+  - `inputs.js` — keyboard
+  - `utils.js` — helper functions
+- Run it: you should see white placeholder rectangles, frozen in place.
+  Nothing moves until Phase 2.
+- Debug mode: press <Kbd>~</Kbd> (or backtick) to toggle debug graphics that
+  show each object's position and velocity. Useful in every phase.
+- `delta`: every `move()` gets the milliseconds since the last frame. Rates are
+  per second (pixels per second, radians per second), so convert with
+  `delta / 1000`.
+- Tunable values are static constants on the class they belong to, in
+  SCREAMING_CAPS: e.g. `Game.JUNK_CATCH_TIME_MS`, `Magpie.BEAM_WIDTH`. Change
+  them to tune the game; refer to them by name in your code.
+- The game pauses when the window loses focus. Click the canvas to resume.
+
+## The UI
+
+A quick hand-made sketch is often the best, most expeditious way to get an idea
+out. Anyone can make a sketch, they are quick to make, and they cost nothing to
+abandon. I _highly recommend_ that you develop a habit of making quick pictures
+to help you think through problems. Ideas, details, nuances come to you as you
+make them.
+
+<ZoomImage src={spaceJunkUI} alt="Space Junk UI sketch" width={400} />
+
+I've annotated the various parts of the UI that you are responsible for
+building. I'll explain them in more detail below.
+
+Be aware that many of these details are tunable - for example, the timer counts
+down from the level's starting time - you can pick a good time based on playing
+and experimenting. I'll call out the tunable parameters by their names in the
+code, like `Game.DEFAULT_NUM_LIVES`.
+
+Here are the highlights:
+
+- **Magpie**: The player's ship.
+- **Mothership**: The cargo ship that the magpie serves. Take space junk to it.
+- **Timer**: Counts minutes and seconds down from the level's starting time.
+- **Score**: Shows the player's current score, starting from zero and going up.
+- **Space Junk**: Dots representing junk floating in space. These are your
+  targets.
+- **Comets**: Objects that float through space and can collide with the Magpie.
+- **Star**: An object to avoid on higher levels. Avoid running into it.
+- **Remaining lives**: Show an icon per spare life.
+
+If any object overlaps an edge, it should appear on both sides. This gives the
+impression that the map does not have any boundaries, that it wraps around onto
+itself.
+
+- Outline: say which parts of the sketch are in scope (Magpie, Mothership,
+  junk, timer, score, lives). Comets, the star, and edge wrapping are not; they
+  are in "Beyond full credit". The map is a plain black background.
+- Outline: in this version, objects that go off one edge pop back in on the
+  opposite edge (given code), but don't draw on both sides at once.
+
+## Phase 1: Draw the ships and the junk (2 points)
+
+- Goal: replace the three placeholders with real shapes
+- You'll edit: `Magpie.drawMagpie`, `Junk.drawJunk`, `Mothership.drawMothership`
+- Key idea: each of these is `static` and draws around (0, 0). Someone else
+  (the given `draw()` methods) has already translated to the right place. You
+  only rotate.
+- Use the size constants at the top of each class, not magic numbers
+
+### Magpie
+
+The Magpie is drawn as a rounded rectangle. It has a sharper rectangular piece
+on the bottom, and a window on the right side.
+
+- Dome: rounded rect, `Magpie.DOME_WIDTH` × `Magpie.DOME_HEIGHT`, centered on
+  (0, 0)
+- Platform: plain rect across the bottom of the dome, `Magpie.PLATFORM_WIDTH`
+  × `Magpie.PLATFORM_HEIGHT`, a little wider than the dome
+- Window: small rect, `Magpie.WINDOW_WIDTH` × `Magpie.WINDOW_HEIGHT`, inside
+  the dome on the right side
+- Rotated by `rotation`. Rotation 0 means the Magpie faces up the screen.
+- Ignore the `beam` parameter for now (Phase 3)
+
+### Mothership
+
+The Mothership is rendered as a longer rectangular ship with rounded corners.
+(Being a cargo ship, they don't spend the extra cash on aesthetics.) It has a
+row of circular porthole-style windows going down the center.
+
+- Body: rounded rect, `Mothership.WIDTH` × `Mothership.HEIGHT`, corner radius
+  `Mothership.CORNER_RADIUS`, centered on (0, 0)
+- Portholes: `Mothership.NUM_PORTHOLES` circles, `Mothership.PORTHOLE_DIAMETER`
+  across, evenly spaced along the middle. Hint: a loop.
+- Rotated by `rotation`
+
+### Space Junk
+
+Space junk is rendered as simple circles. Colliding with junk is harmless, as
+both the Mothership and Magpie have special shielding that makes the junk pass
+straight through them, somehow. In the future, there is magic!
+
+- Filled circle, `Junk.DIAMETER` across, centered on (0, 0)
+
+### Done when
+
+- No placeholders left; all three shapes look like the sketch
+- The Magpie and Mothership start at random angles, and the shapes are turned
+  to match (with debug on, compare to the physics circle)
+- Changing a size constant changes the drawing
+
+## Phase 2: Fly the Magpie (2 points)
+
+- Goal: WASD flies the Magpie, with drift like the arcade game _Asteroids_
+- You'll edit: `Physics.move`, `Physics.rotate`, `Physics.thrust`,
+  `Inputs.handleKeyDown`
+- Physics is shared: once `Physics.move` works, the junk and the Mothership
+  start drifting too
+
+### Controls
+
+- <Kbd>w</Kbd>: thrust forward, at `Inputs.THRUST`
+- <Kbd>s</Kbd>: reverse thrust, at `Inputs.REVERSE_THRUST` (weaker)
+- <Kbd>a</Kbd>: rotate counter-clockwise, at `Inputs.TURN_RATE`
+- <Kbd>d</Kbd>: rotate clockwise, at `Inputs.TURN_RATE`
+- Hold keys down: check them every frame with `keyIsDown()`, not with
+  `keyPressed()`
+
+### Spec
+
+- `move`: position changes by velocity × elapsed time. Velocity is pixels per
+  second; `delta` is milliseconds.
+- `rotate`: rotation changes by rate × elapsed time. Positive is clockwise
+  (because y points down).
+- `thrust`: velocity changes in the direction the ship faces. Rotation 0 faces
+  up, so forward is `(sin(rotation), -cos(rotation))`.
+- Rotation does not change velocity by itself; letting go of <Kbd>w</Kbd>
+  means you keep drifting
+- Off one edge → back on the opposite edge (the given part of `Physics.move`)
+
+### Done when
+
+- Junk and the Mothership drift slowly
+- The Magpie turns both ways, thrusts forward and back, and keeps drifting when
+  you let go
+- Speed is the same no matter the frame rate (because of `delta`)
+
+## Phase 3: Tractor beam (2 points)
+
+- Goal: hold Space to turn on the beam; junk held in the beam is caught
+- You'll edit: the beam part of `Magpie.drawMagpie`, `Magpie.enableBeam`, the
+  Space part of `Inputs.handleKeyDown`, `Game.resolveBeam`
+- Given: `Magpie.beamContains(point)` tells you if a point is inside the beam.
+  (How it works is in the worked example; you don't need to write it.)
+
+### Spec
+
+- Hold <Kbd>Space</Kbd> to turn the beam on; let go to turn it off
+- The beam is a triangle with its point at the Magpie's center, opening away
+  from the dome (down, when the ship faces up), `Magpie.BEAM_HEIGHT` long and
+  `Magpie.BEAM_WIDTH` wide at the open end
+- Drawn with alpha transparency so objects inside it are still visible; drawn
+  before the ship so the ship is on top
+- The beam can't turn on while the Magpie is carrying junk (matters in
+  Phase 4)
+- Catching: each junk tracks `beamTime`, how long it has been in the beam
+  - In the beam: `beamTime` goes up by `delta`
+  - Out of the beam: `beamTime` goes down by `delta`, but not below 0. So
+    sweeping past junk doesn't catch it, but a wobbly aim isn't punished too
+    much.
+  - Caught when `beamTime` passes `Game.JUNK_CATCH_TIME_MS`
+  - If more than one junk is in the beam, catch the one with the most
+    `beamTime`
+  - `resolveBeam` returns the caught junk or `null`; the given `Game.move` does
+    the rest
+
+### Done when
+
+- The beam shows only while Space is held
+- Junk held in the beam for about half a second vanishes (until Phase 4, caught
+  junk just disappears)
+- Catching all the junk shows "All clear!"
+
+## Phase 4: Carry and deliver (2 points)
+
+- Goal: caught junk rides under the Magpie; bring it to the Mothership to score
+- You'll edit: `Magpie.captureJunk`, the cargo drawing in `Magpie.draw`,
+  `Game.resolveDropoff`, `Game.updateScore`
+- Given: `Magpie.move` keeps the carried junk's position in sync with where
+  it's drawn
+
+### Spec
+
+- Capturing junk stores it on the Magpie and switches the beam off. Even if
+  Space is still held, the beam stays off until the junk is delivered.
+- Only one piece of junk at a time
+- Carried junk is drawn underneath the Magpie, at `(0, Magpie.CARGO_Y)` in the
+  ship's rotated frame, and drawn before the ship
+- The Mothership has a junk-attracting field around it that is always on: a
+  circle `Mothership.PICKUP_DIAMETER` across. (Debug mode draws it.)
+- Delivering: carried junk tracks `dropoffTime`, how long it has been in the
+  field, using the same go-up/drain-down rule as `beamTime`
+  - Delivered when `dropoffTime` passes `Game.JUNK_DROPOFF_TIME_MS`
+  - Use p5's `dist()` to check if the junk is inside the circle
+- Each delivery scores `Game.SCORE_DROPOFF` points
+- The level is complete when no junk is left floating and none is being
+  carried (given)
+
+### Done when
+
+- Caught junk follows under the Magpie and turns with it
+- The beam won't come on while carrying
+- Hovering the junk over the Mothership for about a second delivers it, and
+  the score goes up (check with `console.log` until Phase 5 shows it)
+- Delivering all the junk shows "All clear!"
+
+## Phase 5: Timer, score, and lives (2 points)
+
+- Goal: the on-screen display (the "HUD")
+- You'll edit: `Level.timeLeft`, the HUD part of `Level.draw`,
+  `timeToStringParts`
+- Drawn first, before the junk, so everything else draws on top of it
+
+### Timer
+
+The timer starts out at the level's starting time and counts down one second at
+a time. It is rendered in large, easy-to-read text. It is fixed to the top left
+of the screen, and should be rendered _under_ any other objects that might
+happen to occupy the same space.
+
+- The starting time is `Game.LEVEL.time` (ms)
+- `Level.timeLeft()`: starting time minus elapsed time, never below 0 (the
+  given `Level.move` already adds up elapsed time)
+- Shown as `minutes:seconds`, like `1:05`. Seconds always have two digits.
+- `timeToStringParts(ms)` rounds _up_ to whole seconds, so the display reads
+  `2:00` at the start, not `1:59`
+- Text size: `Level.HUD_TEXT_SIZE`, padded `Level.HUD_PAD` from the corner
+- The timer stops when the level is complete or the game is paused (given)
+- Nothing happens when it reaches `0:00` in this version
+
+### Score
+
+The player score is rendered in the same text style as the timer. It is on the
+top right side of the screen. The goal is to make this number go up.
+
+- Right-aligned, so it grows leftward as it gets bigger
+
+### Lives
+
+The Mothership has spare Magpies in its hull. The lives counter is rendered at
+the bottom left, and displays icon-sized versions of the Magpie. When the
+player is on their last Magpie, none are shown at all. For example, when the
+player starts with `Game.DEFAULT_NUM_LIVES`, there are
+`Game.DEFAULT_NUM_LIVES - 1` little icons in that area.
+
+- Reuse `Magpie.drawMagpie()`: translate, then scale by `Level.LIVES_SCALE`
+- Placed using `Level.LIVES_PAD_LEFT`, `Level.LIVES_PAD_BOTTOM`,
+  `Level.LIVES_GAP`
+- Lives never go down in this version, but draw from `lives` anyway
+
+### Done when
+
+- Timer counts down from the level's starting time and stops on "All clear!"
+- Score shows and goes up with each delivery
+- Two small Magpies at the bottom left (with the default three lives)
+
+## Rubric
+
+| Phase                         | Points |
+| ----------------------------- | ------ |
+| 1. Draw the ships and junk    | 2      |
+| 2. Fly the Magpie             | 2      |
+| 3. Tractor beam               | 2      |
+| 4. Carry and deliver          | 2      |
+| 5. Timer, score, and lives    | 2      |
+| **Total**                     | **10** |
+
+- Outline: partial credit within a phase? (e.g. 1 point if it mostly works)
+- Outline: what the grader does: play one level, check each "Done when" list
+
+## Beyond full credit
+
+- Brief, optional, ungraded. Ideas:
+  - Edge wrapping: make `drawEverywhere` draw nine copies so objects show on
+    both sides of an edge (why nine and not five?)
+  - Lose a life when the timer runs out; game over when lives run out
+  - A time bonus for fast deliveries
+  - More levels, with a short pause between them
+  - Comets and the star from the sketch
+- Allusion: a future homework moves this game out of the web editor and into a
+  real local project, with git, an editor, and the command line. Whatever you
+  build here comes with you.
+
+## Turn it in on Canvas
+
+- Provide the editor link to your p5 sketch in the homework box in Canvas
+- Make sure the sketch is saved and the link works when you're logged out
