@@ -2,8 +2,135 @@ export const title = "Classes"
 
 # Classes
 
-- Outline: what a class is, and why we'd group data and functions together
-- Outline: `class` syntax, `constructor`, and making instances with `new`
-- Outline: instance members and `this`
-- Outline: `static` members (constants and functions that belong to the class,
-  not an instance)
+> Intro: classes are like blueprints for making lots of things that share the
+> same basic format: they all include the same member data (fields) and
+> functions (methods). Given a single class you can make a zillion instances,
+> and they are all independent.
+
+> In this section we're going to look at classes by developing a type of digital
+> creature called a Boid. Boids have history (need two sentences of history).
+
+## The `class` keyword
+
+> Think of a category of thing: cars, kitties, electronic medical records. These
+> are all defined by their shape: what data they hold and what behaviors they
+> exhibit. You can make a class to define that shape, and then create instances
+> of that class that are independent. If you know an object's class, you know a
+> lot about how to work with it.
+
+> For example, we could make a class that represents students: you all have a
+> major or two, optionally a minor, you have a student ID, you can enrol in or
+> drop classes, you have some historical grades, and so on. That's the class for
+> students. But you as an individual have your own _specific_ data: your major,
+> your grades, your schedule.
+
+> Before we show Boids (which are more fun to look at), let's look at a Student
+> type: class Student with some of the fields I mentioned
+
+> You can then create _instances_ of this Student type: const alice = new
+> Student(..) const bob = new Student(..)
+
+> These are two different objects that have the same features, even though the
+> particular data values they have are probably different.
+
+## Classes work nicely in graphics contexts
+
+> Object oriented programming was arguably developed because it mapped so nicely
+> to graphic-based applications like CAD. There are other programming paradigms
+> but "Object Oriented" is one of the most popular. It isn't the only good one,
+> and it isn't always appropriate for some given task. But it is often a great
+> choice for modeling graphical applications and interactive systems.
+
+> Here's a class that represents a primitive Boid. let's get introduced to these
+> little critters:
+
+> p5 sketch of a Boid
+
+> This is a Boid, and it moves around the screen at random. We have a class
+> definition, but only one _instance_. We make that instance by using
+> `new Boid(..)` with arguments. This invokes the class's _constructor_
+> function, which is responsible for creating and assembling a new instance.
+
+> Since this one is lonely, we can add friends:
+
+> p5 sketch of three Boids
+
+> This shows three unique boids in the same little Boid world. They are
+> _instances_.
+
+## Instances
+
+> Each Boid has its own color, its own position, its own heading. They are their
+> own little people! Whenever we create objects based on classes, we call them
+> _instances_. Each boid is independent, but they have the same fields and
+> functions. We can say they have the same _type_, or _shape_.
+
+> Each Boid has its own behavior in the form of functions that are defined
+> inside the class block. Those functions are called `methods` in OO-speak, and
+> when you use them, they operate on some particular instance. `move` is one
+> such method; there is also `draw`. We will see many examples of methods later
+> on.
+
+> Each Boid can refer to its own personal data (its position, its color) using
+> the `this` keyword. Whenever you see `this`, it means "the current object
+> instance". Inside the `move` method, for example, we write `this.x` to refer
+> to the X position of a particular Boid. Data fields associated with instances
+> are called `members` in object-oriented vernacular.
+
+> Classes work nicely with graphics contexts because they compartmentalize the
+> data for various unique items, while recognizing that many of those items also
+> share structure. So we create a class for Boids, and then use it to create
+> many independent Boids.
+
+## `static` members and methods
+
+> Sometimes you want to create data that is common to the entire class of
+> things. For example, with humans, the expected number of eyes and hands and
+> feet are all two; but for some other creatures, we might have Octopuses with
+> eight feet and two eyes, or mythical spider creatures with eight feet and
+> seventeen eyes.
+
+> Whenever you want to hold data that is common to the entire class, you can
+> mark that data as `static`. For example, for our Octopus type, we'd write it
+> like so: (insert an Octopus class with a static const for number of feet = 8).
+
+> This is useful if we want to add tunable parameters to a class, like the
+> default width or height.
+
+> p5 sketch of boids that use static values for their radius, color, speed
+
+> Isn't this nicer to read? instead of hard-coded literals for things like
+> radius,color, speed we have nicely named constants like BOID_RADIUS.
+
+> Static functions can be useful for doing heavy lifting, especially if we think
+> we might want to re-use that function with arbitrary data. For example, the
+> draw function could defer to a static `drawBoid` function, so we can render a
+> boid without needing a specific boid instance.
+
+> p5 sketch of boid with a static draw function. show one boid instance moving
+> around, and at the bottom show text that says "Welcome to the Boid Show" and
+> render two static boids to the left and right of that text.
+
+> This example shows how we can use the static `drawBoid` function from an
+> instance's draw() method, _and_ use that same `drawBoid` function from any
+> other location via `Boid.drawBoid` if all we want is to render a Boid image.
+
+## File organization - one class per file
+
+> It is common but not required to put classes in their own files. For example,
+> `boid.js` should contain a `Boid` class. Good naming conventions can make your
+> life easier because you can find code faster. It also helps to prevent you
+> from reaching into other classes when you don't intend to (creating what
+> programmers affectionately call "spaghetti code", owing to the mess of
+> connections between them).
+
+## Object interactions
+
+> You can make two boids interact. The traditional concept of a Boid is that
+> they recognize each other and adjust their velocities so they move in tandem.
+> If you have many Boids, they exhibit flocking behavior, all based on simple
+> logic. Here is a sketch of two Boids that notice each other and attempt to
+> move in more similar directions:
+
+> p5 sketch of two boids that can notice one another and slightly adjust their
+> movement to align.
