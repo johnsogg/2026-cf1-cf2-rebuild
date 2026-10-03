@@ -33,6 +33,14 @@ Each entry: date added, priority, note.
   struggle to get syntax exactly right. Worth a note (probably in the syntax
   section) naming this tension directly rather than ignoring it.
 
+- **2026-10-03 — P1** — In `geometry.mdx`, add a short (diplomatic) note on
+  naming: the book uses standard object/world/screen terms, but p5's
+  `worldToScreen`/`screenToWorld` use "world" to mean the current transformed
+  frame (our *object* space) and "screen" for canvas pixels (our *world* space
+  in a 2D sketch). Also consider a one-line pointer from the Space Junk worked
+  example (`worked-examples.mdx`, the `screenToWorld` paragraph in Phase 3),
+  which is where students first meet the clash.
+
 ## Structural Notes
 
 > Ideas that cross-cut multiple sections/chapters and might mean reorganizing,

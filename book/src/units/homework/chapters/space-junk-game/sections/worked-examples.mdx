@@ -1,66 +1,401 @@
 export const title = "Worked Examples"
 
+import { phase1, phase2, phase3 } from "./embeds/phase-builds"
+
+import beamIntersection from "./assets/beam-intersection.jpg"
+import beamTimeAccumulation from "./assets/beam-time-accumulation.jpg"
+
 # Space Junk Game — Worked Examples
 
-- Framing: these are from my implementation. Try each phase first; come here
-  when you're stuck or to compare.
-- Each example: what I wrote, why, and the one thing that tripped me up
+On this page, I'm straight up giving you solution code behind expandable areas
+labeled "My Phase N code". You won't see spoilers unless you want them.
+
+**Hang on a second.** Why would we ask you to do all this tricky detail-oriented
+work and then _give you the answers_? In the past, it was difficult to find a
+worked solution without doing something obviously shady (e.g. accessing a
+solution database). But now, you only need access to an LLM, which is built in
+to literally everything (or at least it seems like it). Solutions are
+essentially free.
+
+The head trip here is that getting the right answer is almost beside the point,
+as it always has been. The point is for you to develop the mental mechanisms for
+problem solving, and to build intuitions for how code works. And the way to get
+that is to put in the effort, and to do it the hard way.
+
+So: use these sample solutions if you get stuck. Get yourself un-stuck, then go
+back to working your code The Hard Way.
 
 ## Phase 1: Drawing around the origin
 
-- Source: `Magpie.drawMagpie` + `drawWindow`, `Mothership.drawMothership`
-- Why shapes draw at (0, 0) and only rotate: the caller already translated.
-  Static "shape" draw vs. instance `draw()` that places it.
-- `rectMode(CENTER)` for the dome; `rectMode(CORNER)` for the window, and why
-  the window helper has its own push/pop
-- Porthole spacing: n portholes → n + 1 gaps, `(i + 1) * gap` from the left
-  edge
-- Runnable idea: single-file `p5exercise` with just `drawMagpie` and a slider
-  or mouse-controlled rotation, so students can see the rotate-then-draw order
+Here you edit the various `drawThing` functions for Magpie, Mothership, and
+Junk. In each case, you should assume that the graphics transform is set up
+already so your object's origin is in the correct location. For Magpie and
+Mothership you'll still need to `rotate` to put them at the right angle.
+
+These render functions are all `static`. These functions don't have access to
+any instance data. Whatever information is needed to render an item must be
+passed to the function as arguments.
+
+<P5Sketch code={phase1} allowReset title="Space Junk at the end of Phase 1" />
+
+<details>
+<summary>My Phase 1 code</summary>
+
+```js
+// magpie.js (inside class Magpie)
+
+static drawMagpie({ rotation, beam }) {
+  push(); // important to stash the initial condition
+  rotate(rotation); // we still need to rotate about our origin
+  rectMode(CENTER);
+  fill("#525d80");
+  // the tunable parameters are in static variables like Magpie.DOME_WIDTH.
+  // These are just numbers, but the name tells you what it means.
+  rect(0, 0, Magpie.DOME_WIDTH, Magpie.DOME_HEIGHT, 8);
+  fill("#959ebb");
+  rect(
+    0,
+    Magpie.DOME_HEIGHT / 2,
+    Magpie.PLATFORM_WIDTH,
+    Magpie.PLATFORM_HEIGHT,
+  );
+
+  Magpie.drawWindow(); // defer window drawing to this function
+
+  pop(); // restore initial condition so we leave it how we found it
+}
+
+static drawWindow() {
+  push(); // good practice to push/pop at the beginning/end of render functions
+  rectMode(CORNER);
+  fill("#70eef5");
+  const winX = Magpie.DOME_WIDTH / 2 - Magpie.WINDOW_WIDTH;
+  const winY = -Magpie.WINDOW_HEIGHT;
+  rect(winX, winY, Magpie.WINDOW_WIDTH, Magpie.WINDOW_HEIGHT, 1.5);
+  pop();
+}
+```
+
+```js
+// mothership.js (inside class Mothership)
+
+/**
+ * Draws the Mothership's shape around (0, 0): a rounded rectangle with a
+ * row of porthole windows. Assumes the caller has already moved the
+ * transform to wherever the Mothership should appear.
+ **/
+static drawMothership({ rotation }) {
+  push();
+  rotate(rotation); // mothership also can be angled
+  noStroke();
+  fill("#741160");
+  rectMode(CENTER);
+  rect(0, 0, Mothership.WIDTH, Mothership.HEIGHT, Mothership.CORNER_RADIUS);
+  // portholes are evenly spaced along the middle. With n portholes there
+  // are n + 1 gaps, so each one sits at (i + 1) gaps from the left edge.
+  fill("#70eef5");
+  const gap = Mothership.WIDTH / (Mothership.NUM_PORTHOLES + 1);
+  // the windows are drawn in a line, so draw dots along that line.
+  for (let i = 0; i < Mothership.NUM_PORTHOLES; i++) {
+    const x = -Mothership.WIDTH / 2 + (i + 1) * gap;
+    circle(x, 0, Mothership.PORTHOLE_DIAMETER);
+  }
+  pop();
+}
+```
+
+```js
+// junk.js (inside class Junk)
+
+/**
+ * Draws the junk's shape around (0, 0). Assumes the caller has already
+ * moved the transform to wherever the junk should appear.
+ **/
+static drawJunk() {
+  push();
+  noStroke();
+  fill("#a0936a");
+  circle(0, 0, Junk.DIAMETER);
+  pop();
+}
+```
+
+</details>
 
 ## Phase 2: delta, thrust, and drift
 
-- Source: `Physics.move`, `rotate`, `thrust`; `Inputs.handleKeyDown`
-- Units walk-through: px/s × (ms / 1000) = px. Why per-second rates beat
-  per-frame (frame rates vary)
-- Why forward is `(sin r, -cos r)` when rotation 0 faces up (tie to the
-  transform playground)
-- Velocity is in screen coordinates; rotation only aims the thrust, which is
-  what gives the drift
-- `keyIsDown()` every frame vs. `keyPressed()` once
-- Runnable idea: single-file ship with thrust and debug velocity line
+In this phase you'll write code to control the physical position/speed/angle of
+objects. It is common to model ideas like this with self-contained code so you
+can just attach it to anything that needs it. Here the idea is "things that have
+a position, speed, and angle", which is useful for Magpie, Mothership, and Junk.
+So, we just make a single Physics type, and instrument Magpie and friends to
+hold a `physics` variable.
+
+Specifically this phase is about the `move`, `rotate`, `thrust` functions in
+`Physics`, and the `Inputs.handleKeyDown` function.
+
+One thing that is goofy (but not wrong) is how we calculate velocity. In math
+class, the angle $\theta = 0$ typically is drawn as an angle heading off in the
+positive $x$ dimension. In that case, $x$ is associated with $\cos(\theta)$ and
+$y$ with $\sin(\theta)$.
+
+But in this case, we've oriented things such that zero degrees points to the top
+of the screen, which is the _negative $y$_ direction. This is why the trig works
+out to associate $x$ with $\sin$ and $y$ with negative $\cos$. We've just spun
+the dial by a quarter turn.
+
+The keyboard input is sampled on every frame using `keyIsDown`, as that will
+report true as long as a key is held down. We do that instead of relying on the
+`keyPressed` callback, which happens once per press. If we used `keyPressed` we
+would need to do more work by keeping records of which keys we know are pressed
+but not released.
+
+<P5Sketch code={phase2} allowReset title="Space Junk at the end of Phase 2" />
+
+<details>
+<summary>My Phase 2 code</summary>
+
+```js
+// physics.js (inside class Physics)
+
+/**
+ * Moves the item by its velocity times the elapsed time. `delta` is in ms and
+ * velocity is per second, hence the / 1000. If the `constrain` argument is
+ * present and truthy, it keeps the item on the visible portion of canvas by
+ * wrapping x and y around.
+ **/
+move(delta, { constrain = false } = {}) {
+  const seconds = delta / 1000;
+  // adjust x and y position using current velocity and the change in time.
+  // think of position as where your car is, and the dx/dy as how fast it is
+  // moving east/south.
+  this.x += this.dx * seconds;
+  this.y += this.dy * seconds;
+  // to keep objects on screen, we'll just zap them to the opposite side of
+  // the screen if they've crossed an edge.
+  if (constrain) {
+    // When position is constrained, shift the values back into view
+    // by multiples of the width/height: right or left, and up or down.
+    while (this.x < 0) this.x += width;
+    while (this.y < 0) this.y += height;
+    while (this.x >= width) this.x -= width;
+    while (this.y >= height) this.y -= height;
+  }
+}
+
+/**
+ * Turn at the given rate (radians per second) for `delta` ms. Positive is
+ * clockwise.
+ **/
+rotate(rate, delta) {
+  // compare this to the position/velocity code.
+  this.rotation += rate * (delta / 1000);
+}
+
+/**
+ * Speed up in the 'forward' direction at the given rate (pixels per second,
+ * per second) for `delta` ms. This depends on the current rotation. It is
+ * intended for entities like ships that have a clear 'up' or 'forward'
+ * direction.
+ */
+thrust(accel, delta) {
+  // amt will tell us how much velocity changes for the given time delta
+  const amt = accel * (delta / 1000);
+  // update velocity to be the previous velocity plus some delta.
+  this.dx = this.dx + Math.sin(this.rotation) * amt;
+  this.dy = this.dy + Math.cos(this.rotation) * -amt;
+}
+```
+
+```js
+// inputs.js (inside class Inputs)
+
+/**
+ * WASD for movement, space for tractor beam. `delta` is the ms since the last
+ * frame, so holding a key has the same effect at any frame rate.
+ **/
+handleKeyDown(delta) {
+  if (keyIsDown("w")) {
+    this.magpie.physics.thrust(Inputs.THRUST, delta);
+  }
+  if (keyIsDown("s")) {
+    // I could have modeled REVERSE_THRUST as a negative number and avoided
+    // the minus sign. But this is how I did it.
+    this.magpie.physics.thrust(-Inputs.REVERSE_THRUST, delta);
+  }
+  // counter-clockwise is negative rotation, clockwise is positive
+  if (keyIsDown("a")) {
+    // Notice how this looks basically identical to the thrust calls.
+    this.magpie.physics.rotate(-Inputs.TURN_RATE, delta);
+  }
+  if (keyIsDown("d")) {
+    this.magpie.physics.rotate(Inputs.TURN_RATE, delta);
+  }
+}
+```
+
+</details>
 
 ## Phase 3: The beam and charge-and-drain timers
 
-- Source: beam triangle in `drawMagpie`, `enableBeam`, `Game.resolveBeam`
-- The beam triangle: point at (0, 0), so it pivots with the ship for free
-- Alpha in hex colors (`#f5f37040`)
-- `beamTime` up/down with a floor of 0: `Math.max(0, ...)`. Why drain
-  instead of reset.
-- Picking the junk with the most `beamTime` (the "find the best" loop)
-- How `beamContains` works (given code): `screenToWorld` turns the junk's
-  canvas position into the ship's frame, then the triangle test is simple.
-  Explain at a "what it does" level only.
+In this phase, we add the ability to turn on the tractor beam to catch junk
+inside its field. You'll listen for input to enable it, render it, and check if
+there's junk in the enabled beam.
 
-## Phase 4: Two positions that must agree
+This is an example of a "hit test", where you are checking to see if a point
+(the junk's centroid) is contained in some geometric area (the Magpie's beam
+triangle). You will do a lot of this in the future. In order to compare
+geometry, they have to share the same frame of reference. The provided code does
+this for you by converting the junk's coordinates to the Magpie's coordinate
+system. We're using the p5 built-in function `screenToWorld` which lets us
+compare the junk's location in the ship's frame of reference.
 
-- Source: `captureJunk`, cargo drawing in `Magpie.draw`, `resolveDropoff`,
-  `updateScore`
-- Why `enableBeam` checks `capturedJunk`, and why the beam comes back on its
-  own after delivery if Space is still held
-- Drawing the cargo: rotate, translate `(0, CARGO_Y)`, `Junk.drawJunk()`,
-  and why not `capturedJunk.draw()` (it would translate a second time)
-- The drawn position vs. the logic position: the given `worldToScreen` sync in
-  `Magpie.move`, and why both use `Magpie.CARGO_Y`
-- `resolveDropoff` reuses the Phase 3 charge-and-drain pattern
+<ZoomImage src={beamIntersection} alt="Beam Junk Hit Test" width={600} />
 
-## Phase 5: The HUD
+This is also an example of determining if a non-instantaneous event occurs. Junk
+is captured if it spends enough time in the beam. It would be much easier if we
+capture it whenever it is instantaneously in the beam. But that's not how this
+is specced.
 
-- Source: `Level.draw` HUD, `Level.timeLeft`, `timeToStringParts`
-- Game time (sum of `delta`) vs. wall-clock `millis()`: pausing stops the
-  timer for free
-- `timeToStringParts`: `Math.ceil`, `Math.trunc`, `%`, `padStart`
-- Candidate graded `CodeExercise`: `timeToStringParts` with tests (e.g.
-  125000 → "2", "05"; 0 → "0", "00"; 59001 → "1", "00")
-- `textAlign(RIGHT, TOP)` for the score
-- Lives loop: push/pop _inside_ the loop; `lives - 1` icons
+Whenever we notice that junk is in the beam, we record how long it has been in
+the beam. So, if we see junk is in the beam and that `delta` time has passed
+since we last checked, just add `delta` to its beam time value. Once the beam
+time goes beyond some limit, we capture the related junk.
+
+If the junk moves out of the beam before it is captured, we need to deplete the
+elapsed time by subtracting instead of adding. Just be sure to prevent it from
+going negative (`Math.max(0, time)`). This way, you can still reposition the
+beam to catch it quickly.
+
+It is possible to have more than one junk in the beam at a time, but we are only
+allowed to capture one. This is an edge case, but in a situation where there are
+two junks in the beam and they're both over the capture time limit, pick the one
+with the larger elapsed time.
+
+<ZoomImage
+  src={beamTimeAccumulation}
+  alt="Beam Junk Accumulation"
+  width={600}
+/>
+
+Graphically, the beam has to be somewhat see-through so we can still see objects
+'behind' it. I do this by using alpha transparency. Typically an RGB color code
+has three components: red, green, and blue (e.g. `"#ff0000"` is fully red, with
+no green or blue). But you can also add a fourth component to represent how
+opaque it is: `00` is totally transparent while `ff` is fully opaque. So to make
+a halfway translucent red, we'd use `"#ff000080"`.
+
+The color I picked for the tractor beam is just yellow at about 25% opacity:
+`#f5f37040`.
+
+<P5Sketch code={phase3} allowReset title="Space Junk at the end of Phase 3" />
+
+<details>
+<summary>My Phase 3 code</summary>
+
+```js
+// magpie.js (inside class Magpie)
+
+static drawMagpie({ rotation, beam }) {
+  push();
+  rotate(rotation);
+  if (beam) {
+    const bx = Magpie.BEAM_WIDTH / 2;
+    const bh = Magpie.BEAM_HEIGHT;
+    fill("#f5f37040");
+    triangle(0, 0, bx, bh, -bx, bh);
+  }
+  rectMode(CENTER);
+  fill("#525d80");
+  rect(0, 0, Magpie.DOME_WIDTH, Magpie.DOME_HEIGHT, 8);
+  fill("#959ebb");
+  rect(
+    0,
+    Magpie.DOME_HEIGHT / 2,
+    Magpie.PLATFORM_WIDTH,
+    Magpie.PLATFORM_HEIGHT,
+  );
+
+  Magpie.drawWindow();
+
+  pop();
+}
+
+/**
+ * Set the beam state to on (true) or off (false). We can only turn on the
+ * beam if we are not carrying junk.
+ **/
+enableBeam(v) {
+  if (!v) this.beam = v;
+  if (!this.capturedJunk) {
+    this.beam = v;
+  }
+}
+```
+
+```js
+// inputs.js (inside class Inputs)
+
+/**
+ * WASD for movement, space for tractor beam. `delta` is the ms since the last
+ * frame, so holding a key has the same effect at any frame rate.
+ **/
+handleKeyDown(delta) {
+  if (keyIsDown("w")) {
+    this.magpie.physics.thrust(Inputs.THRUST, delta);
+  }
+  if (keyIsDown("s")) {
+    this.magpie.physics.thrust(-Inputs.REVERSE_THRUST, delta);
+  }
+  // counter-clockwise is negative rotation, clockwise is positive
+  if (keyIsDown("a")) {
+    this.magpie.physics.rotate(-Inputs.TURN_RATE, delta);
+  }
+  if (keyIsDown("d")) {
+    this.magpie.physics.rotate(Inputs.TURN_RATE, delta);
+  }
+  if (keyIsDown("Space")) {
+    this.magpie.enableBeam(true);
+  } else {
+    this.magpie.enableBeam(false);
+  }
+}
+```
+
+```js
+// game.js (inside class Game)
+
+/**
+ * Checks which junk, if any, is inside the Magpie's beam. The delta param
+ * is the elapsed time in ms since the previous render, so it should be
+ * roughly 16ms if the frame rate remains 60 hz. Returns the junk that has
+ * been in the beam long enough to catch, or null if there isn't one.
+ **/
+resolveBeam(delta) {
+  const caught = [];
+  for (const junk of this.level.junk) {
+    // either increase or decrease 'beam time' for each junk
+    if (this.magpie.beamContains(junk.physics)) {
+      junk.beamTime += delta;
+      caught.push(junk);
+    } else {
+      junk.beamTime = Math.max(0, junk.beamTime - delta);
+    }
+  }
+  if (caught.length > 0) {
+    // pick the junk with largest beam time and compare it to limit
+    let best = caught[0];
+    for (const junk of caught) {
+      if (junk.beamTime > best.beamTime) {
+        best = junk;
+      }
+    }
+    if (best.beamTime > Game.JUNK_CATCH_TIME_MS) {
+      return best;
+    }
+  }
+  return null;
+}
+```
+
+</details>

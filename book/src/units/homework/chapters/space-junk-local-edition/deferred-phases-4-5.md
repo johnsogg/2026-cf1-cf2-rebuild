@@ -1,4 +1,6 @@
-<!-- Phases 4 and 5 cut from the first Space Junk homework (description.mdx) on 2026-10-03. Kept here for the local-development edition. -->
+<!-- Phases 4 and 5 cut from the first Space Junk homework on 2026-10-03. Kept here for the local-development edition. -->
+
+# From description.mdx
 
 ## Phase 4: Carry and deliver (2 points)
 
@@ -88,3 +90,28 @@ little icons in that area.
 - Timer counts down from the level's starting time and stops on "All clear!"
 - Score shows and goes up with each delivery
 - Two small Magpies at the bottom left (with the default three lives)
+
+# From worked-examples.mdx
+
+## Phase 4: Two positions that must agree
+
+- Source: `captureJunk`, cargo drawing in `Magpie.draw`, `resolveDropoff`,
+  `updateScore`
+- Why `enableBeam` checks `capturedJunk`, and why the beam comes back on its
+  own after delivery if Space is still held
+- Drawing the cargo: rotate, translate `(0, CARGO_Y)`, `Junk.drawJunk()`,
+  and why not `capturedJunk.draw()` (it would translate a second time)
+- The drawn position vs. the logic position: the given `worldToScreen` sync in
+  `Magpie.move`, and why both use `Magpie.CARGO_Y`
+- `resolveDropoff` reuses the Phase 3 charge-and-drain pattern
+
+## Phase 5: The HUD
+
+- Source: `Level.draw` HUD, `Level.timeLeft`, `timeToStringParts`
+- Game time (sum of `delta`) vs. wall-clock `millis()`: pausing stops the
+  timer for free
+- `timeToStringParts`: `Math.ceil`, `Math.trunc`, `%`, `padStart`
+- Candidate graded `CodeExercise`: `timeToStringParts` with tests (e.g.
+  125000 → "2", "05"; 0 → "0", "00"; 59001 → "1", "00")
+- `textAlign(RIGHT, TOP)` for the score
+- Lives loop: push/pop _inside_ the loop; `lives - 1` icons

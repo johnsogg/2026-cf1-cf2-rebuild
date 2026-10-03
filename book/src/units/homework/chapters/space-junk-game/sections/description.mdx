@@ -12,7 +12,7 @@ import gameElements from "./assets/game-elements.png"
 
 Unlike most of the previous homework assignments, this one has a definite
 description of what I want you to do. The point is to build something to
-somebody else's arguably bad specification, with a clear, testable rubric.
+somebody else's specification, with a clear, testable rubric.
 
 And, just so you know that I know, and now _we all know_: it is also quite
 AI-friendly. The thing that makes this well-defined for a human programmer is
@@ -24,7 +24,7 @@ Of course, having an LLM do your thinking and learning for you is Bad(tm).
 
 I've made this homework as something that you can step through and have some
 productive struggle along the way. You should be able to do this the old
-fashioned way (e.g. not using AI).
+fashioned way (i.e. not using AI).
 
 ## Overview
 
@@ -66,12 +66,12 @@ homeworks. I'll explain the ones for this homework in more detail below.
 Be aware that many of these details are tunable - for example, the timer counts
 down from the level's starting time - you can pick a good time based on playing
 and experimenting. I'll call out the tunable parameters by their names in the
-code, like `Game.DEFAULT_NUM_LIVES`.
+code, like `Game.JUNK_CATCH_TIME_MS` or `Inputs.THRUST`.
 
 Here are the highlights:
 
 - **Magpie**: The player's trusty ship.
-- **Mothership**: The cargo ship that the magpie serves. Take space junk to it.
+- **Mothership**: The cargo ship that the Magpie serves. Take space junk to it.
 - **Timer**: Counts minutes and seconds down from the level's starting time.
 - **Score**: Shows the player's current score, starting from zero and going up.
 - **Space Junk**: Dots representing junk floating in space. These are your
@@ -98,7 +98,8 @@ previous, and the game gets more and more playable as you progress.
 
 The full game will be completed over the course of two homeworks. This one is
 done in the p5 web editor. The next one is the "local development" edition,
-where you'll pick up where you left off and finish the game.
+where you'll pick up where you left off and finish the game. If you see Phase 4
+and 5, those are for the next homework, not this one.
 
 Each phase will have a worked example showing you how I built it. If you get
 stuck, there is no shame in peeking at the solution to learn from. Unless you're
@@ -108,7 +109,10 @@ This implementation uses classes with static members to model game elements and
 constants. It also uses affine transforms (rotate/translate/scale) for rendering
 and determining where things are.
 
-> TODO: point to the book sections on classes and transforms once they exist
+If classes are new to you, read the
+[Classes section](../../programming-languages/javascript/classes) first. For
+transforms, see the
+[Geometry section](../../programming-languages/building-with-code/geometry).
 
 ## Getting started
 
@@ -157,18 +161,25 @@ your other work as well. This shows each object's position and velocity, plus
 the Mothership's pickup circle.
 
 Many functions take a `delta` parameter. This means the number of milliseconds
-since the last frame. We can pause the game, so when that happens the `delta`
-gets capped at some number (50, I think). We're using p5's `deltaTime` as the
-basis for this.
+since the last frame. We're using p5's `deltaTime` as the basis for this. If the
+browser tab is hidden for a while, the next frame's `delta` could be huge, so
+it's capped at 50ms and we don't see everything jump at once.
 
-Values that record rate-of-change describe change per second. Velocity is
-expressed as pixels per second, rotation as radians per second. So you can
-convert those to -per-millisecond with the clever use of division:
-`delta / 1000`.
+Values that record rate-of-change describe change _per second_. Velocity is
+expressed as pixels per second, rotation as radians per second. However, the
+`delta` is in milliseconds.
+
+```js
+const seconds = delta / 1000 // e.g. 16ms → 0.016 seconds
+```
+
+Then multiply any per-second rate by `seconds`. For example, something moving at
+60 pixels per second, during a frame that took 250ms, moves `60 * 0.25 = 15`
+pixels.
 
 The tunable values are written as `SCREAMING_CAPS` and are static constants
-inside various classes, like `Game.JUNK_CATCH_TIME_MS` is a number you can mess
-with to adjust gameplay.
+inside various classes. For example, `Game.JUNK_CATCH_TIME_MS` is a number you
+can tweak to adjust gameplay.
 
 OK, let's get into each phase.
 
@@ -190,7 +201,8 @@ centered at `(0, 0)`.
 
 Each game element should look like the following. I included the lines to
 reinforce that each item has its own coordinate system. The lines are not part
-of the render. The only thing that your code will need to do is `rotate`.
+of the render. The only thing that your code will need to do is `rotate` because
+the transformations that position your entity will be applied already.
 
 <ZoomImage
   src={gameElements}
@@ -213,7 +225,7 @@ code, and it will look something like this:
   width={600}
 />
 
-Specific guidance on each of our game elements are as follows.
+Specific guidance on each of our game elements is as follows.
 
 ### Spec - Magpie
 
@@ -227,8 +239,8 @@ on the bottom, and a window on the right side.
 - Platform: plain or rounded rectangle, `Magpie.PLATFORM_WIDTH` by
   `Magpie.PLATFORM_HEIGHT`, centered on the dome's bottom edge. It's a little
   wider than the dome.
-- Window: small rect, `Magpie.WINDOW_WIDTH` × `Magpie.WINDOW_HEIGHT`, inside the
-  dome against its right edge, just above center
+- Window: small rect, `Magpie.WINDOW_WIDTH` by `Magpie.WINDOW_HEIGHT`, inside
+  the dome against its right edge, just above center
 - Ignore the `beam` parameter for now (that's for Phase 3)
 
 ### Spec - Mothership
@@ -237,8 +249,10 @@ The Mothership is rendered as a longer rectangular ship with rounded corners.
 (Being a cargo ship, they don't spend the extra cash on aesthetics.) It has a
 row of circular porthole-style windows going down the center.
 
-- `push/pop` as first and last things, followed by `rotate`.
-- Body: rounded rect, `Mothership.WIDTH` × `Mothership.HEIGHT`, corner radius
+- `push/pop` as first and last things - get used to bracketing draw code with
+  push/pop.
+- `rotate` immediately after pushing
+- Body: rounded rect, `Mothership.WIDTH` by `Mothership.HEIGHT`, corner radius
   `Mothership.CORNER_RADIUS`, centered on (0, 0)
 - Portholes: `Mothership.NUM_PORTHOLES` circles, `Mothership.PORTHOLE_DIAMETER`
   across, evenly spaced along the middle. Hint: use a loop and place circles
@@ -250,8 +264,9 @@ Space junk is rendered as simple circles. Colliding with junk is harmless, as
 both the Mothership and Magpie have special shielding that makes the junk pass
 straight through them, somehow. In the future, there is magic!
 
-- Follow above advice about `push/pop` but don't need to worry about `rotate`
-  because it is a circle.
+- Follow above advice about `push/pop`
+- No need to worry about `rotate` because it is a circle and looks the same no
+  matter what.
 - Filled circle, `Junk.DIAMETER` across, centered on (0, 0)
 
 ### Done when
@@ -267,8 +282,8 @@ might find more aesthetically pleasing values.
 
 OK, so now we're going to move on. Pun intended!
 
-Use the WASD keys to pilot the Magpie around. There is no atmosphere, so...
-objects at motion stay at motion.
+Use the WASD keys to pilot the Magpie around. There is no atmosphere to slow
+things down, so... objects in motion stay in motion.
 
 You'll edit these functions:
 
@@ -311,7 +326,7 @@ The reason $x$ is associated with $\sin$ and $y$ with negative $\cos$ is because
 
 ### Controls
 
-Edit `input.js` `handleKeyDown` to support the following. As an example:
+Edit `inputs.js` `handleKeyDown` to support the following. As an example:
 
 ```js
 if (keyIsDown("w")) {
@@ -331,10 +346,10 @@ key updates its beam state (you can hold off on that until the next phase).
 
 ### Spec
 
-- `move`: position changes by velocity x elapsed time. Velocity is pixels per
+- `move`: position changes by `velocity * seconds`. Velocity is pixels per
   second; `delta` is milliseconds.
-- `rotate`: rotation changes by rate x elapsed time. Positive is clockwise
-  (because positive y points down).
+- `rotate`: rotation changes by `rate * seconds`. Positive is clockwise (because
+  positive y points down).
 - `thrust`: velocity changes in the direction the ship faces. Rotation 0 faces
   up, so forward is `(sin(rotation), -cos(rotation))`.
 
@@ -365,11 +380,11 @@ For this phase, you'll implement these:
 
 You're given the function `Magpie.beamContains(point)` that tells you if a point
 (the Junk's center point) is inside the beam. If you're curious to see how this
-is built, look at the worked example.
+is built, find it in the starter code.
 
 ### Algorithm for `Game.resolveBeam`
 
-The hard part to this phase is computing how long a junk has been inside the
+The hard part of this phase is computing how long a junk has been inside the
 beam. Here's my plain English process for this.
 
 _Loop through all junk. For each junk, check if the Magpie beam contains its
@@ -389,7 +404,7 @@ for each junk in the level's junk list:
         junk.beamTime = junk.beamTime + delta
     else:
         junk.beamTime = max(0, junk.beamTime - delta)
-    if junk.beamTime > limit:
+    if junk.beamTime > junkCatchTimeLimit:
         if best is null:
             best = junk
         else if best.beamTime < junk.beamTime:
@@ -406,7 +421,7 @@ return best
   open end.
 - Drawn with alpha transparency so objects inside it are still visible; drawn
   before the ship so the ship is on top. I used `"#f5f37040"` - the `40` at the
-  end gives it `40/255` opacity
+  end gives it about 25% opacity.
 - Catching: each junk instance tracks `beamTime`, how long it has been in the
   beam
   - In the beam: `beamTime` goes up by `delta`
@@ -417,16 +432,13 @@ return best
   - If more than one junk is in the beam, catch the one with the most `beamTime`
   - `resolveBeam` returns the caught junk or `null`; the given `Game.move` does
     the rest
-- Image: hand sketch of `beamTime` over time. It rises in the beam, drains out
-  of it, and there's a dashed line at `JUNK_CATCH_TIME_MS`.
 
 ### Done when
 
-- The beam shows only while Space is held
+- The beam shows only while the <Kbd>Space</Kbd> Space key is held
 - Junk held in the beam for about half a second vanishes (for now, caught junk
   just disappears; delivering it comes in the next homework)
 - Catching all the junk shows "All clear!"
-- Image: the Phase 3 build with the beam on and junk inside it
 
 ## Rubric
 
@@ -437,9 +449,6 @@ return best
 | 3. Tractor beam            | 3      |
 | Turned in                  | 1      |
 | **Total**                  | **10** |
-
-- Outline (suggested): the grader plays one level and checks each phase's "Done
-  when" list. Partial credit within a phase is at the grader's discretion.
 
 ## Beyond full credit
 
