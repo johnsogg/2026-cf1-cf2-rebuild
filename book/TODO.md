@@ -84,6 +84,16 @@ Each entry: date added, priority, note.
 
 > Ideas that don't clearly fit the above.
 
+- **2026-10-04 — P2** — `HitTestPlayground` for `geometry.mdx` (Hit tests
+  section; placeholder MDX comment is there). Pick two primitives (point,
+  circle, axis-aligned rect, segment, polygon), drag vertices or drag a shape
+  from its middle, and show whether/where they intersect: shade overlap
+  regions (canvas clipping handles concave polygons), mark boundary
+  crossings, call out containment. Deferred for open questions: rects
+  axis-aligned only? polygons concave but non-self-intersecting? Should reuse
+  `utils/geometry.ts`, `utils/playgroundCanvas.ts`, and `useDragHandles` like
+  the other geometry playgrounds.
+
 - **2026-08-15 — P3** — Considered adding an OKLCH mode to
   `CompFoundColorPicker`, decided against it for now: the gamut's bumpiness (max
   chroma varies by both hue and lightness, pinching to zero at the extremes)

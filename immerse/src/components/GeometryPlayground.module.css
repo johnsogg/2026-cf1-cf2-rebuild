@@ -1,0 +1,154 @@
+/* Shared by PointPlayground, PointLinePlayground, LinePlayground, and
+   CurvePlayground, so they lay out and read alike. */
+
+.wrapper {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  accent-color: var(--accent);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-bottom: 10px;
+}
+
+.controlGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controlLabel {
+  color: var(--text-muted);
+}
+
+.toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle button {
+  padding: 4px 12px;
+  border: none;
+  background: var(--bg);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.toggle button + button {
+  border-left: 1px solid var(--border);
+}
+
+.toggle .active {
+  background: var(--accent-subtle);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.slider input {
+  width: 160px;
+}
+
+.sliderValue {
+  min-width: 3.5em;
+  text-align: right;
+}
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.canvasWrapper {
+  flex: 0 1 var(--gp-width);
+  max-width: var(--gp-width);
+  min-width: 220px;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--gp-aspect-ratio);
+  touch-action: none;
+}
+
+.side {
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+.readout {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.readout th,
+.readout td {
+  padding: 3px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.readout th {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.readout td:first-child {
+  text-align: left;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.equation {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.status {
+  margin-top: 12px;
+  max-width: 34em;
+  line-height: 1.45;
+}
+
+.code {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--code-bg);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-x: auto;
+}

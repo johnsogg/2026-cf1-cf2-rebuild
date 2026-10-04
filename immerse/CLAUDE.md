@@ -32,6 +32,25 @@ import** — noted per component below. The rest need the explicit
   dragging moves whichever of A/B is closest to the mouse. Same
   theme-color approach as CoordinatePlane. Needs an import.
 
+- **AnglePlayground**, **PointPlayground**, **PointLinePlayground**,
+  **LinePlayground**, **CurvePlayground** - The geometry playgrounds (from
+  `geometry.mdx`). `AnglePlayground`: spin a fixed-length vector around a
+  centered origin; reads out θ, cos θ, sin θ with color-coded axis shadows,
+  plus a toggle for whether θ = 0 points right (+x) or up (−y).
+  Draggable points in p5 coordinates with a side readout. `PointPlayground`:
+  distance between two points, with Δx/Δy legs and live Pythagoras.
+  `PointLinePlayground`: point to segment distance, closest point, and where
+  the perpendicular lands. `LinePlayground`: two objects, each toggled
+  between segment/ray/line, with intersection, distance, and dot/cross;
+  `showParameters` adds t/u and a t slider. `CurvePlayground`: Bézier (de
+  Casteljau t slider, chain + smooth joint toggles) or cardinal spline
+  (`mode="cardinal"`: tightness, ends, hidden Bézier handles). All of them
+  share `utils/geometry.ts` (math), `utils/playgroundCanvas.ts` (drawing and
+  the color roles), `hooks/useDragHandles.ts` (pointer dragging), and
+  `GeometryPlaygroundParts.tsx` (controls, readout, KaTeX equations) - build
+  new geometry playgrounds on those so they look and behave the same. Need
+  an import.
+
 - **TransformPlayground** - Canvas sandbox for stacking 2D affine
   transforms (translate / rotate / scale, applied top to bottom like p5
   calls) with the Space Junk Magpie drawn in object space. Toggles between
