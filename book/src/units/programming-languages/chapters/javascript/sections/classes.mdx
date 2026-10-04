@@ -3,27 +3,28 @@ export const title = "Classes"
 # Classes
 
 A class is a blueprint for making lots of things that share the same basic
-format. Every thing made from a class has the same data (called _fields_) and
-the same functions (called _methods_). Given a single class, you can make a
-zillion of these things, and each one is independent of the others.
+format. Every thing made from a class has the same kinds of data (called
+_fields_) and the same functions (called _methods_). Given a single class, you
+can make a zillion of these things, and each one is independent of the others.
 
 In this section we'll learn about classes by building a kind of digital creature
-called a _Boid_. Craig Reynolds invented Boids in 1986 to simulate flocking
-birds: the name is short for "bird-oid object." Each Boid follows a few simple
-rules about the neighbors it can see, and yet a whole group of them swoops and
-swirls like a real flock of birds or a school of fish.
+called a _Boid_.
+[Craig Reynolds invented Boids](https://en.wikipedia.org/wiki/Boids) in 1986 to
+simulate flocking birds: the name is short for "bird-oid object." Each Boid
+follows a few simple rules about the neighbors it can see, and yet a whole group
+of them swoops and swirls like a real flock of birds or a school of fish.
 
 ## The `class` keyword
 
 Think of a category of things: cars, kitties, electronic medical records. Each
 category is defined by its shape: what data its members hold, and what they can
-do. A class defines that shape. Then you create _instances_ of the class, and
-each instance is independent. If you know an object's class, you know a lot
-about how to work with it.
+do. A class defines that shape, and each thing you make from it is an
+_instance_ of that class. If you know an object's class, you know a lot about
+how to work with it.
 
 For example, we could make a class that represents students. Every student has a
-name and a student ID. You have a major or two, and maybe a minor. You can
-enroll in classes and drop them. That's the Student class. But you as an
+name and a student ID. Each has a major or two, and maybe a minor. Students can
+enroll in courses and drop them. That's the Student class. But you as an
 individual have your own _specific_ data: your name, your major, your schedule.
 
 Before we get to Boids (which are more fun to look at), here is a `Student`
@@ -75,19 +76,20 @@ comes a special function called the `constructor`, which sets up a brand new
 student. Last are the methods `enroll` and `drop`, which are things a student
 can do.
 
-The two lines that say `new Student(...)` each create an _instance_ of the
+The two lines that say `new Student(...)` each create an instance of the
 `Student` class. `alice` and `bob` are two different objects with the same
 features, even though the data in each one is different. When Bob drops a
 course, Alice's schedule doesn't change.
 
 ## Classes work nicely in graphics contexts
 
-Object-oriented programming grew up alongside computer graphics and simulation.
-One of the earliest programs to use the idea of a reusable "master" drawing,
-with lots of independent copies, was Ivan Sutherland's Sketchpad, an early CAD
-system from 1963. Object-oriented programming isn't the only good way to
-program, and it isn't the right choice for every task. But it is often a great
-choice for graphical applications and interactive systems.
+[Object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming)
+grew up alongside computer graphics and simulation. One of the earliest programs
+to use the idea of a reusable "master" drawing, with lots of independent copies,
+was Ivan Sutherland's [Sketchpad](https://en.wikipedia.org/wiki/Sketchpad), an
+early CAD system from 1963. Object-oriented programming isn't the only good way
+to program, and it isn't the right choice for every task. But it is often a
+great choice for graphical applications and interactive systems.
 
 Let's meet our first Boid. Here's a class that represents a simple one:
 
@@ -159,7 +161,7 @@ function draw() {
 </Ask>
 
 This Boid drifts across the screen in a random direction, wrapping around at the
-edges. We have one class definition, and one _instance_ of it. We make that
+edges. We have one class definition, and one instance of it. We make that
 instance with `new Boid(...)`, passing in a position, a size, and a color. Using
 `new` calls the class's _constructor_, which builds and sets up the new
 instance.
@@ -167,10 +169,10 @@ instance.
 This sketch uses `deltaTime`, as we saw in the animation section. Each time
 `draw` runs, it calculates `delta`, the number of milliseconds since the last
 frame, and passes it to `move`. The Boid's velocity is in pixels per _second_,
-so `move` turns `delta` into seconds before using it. (`MAX_DELTA_MS` is a
-safety net. If you switch tabs and come back, `deltaTime` might be huge, and the
-Boid would teleport.) Game engines like Godot and Unity work the same way, and
-so does the Space Junk homework.
+so `move` turns `delta` into seconds before using it. Game engines like Godot
+and Unity work the same way, and so does the Space Junk homework.
+(`MAX_DELTA_MS` is a safety net. If you switch tabs and come back, `deltaTime`
+might be huge, and the Boid would teleport.)
 
 This Boid is lonely. Let's give it some friends:
 
@@ -257,14 +259,13 @@ didn't change at all. We just called `new Boid(...)` three times.
 ## Instances
 
 Each Boid has its own color, its own position, and its own heading. They are
-their own little people! Every object created from a class is an _instance_ of
-that class. Each Boid is independent, but they all have the same fields and
-methods. We say they have the same _type_, or the same _shape_.
+their own little people! But they all have the same fields and methods. We say
+they have the same _type_, or the same _shape_.
 
 Each Boid gets its behavior from the functions defined inside the class block.
-In object-oriented terms these functions are called _methods_, and when you call
-one, it works on one particular instance. `move` is a method, and so is `draw`.
-Calling `boid.move(delta)` moves that one Boid and none of the others.
+These functions are the class's methods, and when you call one, it works on one
+particular instance. `move` is a method, and so is `draw`. Calling
+`boid.move(delta)` moves that one Boid and none of the others.
 
 Inside a method, a Boid refers to its own personal data (its position, its
 color) with the `this` keyword. `this` means "the instance this method was
@@ -278,7 +279,7 @@ own compartment of data, while capturing the structure that all of those items
 share. We write one class for Boids, and then use it to make as many independent
 Boids as we like.
 
-## `static` members and methods
+## `static` fields and methods
 
 Sometimes you want data that is common to the entire class of things. For
 example, humans are expected to have two eyes, two hands, and two feet. Other
@@ -545,9 +546,9 @@ does this: the `Junk` class is in `junk.js`, `Mothership` is in `mothership.js`,
 and so on. Good naming conventions make your life easier, because you can find
 code faster.
 
-Separate files also make it harder to reach into another class's business when
-you didn't mean to. When every part of a program pokes at every other part, the
-connections turn into a tangled mess that programmers affectionately call
+Separate files also nudge you to think of each class as its own thing, which
+discourages tangling. When every part of a program pokes at every other part,
+the connections turn into a tangled mess that programmers affectionately call
 "spaghetti code."
 
 (The sketches in this book put everything in one file, because each example runs
@@ -689,12 +690,12 @@ function draw() {
 the method can compare the two: how far apart they are, and how different their
 velocities are. If they're close enough, `this` Boid turns a little toward
 `other`'s heading. Since every Boid runs the same code, both of them turn toward
-each other's heading until they're flying side by side.
+each other's heading until they're flying the same way.
 
 The nested loops in `draw` have each Boid notice every other Boid. The check
 `boid !== other` keeps a Boid from noticing itself.
 
-## Same variable names, different behaviors
+## Same fields, different behaviors
 
 Even though objects made from a class all have the same set of fields, they can
 behave quite differently depending on the **values** those fields hold.
@@ -791,7 +792,7 @@ class Boid {
     push()
     translate(this.x, this.y)
     if (this.isDistracted) {
-      Boid.drawDistractionBubble()
+      Boid.drawThoughtCloud()
     } else if (debug) {
       Boid.drawNoticeCircle()
     }
@@ -800,10 +801,10 @@ class Boid {
   }
 
   /**
-   * Draws a thought bubble above and to the right of a boid centered at
+   * Draws a thought cloud above and to the right of a boid centered at
    * (0, 0): this boid is lost in thought.
    **/
-  static drawDistractionBubble() {
+  static drawThoughtCloud() {
     push()
     noStroke()
     fill("white")
@@ -940,7 +941,7 @@ angle before using it, so it aims one way but drifts a little to one side.
 method subtracts `delta` from it every frame, and when it reaches zero, the Boid
 picks a new error and starts a new countdown. `isDistracted` and
 `isDistractedNextUpdate` work the same way. While a Boid is distracted, it shows
-a thought bubble instead of its gray ring, and `notice` returns right away
+a thought cloud instead of its gray ring, and `notice` returns right away
 without doing anything.
 
 The new error and the countdowns come from `randomGaussian` rather than
@@ -955,9 +956,9 @@ but different values give different behaviors.
 
 ## Graphical embellishments
 
-In the last Boids sketch, a distracted Boid draws a thought bubble. When it
+In the last Boids sketch, a distracted Boid draws a thought cloud. When it
 isn't distracted, it draws a gray circle showing how far away it can notice
-other Boids. These two pictures play different roles. The thought bubble is part
+other Boids. These two pictures play different roles. The thought cloud is part
 of the finished look: it's fun, and it tells the viewer something about the
 Boid. The notice circle is more like a debugging tool. It helps _us_, the
 programmers, see whether `NOTICE_RADIUS` is doing what we think it is, but it
@@ -1109,7 +1110,7 @@ class Boid {
     push()
     translate(this.x, this.y)
     if (this.isDistracted) {
-      Boid.drawDistractionBubble()
+      Boid.drawThoughtCloud()
     } else if (debug) {
       Boid.drawNoticeCircle()
     }
@@ -1118,10 +1119,10 @@ class Boid {
   }
 
   /**
-   * Draws a thought bubble above and to the right of a boid centered at
+   * Draws a thought cloud above and to the right of a boid centered at
    * (0, 0): this boid is lost in thought.
    **/
-  static drawDistractionBubble() {
+  static drawThoughtCloud() {
     push()
     noStroke()
     fill("white")
@@ -1303,9 +1304,10 @@ that extend it. A subclass is a specialization of its base class. It gets all of
 the base class's fields and methods for free, and it can replace (or _override_)
 the methods where it should behave differently.
 
-Here are three kinds of Boid that extend the regular one. Each kind has its own
-color: regular Boids are green, shy Boids are blue, codependent Boids are pink,
-and toddler Boids are small and yellow. There are two of each.
+Here are three kinds of Boid that extend the regular one, mixed in with some
+regular Boids. Each kind has its own color: regular Boids are green, shy Boids
+are blue, codependent Boids are pink, and toddler Boids are small and yellow.
+There are two of each.
 
 <Ask id="classes-boid-subclasses" mode="untracked" title="Kinds of Boids">
 
@@ -1430,7 +1432,7 @@ class Boid {
     push()
     translate(this.x, this.y)
     if (this.isDistracted) {
-      Boid.drawDistractionBubble(this.diameter)
+      Boid.drawThoughtCloud(this.diameter)
     } else if (debug) {
       Boid.drawNoticeCircle()
     }
@@ -1439,10 +1441,10 @@ class Boid {
   }
 
   /**
-   * Draws a thought bubble above and to the right of a boid of the given
+   * Draws a thought cloud above and to the right of a boid of the given
    * diameter, centered at (0, 0): this boid is lost in thought.
    **/
-  static drawDistractionBubble(diameter) {
+  static drawThoughtCloud(diameter) {
     push()
     noStroke()
     fill("white")
@@ -1727,11 +1729,6 @@ happen, and more room for them to fly around, so the canvas is bigger and there
 are lots of regular Boids, with a few of the other kinds thrown in to shake
 things up.
 
-Because there are so many more Boids, we draw everything at half size. This is
-easy, because we only need to `scale` the transform before drawing. The Boids'
-world is still measured in the same units as before, but now it's twice as wide
-and twice as tall as the canvas, and `scale(VIEW_SCALE)` shrinks it to fit.
-
 Something else has been bugging me this whole time: when a Boid crosses an edge
 of the canvas, it teleports to the other side. It would be nicer if a Boid that
 straddles an edge were drawn on both sides, half on each.
@@ -1910,7 +1907,7 @@ class Boid {
       push()
       translate(position.x, position.y)
       if (this.isDistracted) {
-        Boid.drawDistractionBubble(this.diameter)
+        Boid.drawThoughtCloud(this.diameter)
       } else if (debug) {
         Boid.drawNoticeCircle()
       }
@@ -1920,10 +1917,10 @@ class Boid {
   }
 
   /**
-   * Draws a thought bubble above and to the right of a boid of the given
+   * Draws a thought cloud above and to the right of a boid of the given
    * diameter, centered at (0, 0): this boid is lost in thought.
    **/
-  static drawDistractionBubble(diameter) {
+  static drawThoughtCloud(diameter) {
     push()
     noStroke()
     fill("white")
@@ -2209,6 +2206,32 @@ function keyPressed() {
 
 </Ask>
 
+Because there are so many more Boids, we draw everything at half size. This is
+easy, because we only need to `scale` the transform before drawing. The Boids'
+world is still measured in the same units as before, but now it's twice as wide
+and twice as tall as the canvas, and `scale(VIEW_SCALE)` shrinks it to fit.
+
+The new `wrappedPositions` function does the tic-tac-toe trick. It tries all
+nine squares, and returns each copy of a position that would spill into the
+middle one. Most of the time that's just the Boid's real position. Near an edge
+there are two copies, and near a corner there are four. `Boid` and `Bubble` each
+draw themselves once at every position in that list.
+
+The wrapping isn't only about looks. A Boid near the right edge should be able
+to notice a Boid just across the edge on the left, since on screen they're
+neighbors. The new `offsetTo` method finds the shortest way from one Boid to
+another, even if it crosses an edge, and `distanceTo`, `ShyBoid`, and
+`CodependentBoid` all use it.
+
+{/* prettier-ignore-start */}
+
+To get the flock to come together, a few numbers changed, too. Boids fly faster
+and turn more sharply, they drift less far off course, and they get distracted
+less often. Debugging graphics start out off, since 56 notice circles make a
+mess. Press <Kbd>~</Kbd> to see them.
+
+{/* prettier-ignore-end */}
+
 <Callout intent="note">
 **These aren't quite Reynolds' Boids.**
 
@@ -2226,24 +2249,3 @@ sheet, rather than forming the swirling clumps that Reynolds' Boids are famous
 for. Our shy and codependent Boids aren't from Reynolds at all.
 
 </Callout>
-
-The new `wrappedPositions` function does the tic-tac-toe trick. It tries all
-nine squares, and returns each copy of a position that would spill into the
-middle one. Most of the time that's just the Boid's real position. Near an edge
-there are two copies, and near a corner there are four. `Boid` and `Bubble` each
-draw themselves once at every position in that list.
-
-The wrapping isn't only about looks. A Boid near the right edge should be able
-to notice a Boid just across the edge on the left, since on screen they're
-neighbors. The new `offsetTo` method finds the shortest way from one Boid to
-another, even if it crosses an edge, and `distanceTo`, `ShyBoid`, and
-`CodependentBoid` all use it.
-
-{/* prettier-ignore-start */}
-
-To get the flock to come together, a few numbers changed, too. Boids fly a
-little faster and turn a little more quickly, and they wander off course and get
-distracted less often. Debugging graphics start out off, since 56 notice circles
-make a mess. Press <Kbd>~</Kbd> to see them.
-
-{/* prettier-ignore-end */}
