@@ -693,3 +693,1557 @@ each other's heading until they're flying side by side.
 
 The nested loops in `draw` have each Boid notice every other Boid. The check
 `boid !== other` keeps a Boid from noticing itself.
+
+## Same variable names, different behaviors
+
+Even though objects made from a class all have the same set of fields, they can
+behave quite differently depending on the **values** those fields hold.
+
+The two Boids above fly around until they come close to each other, and then
+they start flying together. Once they've found each other, they move at exactly
+the same speed, in exactly the same direction. That's a little too perfect. What
+if their flight was noisier, with some randomness in it? What if they could get
+distracted and forget they were trying to fly alongside another Boid?
+
+Take a look at the Boid's `move` method:
+
+```js
+const seconds = delta / 1000
+this.x += this.dx * seconds
+this.y += this.dy * seconds
+```
+
+This is simple and mechanical: update the position using exactly the current
+velocity and the time that has passed. Real birds aren't that precise. Let's
+give each Boid a small amount of natural error in its velocity, so it flies a
+little off course, and have that error change every few seconds.
+
+Let's also let Boids get distracted by their innermost thoughts, so they stop
+noticing the Boids around them. Each Boid gets an `isDistracted` field. While
+it's `true`, `notice` doesn't do anything. A Boid changes its mind about being
+distracted every few seconds, using the same kind of timer as the velocity
+error.
+
+<Ask id="classes-boids-distracted" mode="interacted" title="Distracted Boids">
+
+Try changing `Boid.ERROR_SPREAD` and `Boid.DISTRACTION_CHANCE`. What happens if
+the error is much bigger? What if the Boids are always distracted, or never?
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+/** When true, draw debugging graphics. Toggled with ~ or backtick. */
+let debug = true
+
+class Boid {
+  /** How big every boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast every boid travels, in pixels per second. */
+  static SPEED = 50
+  /** How far away a boid can notice others, in pixels. */
+  static NOTICE_RADIUS = 120
+  /** How quickly a boid can turn, in pixels per second, per second. */
+  static STEER = 30
+  /** How far off course a boid typically flies, in radians. */
+  static ERROR_SPREAD = 0.25
+  /** The chance a boid is distracted, each time it changes its mind. */
+  static DISTRACTION_CHANCE = 0.3
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+  /** How far off course this boid is flying right now, in radians. */
+  velocityError
+  /** Time until this boid picks a new velocityError, in ms. */
+  velocityErrorNextUpdate
+  /** While true, this boid ignores other boids. */
+  isDistracted
+  /** Time until this boid decides whether to be distracted, in ms. */
+  isDistractedNextUpdate
+
+  constructor(x, y, bodyColor) {
+    this.x = x
+    this.y = y
+    // head off in a random direction, at the standard speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * Boid.SPEED
+    this.dy = Math.sin(angle) * Boid.SPEED
+    this.bodyColor = bodyColor
+    this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+    this.velocityErrorNextUpdate = Boid.randomDuration()
+    this.isDistracted = false
+    this.isDistractedNextUpdate = Boid.randomDuration()
+  }
+
+  /**
+   * A random duration between 2 and 4 seconds, in ms. Most are close to 3
+   * seconds, because it's from a gaussian (bell curve) distribution.
+   **/
+  static randomDuration() {
+    return constrain(randomGaussian(3000, 500), 2000, 4000)
+  }
+
+  draw() {
+    push()
+    translate(this.x, this.y)
+    if (this.isDistracted) {
+      Boid.drawDistractionBubble()
+    } else if (debug) {
+      Boid.drawNoticeCircle()
+    }
+    Boid.drawBoid(this.bodyColor, this.dx, this.dy)
+    pop()
+  }
+
+  /**
+   * Draws a thought bubble above and to the right of a boid centered at
+   * (0, 0): this boid is lost in thought.
+   **/
+  static drawDistractionBubble() {
+    push()
+    noStroke()
+    fill("white")
+    circle(Boid.DIAMETER * 0.5, -Boid.DIAMETER * 0.6, 5)
+    circle(Boid.DIAMETER * 0.75, -Boid.DIAMETER * 0.9, 8)
+    ellipse(Boid.DIAMETER * 1.2, -Boid.DIAMETER * 1.3, 22, 15)
+    pop()
+  }
+
+  /**
+   * Draws a ring around (0, 0) showing how far a boid can see. NOTICE_RADIUS
+   * is a radius, so the circle's diameter is twice that.
+   **/
+  static drawNoticeCircle() {
+    push()
+    noFill()
+    stroke("#444")
+    circle(0, 0, 2 * Boid.NOTICE_RADIUS)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, Boid.DIAMETER)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(Boid.DIAMETER * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.15)
+    pop()
+  }
+
+  /**
+   * Counts down this boid's timers. When one runs out, the boid picks a new
+   * value for it and starts the timer over.
+   **/
+  changeMind(delta) {
+    this.velocityErrorNextUpdate -= delta
+    if (this.velocityErrorNextUpdate <= 0) {
+      this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+      this.velocityErrorNextUpdate = Boid.randomDuration()
+    }
+    this.isDistractedNextUpdate -= delta
+    if (this.isDistractedNextUpdate <= 0) {
+      this.isDistracted = random() < Boid.DISTRACTION_CHANCE
+      this.isDistractedNextUpdate = Boid.randomDuration()
+    }
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    this.changeMind(delta)
+    const seconds = delta / 1000
+    // fly in the direction of (dx, dy), but a little off course
+    const velocity = createVector(this.dx, this.dy).rotate(this.velocityError)
+    this.x += velocity.x * seconds
+    this.y += velocity.y * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+
+  /**
+   * If the other boid is close enough to notice, nudge this boid's velocity
+   * a little toward the other's. Speed stays the same; only the direction
+   * changes. A distracted boid doesn't notice anything.
+   **/
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    const distance = Math.hypot(other.x - this.x, other.y - this.y)
+    if (distance < Boid.NOTICE_RADIUS) {
+      const maxChange = Boid.STEER * (delta / 1000)
+      const nudge = createVector(other.dx - this.dx, other.dy - this.dy)
+      nudge.limit(maxChange)
+      const velocity = createVector(this.dx + nudge.x, this.dy + nudge.y)
+      velocity.setMag(Boid.SPEED)
+      this.dx = velocity.x
+      this.dy = velocity.y
+    }
+  }
+}
+
+const boids = []
+
+function setup() {
+  createCanvas(400, 300)
+  boids.push(new Boid(150, 150, "#f66"))
+  boids.push(new Boid(250, 150, "#48f"))
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+  }
+  // every boid notices every other boid, but not itself
+  for (const boid of boids) {
+    for (const other of boids) {
+      if (boid !== other) {
+        boid.notice(other, delta)
+      }
+    }
+  }
+  for (const boid of boids) {
+    boid.draw()
+  }
+}
+
+/** Toggles debug graphics with ~ (or backtick, the same key unshifted). */
+function keyPressed() {
+  if (key === "~" || key === "`") {
+    debug = !debug
+  }
+}
+```
+
+</Ask>
+
+Each Boid now has four new fields. `velocityError` is an angle: how far off
+course the Boid is flying. In `move`, the Boid rotates its velocity by that
+angle before using it, so it aims one way but drifts a little to one side.
+`velocityErrorNextUpdate` is a countdown, in milliseconds. The new `changeMind`
+method subtracts `delta` from it every frame, and when it reaches zero, the Boid
+picks a new error and starts a new countdown. `isDistracted` and
+`isDistractedNextUpdate` work the same way. While a Boid is distracted, it shows
+a thought bubble instead of its gray ring, and `notice` returns right away
+without doing anything.
+
+The new error and the countdowns come from `randomGaussian` rather than
+`random`. A gaussian (or "bell curve") distribution gives values that are
+usually close to the middle and only occasionally far from it. So most Boids fly
+only a little off course, and once in a while one wanders a lot.
+
+Both Boids run exactly the same code. The difference is in their values: at any
+moment, one might be drifting left while the other drifts right, or one might be
+lost in thought while the other is paying attention. Same fields, same methods,
+but different values give different behaviors.
+
+## Graphical embellishments
+
+In the last Boids sketch, a distracted Boid draws a thought bubble. When it
+isn't distracted, it draws a gray circle showing how far away it can notice
+other Boids. These two pictures play different roles. The thought bubble is part
+of the finished look: it's fun, and it tells the viewer something about the
+Boid. The notice circle is more like a debugging tool. It helps _us_, the
+programmers, see whether `NOTICE_RADIUS` is doing what we think it is, but it
+would clutter up a finished flock.
+
+As you gain experience writing code, you'll build an intuition for when it's
+worth the effort to write little debugging helpers like this. Often it's a few
+lines of code, and it saves you from staring at numbers in the console trying to
+imagine what's happening on the screen.
+
+{/* prettier-ignore-start */}
+
+I didn't mention this earlier, but you can press the tilde key (<Kbd>~</Kbd>)
+in that sketch to turn the debugging graphics on and off. (Click the canvas
+first, so it gets your key presses.)
+
+{/* prettier-ignore-end */}
+
+## Boids with trails
+
+Let's say we want Boids to leave a trail behind them, showing where they've
+been. Every so often, a Boid leaves a bubble behind, and that bubble gets
+smaller over time until it disappears completely.
+
+How would you model this, based on what you know about the Boid code? One idea
+is that each Boid could remember the places it has been, and draw dots in those
+spots. But that fights against how `draw` works now: it moves the graphics
+transform to the Boid's current position before drawing anything. More
+importantly, a bubble doesn't need to stay connected to the Boid that made it.
+Once it's been left behind, it doesn't need to know anything about that Boid at
+all!
+
+So it makes sense to keep the bubbles in their own list, side by side with the
+list of Boids. Bubbles are _created_ by Boids, but once a bubble exists, it's
+completely separate. That sounds like another good use for a class!
+
+<Ask id="classes-boids-trails" mode="untracked" title="Boids with trails">
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+/** When true, draw debugging graphics. Toggled with ~ or backtick. */
+let debug = true
+
+class Bubble {
+  /** How big a bubble is when it's first made, in pixels. */
+  static DIAMETER = 12
+  /**
+   * How long a bubble lasts, in ms. Boids leave a bubble every
+   * Boid.BUBBLE_INTERVAL_MS, so this works out to about six bubbles per boid.
+   **/
+  static TTL = 3000
+
+  x
+  y
+  bubbleColor
+  /** Time left before this bubble disappears, in ms. */
+  timeToLive
+
+  constructor(x, y, bubbleColor) {
+    this.x = x
+    this.y = y
+    this.bubbleColor = bubbleColor
+    this.timeToLive = Bubble.TTL
+  }
+
+  /** Counts down this bubble's remaining life by `delta` milliseconds. */
+  age(delta) {
+    this.timeToLive -= delta
+  }
+
+  /** True once this bubble has run out of time. */
+  isPopped() {
+    return this.timeToLive <= 0
+  }
+
+  /** Draws the bubble, shrinking from full size to nothing as it ages. */
+  draw() {
+    const diameter = Bubble.DIAMETER * (this.timeToLive / Bubble.TTL)
+    push()
+    noFill()
+    stroke(this.bubbleColor)
+    circle(this.x, this.y, diameter)
+    pop()
+  }
+}
+
+class Boid {
+  /** How big every boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast every boid travels, in pixels per second. */
+  static SPEED = 50
+  /** How far away a boid can notice others, in pixels. */
+  static NOTICE_RADIUS = 120
+  /** How quickly a boid can turn, in pixels per second, per second. */
+  static STEER = 30
+  /** How far off course a boid typically flies, in radians. */
+  static ERROR_SPREAD = 0.25
+  /** The chance a boid is distracted, each time it changes its mind. */
+  static DISTRACTION_CHANCE = 0.3
+  /**
+   * How often a boid leaves a bubble behind, in ms. At SPEED, that puts the
+   * bubbles about 25 pixels apart.
+   **/
+  static BUBBLE_INTERVAL_MS = 500
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+  /** How far off course this boid is flying right now, in radians. */
+  velocityError
+  /** Time until this boid picks a new velocityError, in ms. */
+  velocityErrorNextUpdate
+  /** While true, this boid ignores other boids. */
+  isDistracted
+  /** Time until this boid decides whether to be distracted, in ms. */
+  isDistractedNextUpdate
+  /** Time since this boid last left a bubble, in ms. */
+  sinceBubbleMs
+
+  constructor(x, y, bodyColor) {
+    this.x = x
+    this.y = y
+    // head off in a random direction, at the standard speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * Boid.SPEED
+    this.dy = Math.sin(angle) * Boid.SPEED
+    this.bodyColor = bodyColor
+    this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+    this.velocityErrorNextUpdate = Boid.randomDuration()
+    this.isDistracted = false
+    this.isDistractedNextUpdate = Boid.randomDuration()
+    this.sinceBubbleMs = 0
+  }
+
+  /**
+   * A random duration between 2 and 4 seconds, in ms. Most are close to 3
+   * seconds, because it's from a gaussian (bell curve) distribution.
+   **/
+  static randomDuration() {
+    return constrain(randomGaussian(3000, 500), 2000, 4000)
+  }
+
+  draw() {
+    push()
+    translate(this.x, this.y)
+    if (this.isDistracted) {
+      Boid.drawDistractionBubble()
+    } else if (debug) {
+      Boid.drawNoticeCircle()
+    }
+    Boid.drawBoid(this.bodyColor, this.dx, this.dy)
+    pop()
+  }
+
+  /**
+   * Draws a thought bubble above and to the right of a boid centered at
+   * (0, 0): this boid is lost in thought.
+   **/
+  static drawDistractionBubble() {
+    push()
+    noStroke()
+    fill("white")
+    circle(Boid.DIAMETER * 0.5, -Boid.DIAMETER * 0.6, 5)
+    circle(Boid.DIAMETER * 0.75, -Boid.DIAMETER * 0.9, 8)
+    ellipse(Boid.DIAMETER * 1.2, -Boid.DIAMETER * 1.3, 22, 15)
+    pop()
+  }
+
+  /**
+   * Draws a ring around (0, 0) showing how far a boid can see. NOTICE_RADIUS
+   * is a radius, so the circle's diameter is twice that.
+   **/
+  static drawNoticeCircle() {
+    push()
+    noFill()
+    stroke("#444")
+    circle(0, 0, 2 * Boid.NOTICE_RADIUS)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, Boid.DIAMETER)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(Boid.DIAMETER * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.15)
+    pop()
+  }
+
+  /**
+   * Counts down this boid's timers. When one runs out, the boid picks a new
+   * value for it and starts the timer over.
+   **/
+  changeMind(delta) {
+    this.velocityErrorNextUpdate -= delta
+    if (this.velocityErrorNextUpdate <= 0) {
+      this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+      this.velocityErrorNextUpdate = Boid.randomDuration()
+    }
+    this.isDistractedNextUpdate -= delta
+    if (this.isDistractedNextUpdate <= 0) {
+      this.isDistracted = random() < Boid.DISTRACTION_CHANCE
+      this.isDistractedNextUpdate = Boid.randomDuration()
+    }
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    this.changeMind(delta)
+    const seconds = delta / 1000
+    // fly in the direction of (dx, dy), but a little off course
+    const velocity = createVector(this.dx, this.dy).rotate(this.velocityError)
+    this.x += velocity.x * seconds
+    this.y += velocity.y * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+
+  /**
+   * Every BUBBLE_INTERVAL_MS, adds a new bubble to `bubbles` at this boid's
+   * position. After that, the bubble is on its own.
+   **/
+  leaveTrail(delta, bubbles) {
+    this.sinceBubbleMs += delta
+    if (this.sinceBubbleMs >= Boid.BUBBLE_INTERVAL_MS) {
+      this.sinceBubbleMs -= Boid.BUBBLE_INTERVAL_MS
+      bubbles.push(new Bubble(this.x, this.y, this.bodyColor))
+    }
+  }
+
+  /**
+   * If the other boid is close enough to notice, nudge this boid's velocity
+   * a little toward the other's. Speed stays the same; only the direction
+   * changes. A distracted boid doesn't notice anything.
+   **/
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    const distance = Math.hypot(other.x - this.x, other.y - this.y)
+    if (distance < Boid.NOTICE_RADIUS) {
+      const maxChange = Boid.STEER * (delta / 1000)
+      const nudge = createVector(other.dx - this.dx, other.dy - this.dy)
+      nudge.limit(maxChange)
+      const velocity = createVector(this.dx + nudge.x, this.dy + nudge.y)
+      velocity.setMag(Boid.SPEED)
+      this.dx = velocity.x
+      this.dy = velocity.y
+    }
+  }
+}
+
+const boids = []
+let bubbles = []
+
+function setup() {
+  createCanvas(400, 300)
+  boids.push(new Boid(150, 150, "#f66"))
+  boids.push(new Boid(250, 150, "#48f"))
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+    boid.leaveTrail(delta, bubbles)
+  }
+  // age the bubbles, and keep only the ones that haven't popped yet
+  for (const bubble of bubbles) {
+    bubble.age(delta)
+  }
+  bubbles = bubbles.filter((bubble) => !bubble.isPopped())
+  // every boid notices every other boid, but not itself
+  for (const boid of boids) {
+    for (const other of boids) {
+      if (boid !== other) {
+        boid.notice(other, delta)
+      }
+    }
+  }
+  // bubbles first, so the boids are drawn on top of them
+  for (const bubble of bubbles) {
+    bubble.draw()
+  }
+  for (const boid of boids) {
+    boid.draw()
+  }
+}
+
+/** Toggles debug graphics with ~ (or backtick, the same key unshifted). */
+function keyPressed() {
+  if (key === "~" || key === "`") {
+    debug = !debug
+  }
+}
+```
+
+</Ask>
+
+Each `Bubble` has a `timeToLive` field: how many milliseconds it has left before
+it disappears. "Time to live," or _TTL_, is a common term in programming for
+anything that should only stick around for a limited time. Network messages,
+saved copies of web pages, and login sessions often have TTLs. A new bubble
+starts with `Bubble.TTL` milliseconds to live, and every frame its `age` method
+subtracts `delta`. As its time runs out, it draws itself smaller and smaller,
+and once `timeToLive` reaches zero, the sketch's `draw` function filters it out
+of the `bubbles` list.
+
+Notice that `leaveTrail` hands the new bubble its starting position and color,
+and that's it. The bubble never looks at its Boid again, so the Boid can fly
+away and the bubble stays right where it was left.
+
+## Extending classes
+
+So far, every Boid has come from a single class definition. They all run the
+same code, so the only differences between them come from their values. But what
+if we wanted more variety in how Boids _behave_? Perhaps a shy Boid that
+actively avoids the others? Or a codependent Boid that's really good at
+following other Boids? Or a toddler Boid that's small, fast, and kind of wild in
+its movements? We'd like all of these variations to reuse the code we already
+have, rather than copying the whole `Boid` class three times.
+
+This is a perfect use for _extending_ a class. We keep `Boid` as the _base
+class_ (also called the _superclass_ or _parent class_), and write _subclasses_
+that extend it. A subclass is a specialization of its base class. It gets all of
+the base class's fields and methods for free, and it can replace (or _override_)
+the methods where it should behave differently.
+
+Here are three kinds of Boid that extend the regular one. Each kind has its own
+color: regular Boids are green, shy Boids are blue, codependent Boids are pink,
+and toddler Boids are small and yellow. There are two of each.
+
+<Ask id="classes-boid-subclasses" mode="untracked" title="Kinds of Boids">
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+/** When true, draw debugging graphics. Toggled with ~ or backtick. */
+let debug = true
+
+class Bubble {
+  /** How big a bubble is when it's first made, in pixels. */
+  static DIAMETER = 12
+  /**
+   * How long a bubble lasts, in ms. Boids leave a bubble every
+   * Boid.BUBBLE_INTERVAL_MS, so this works out to about six bubbles per boid.
+   **/
+  static TTL = 3000
+
+  x
+  y
+  bubbleColor
+  /** Time left before this bubble disappears, in ms. */
+  timeToLive
+
+  constructor(x, y, bubbleColor) {
+    this.x = x
+    this.y = y
+    this.bubbleColor = bubbleColor
+    this.timeToLive = Bubble.TTL
+  }
+
+  /** Counts down this bubble's remaining life by `delta` milliseconds. */
+  age(delta) {
+    this.timeToLive -= delta
+  }
+
+  /** True once this bubble has run out of time. */
+  isPopped() {
+    return this.timeToLive <= 0
+  }
+
+  /** Draws the bubble, shrinking from full size to nothing as it ages. */
+  draw() {
+    const diameter = Bubble.DIAMETER * (this.timeToLive / Bubble.TTL)
+    push()
+    noFill()
+    stroke(this.bubbleColor)
+    circle(this.x, this.y, diameter)
+    pop()
+  }
+}
+
+class Boid {
+  /** The body color of a regular boid. */
+  static COLOR = "#8f8"
+  /** How big a regular boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast a regular boid travels, in pixels per second. */
+  static SPEED = 50
+  /** How far away a boid can notice others, in pixels. */
+  static NOTICE_RADIUS = 120
+  /** How quickly a boid can turn, in pixels per second, per second. */
+  static STEER = 30
+  /** How far off course a boid typically flies, in radians. */
+  static ERROR_SPREAD = 0.25
+  /** The chance a boid is distracted, each time it changes its mind. */
+  static DISTRACTION_CHANCE = 0.3
+  /**
+   * How often a boid leaves a bubble behind, in ms. At SPEED, that puts the
+   * bubbles about 25 pixels apart.
+   **/
+  static BUBBLE_INTERVAL_MS = 500
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+  /** How big this boid is, in pixels. */
+  diameter
+  /** How fast this boid travels, in pixels per second. */
+  speed
+  /** How far off course this boid is flying right now, in radians. */
+  velocityError
+  /** Time until this boid picks a new velocityError, in ms. */
+  velocityErrorNextUpdate
+  /** While true, this boid ignores other boids. */
+  isDistracted
+  /** Time until this boid decides whether to be distracted, in ms. */
+  isDistractedNextUpdate
+  /** Time since this boid last left a bubble, in ms. */
+  sinceBubbleMs
+
+  constructor(x, y, bodyColor, diameter, speed) {
+    this.x = x
+    this.y = y
+    this.bodyColor = bodyColor
+    this.diameter = diameter
+    this.speed = speed
+    // head off in a random direction, at this boid's speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * this.speed
+    this.dy = Math.sin(angle) * this.speed
+    this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+    this.velocityErrorNextUpdate = Boid.randomDuration()
+    this.isDistracted = false
+    this.isDistractedNextUpdate = Boid.randomDuration()
+    this.sinceBubbleMs = 0
+  }
+
+  /**
+   * A random duration between 2 and 4 seconds, in ms. Most are close to 3
+   * seconds, because it's from a gaussian (bell curve) distribution.
+   **/
+  static randomDuration() {
+    return constrain(randomGaussian(3000, 500), 2000, 4000)
+  }
+
+  draw() {
+    push()
+    translate(this.x, this.y)
+    if (this.isDistracted) {
+      Boid.drawDistractionBubble(this.diameter)
+    } else if (debug) {
+      Boid.drawNoticeCircle()
+    }
+    Boid.drawBoid(this.bodyColor, this.diameter, this.dx, this.dy)
+    pop()
+  }
+
+  /**
+   * Draws a thought bubble above and to the right of a boid of the given
+   * diameter, centered at (0, 0): this boid is lost in thought.
+   **/
+  static drawDistractionBubble(diameter) {
+    push()
+    noStroke()
+    fill("white")
+    circle(diameter * 0.5, -diameter * 0.6, 5)
+    circle(diameter * 0.75, -diameter * 0.9, 8)
+    ellipse(diameter * 1.2, -diameter * 1.3, 22, 15)
+    pop()
+  }
+
+  /**
+   * Draws a ring around (0, 0) showing how far a boid can see. NOTICE_RADIUS
+   * is a radius, so the circle's diameter is twice that.
+   **/
+  static drawNoticeCircle() {
+    push()
+    noFill()
+    stroke("#444")
+    circle(0, 0, 2 * Boid.NOTICE_RADIUS)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, diameter, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, diameter)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(diameter * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, diameter * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, diameter * 0.15)
+    pop()
+  }
+
+  /**
+   * Counts down this boid's timers. When one runs out, the boid picks a new
+   * value for it and starts the timer over.
+   **/
+  changeMind(delta) {
+    this.velocityErrorNextUpdate -= delta
+    if (this.velocityErrorNextUpdate <= 0) {
+      this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+      this.velocityErrorNextUpdate = Boid.randomDuration()
+    }
+    this.isDistractedNextUpdate -= delta
+    if (this.isDistractedNextUpdate <= 0) {
+      this.isDistracted = random() < Boid.DISTRACTION_CHANCE
+      this.isDistractedNextUpdate = Boid.randomDuration()
+    }
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    this.changeMind(delta)
+    const seconds = delta / 1000
+    // fly in the direction of (dx, dy), but a little off course
+    const velocity = createVector(this.dx, this.dy).rotate(this.velocityError)
+    this.x += velocity.x * seconds
+    this.y += velocity.y * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+
+  /**
+   * Every BUBBLE_INTERVAL_MS, adds a new bubble to `bubbles` at this boid's
+   * position. After that, the bubble is on its own.
+   **/
+  leaveTrail(delta, bubbles) {
+    this.sinceBubbleMs += delta
+    if (this.sinceBubbleMs >= Boid.BUBBLE_INTERVAL_MS) {
+      this.sinceBubbleMs -= Boid.BUBBLE_INTERVAL_MS
+      bubbles.push(new Bubble(this.x, this.y, this.bodyColor))
+    }
+  }
+
+  /** The distance from this boid's center to the other boid's, in pixels. */
+  distanceTo(other) {
+    return Math.hypot(other.x - this.x, other.y - this.y)
+  }
+
+  /**
+   * Turns this boid's velocity a little toward (targetDx, targetDy). `steer`
+   * is how quickly it can turn, in pixels per second, per second. Speed stays
+   * the same; only the direction changes.
+   **/
+  steerToward(targetDx, targetDy, steer, delta) {
+    const maxChange = steer * (delta / 1000)
+    const nudge = createVector(targetDx - this.dx, targetDy - this.dy)
+    nudge.limit(maxChange)
+    const velocity = createVector(this.dx + nudge.x, this.dy + nudge.y)
+    velocity.setMag(this.speed)
+    this.dx = velocity.x
+    this.dy = velocity.y
+  }
+
+  /**
+   * If the other boid is close enough to notice, turn a little toward its
+   * heading. A distracted boid doesn't notice anything.
+   **/
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      this.steerToward(other.dx, other.dy, Boid.STEER, delta)
+    }
+  }
+}
+
+/** A boid that turns away from any boid it notices. */
+class ShyBoid extends Boid {
+  static COLOR = "#48f"
+  /** Shy boids turn away quickly, in pixels per second, per second. */
+  static STEER = 80
+
+  constructor(x, y) {
+    super(x, y, ShyBoid.COLOR, Boid.DIAMETER, Boid.SPEED)
+  }
+
+  /** Instead of matching the other boid's heading, head away from it. */
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      const away = createVector(this.x - other.x, this.y - other.y)
+      away.setMag(this.speed)
+      this.steerToward(away.x, away.y, ShyBoid.STEER, delta)
+    }
+  }
+}
+
+/** A boid that follows any boid it notices, and never gets distracted. */
+class CodependentBoid extends Boid {
+  static COLOR = "#eaf"
+  /** Codependent boids turn quickly, in pixels per second, per second. */
+  static STEER = 80
+
+  constructor(x, y) {
+    super(x, y, CodependentBoid.COLOR, Boid.DIAMETER, Boid.SPEED)
+  }
+
+  /** Changes its mind like any boid, except it's never distracted. */
+  changeMind(delta) {
+    super.changeMind(delta)
+    this.isDistracted = false
+  }
+
+  /** Instead of matching the other boid's heading, head right for it. */
+  notice(other, delta) {
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      const toward = createVector(other.x - this.x, other.y - this.y)
+      toward.setMag(this.speed)
+      this.steerToward(toward.x, toward.y, CodependentBoid.STEER, delta)
+    }
+  }
+}
+
+/** A small, fast boid that wiggles all over the place. */
+class ToddlerBoid extends Boid {
+  static COLOR = "#fd5"
+  /** How big a toddler boid is, in pixels. */
+  static DIAMETER = 16
+  /** How fast a toddler boid travels, in pixels per second. */
+  static SPEED = 100
+  /** How sharply a toddler boid wiggles, in radians per second. */
+  static WIGGLE = 10
+
+  constructor(x, y) {
+    super(x, y, ToddlerBoid.COLOR, ToddlerBoid.DIAMETER, ToddlerBoid.SPEED)
+  }
+
+  /** Turns a random amount, then moves like any other boid. */
+  move(delta) {
+    const turn = random(-1, 1) * ToddlerBoid.WIGGLE * (delta / 1000)
+    const velocity = createVector(this.dx, this.dy).rotate(turn)
+    this.dx = velocity.x
+    this.dy = velocity.y
+    super.move(delta)
+  }
+}
+
+const boids = []
+let bubbles = []
+
+function setup() {
+  createCanvas(400, 300)
+  for (let i = 0; i < 2; i++) {
+    const x = random(0, width)
+    const y = random(0, height)
+    // a regular boid passes in the regular color, size, and speed
+    boids.push(new Boid(x, y, Boid.COLOR, Boid.DIAMETER, Boid.SPEED))
+    boids.push(new ShyBoid(random(0, width), random(0, height)))
+    boids.push(new CodependentBoid(random(0, width), random(0, height)))
+    boids.push(new ToddlerBoid(random(0, width), random(0, height)))
+  }
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+    boid.leaveTrail(delta, bubbles)
+  }
+  // age the bubbles, and keep only the ones that haven't popped yet
+  for (const bubble of bubbles) {
+    bubble.age(delta)
+  }
+  bubbles = bubbles.filter((bubble) => !bubble.isPopped())
+  // every boid notices every other boid, but not itself
+  for (const boid of boids) {
+    for (const other of boids) {
+      if (boid !== other) {
+        boid.notice(other, delta)
+      }
+    }
+  }
+  // bubbles first, so the boids are drawn on top of them
+  for (const bubble of bubbles) {
+    bubble.draw()
+  }
+  for (const boid of boids) {
+    boid.draw()
+  }
+}
+
+/** Toggles debug graphics with ~ (or backtick, the same key unshifted). */
+function keyPressed() {
+  if (key === "~" || key === "`") {
+    debug = !debug
+  }
+}
+```
+
+</Ask>
+
+A subclass starts with `class ShyBoid extends Boid`. The `extends` keyword says
+that a `ShyBoid` is a kind of `Boid`: it has every field and method a `Boid`
+has. A `ShyBoid` never defines `move`, `draw`, or `leaveTrail`, but it can still
+do all of those things, because it _inherits_ them from `Boid`.
+
+Each subclass has its own constructor, which calls `super(...)`. That runs the
+base class's constructor, so the Boid gets set up as usual, with the color,
+size, and speed for its kind. (In JavaScript, a subclass's constructor must call
+`super` before it uses `this`.) To make that possible, the `Boid` constructor
+now takes a diameter and a speed along with the color, instead of using
+`Boid.DIAMETER` and `Boid.SPEED` for everyone.
+
+When a subclass defines a method with the same name as one in its base class, it
+_overrides_ that method. `ShyBoid` and `CodependentBoid` each write their own
+`notice`. The shy one steers directly away from any Boid it notices, and the
+codependent one steers right toward it. Both use `steerToward`, a helper method
+inherited from `Boid`, so the turning math only exists in one place.
+
+Sometimes a subclass wants to do what the base class does, plus a little more.
+Inside a method, `super.methodName(...)` calls the base class's version.
+`ToddlerBoid`'s `move` turns the Boid a random amount, and then calls
+`super.move(delta)` to do the regular moving. `CodependentBoid`'s `changeMind`
+calls `super.changeMind(delta)` to run the usual timers, and then sets
+`isDistracted` back to `false`, so it never gets distracted.
+
+The loops in `draw` don't know or care what kind of Boid they're working with.
+They call `boid.move(delta)` and `boid.notice(other, delta)`, and each Boid runs
+its own version of that method. The fancy name for this is _polymorphism_: the
+same method call can do different things, depending on the class of the object
+it's called on.
+
+## Boid Finale
+
+We now have four kinds of Boids (the base `Boid` class and three subclasses),
+plus a `Bubble` class that shows where Boids have been. For our last Boid demo,
+let's see the famous flocking behavior. That takes enough Boids to see it
+happen, and more room for them to fly around, so the canvas is bigger and there
+are lots of regular Boids, with a few of the other kinds thrown in to shake
+things up.
+
+Because there are so many more Boids, we draw everything at half size. This is
+easy, because we only need to `scale` the transform before drawing. The Boids'
+world is still measured in the same units as before, but now it's twice as wide
+and twice as tall as the canvas, and `scale(VIEW_SCALE)` shrinks it to fit.
+
+Something else has been bugging me this whole time: when a Boid crosses an edge
+of the canvas, it teleports to the other side. It would be nicer if a Boid that
+straddles an edge were drawn on both sides, half on each.
+
+Imagine the canvas you're looking at is the center square of a tic-tac-toe
+board, and the eight squares around it all show exactly the same picture. We
+only ever see the middle square. But when a Boid straddles an edge, its copy in
+the neighboring square spills over into the middle one, so we see part of it on
+the other side. This makes the screen seem to wrap around, left to right and top
+to bottom, and makes the motion feel much more fluid.
+
+There are new buttons on the editor. One opens the code+sketch in full screen
+mode, and the other opens just the sketch in full screen mode.
+
+<Ask id="classes-boid-finale" mode="untracked" title="Boid finale">
+
+```p5exercise autorun size="large" allowFullScreenEditor allowFullScreenSketch
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+/** How much to shrink everything when drawing. 0.5 means half size. */
+const VIEW_SCALE = 0.5
+/**
+ * How big the boids' world is. Set from the canvas's real size, so that at
+ * VIEW_SCALE the world exactly fills the canvas.
+ **/
+let worldWidth
+let worldHeight
+/** How many regular boids to make. */
+const NUM_REGULAR_BOIDS = 50
+
+/** When true, draw debugging graphics. Toggled with ~ or backtick. */
+let debug = false
+
+/**
+ * Where to draw something centered at (x, y) with the given radius, so that it
+ * shows up on both sides when it straddles an edge. Imagine eight copies of the
+ * world tiled around the real one, like a tic-tac-toe board. This returns each
+ * copy of (x, y) that would spill into the middle tile, which is the only one
+ * we see.
+ **/
+function wrappedPositions(x, y, radius) {
+  const positions = []
+  for (const offsetX of [-worldWidth, 0, worldWidth]) {
+    for (const offsetY of [-worldHeight, 0, worldHeight]) {
+      const copyX = x + offsetX
+      const copyY = y + offsetY
+      const overlapsX = copyX + radius > 0 && copyX - radius < worldWidth
+      const overlapsY = copyY + radius > 0 && copyY - radius < worldHeight
+      if (overlapsX && overlapsY) {
+        positions.push(createVector(copyX, copyY))
+      }
+    }
+  }
+  return positions
+}
+
+class Bubble {
+  /** How big a bubble is when it's first made, in pixels. */
+  static DIAMETER = 12
+  /**
+   * How long a bubble lasts, in ms. Boids leave a bubble every
+   * Boid.BUBBLE_INTERVAL_MS, so this works out to about six bubbles per boid.
+   **/
+  static TTL = 3000
+
+  x
+  y
+  bubbleColor
+  /** Time left before this bubble disappears, in ms. */
+  timeToLive
+
+  constructor(x, y, bubbleColor) {
+    this.x = x
+    this.y = y
+    this.bubbleColor = bubbleColor
+    this.timeToLive = Bubble.TTL
+  }
+
+  /** Counts down this bubble's remaining life by `delta` milliseconds. */
+  age(delta) {
+    this.timeToLive -= delta
+  }
+
+  /** True once this bubble has run out of time. */
+  isPopped() {
+    return this.timeToLive <= 0
+  }
+
+  /**
+   * Draws the bubble, shrinking from full size to nothing as it ages. Near an
+   * edge, it's drawn on both sides.
+   **/
+  draw() {
+    const diameter = Bubble.DIAMETER * (this.timeToLive / Bubble.TTL)
+    push()
+    noFill()
+    stroke(this.bubbleColor)
+    for (const position of wrappedPositions(this.x, this.y, diameter / 2)) {
+      circle(position.x, position.y, diameter)
+    }
+    pop()
+  }
+}
+
+class Boid {
+  /** The body color of a regular boid. */
+  static COLOR = "#8f8"
+  /** How big a regular boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast a regular boid travels, in pixels per second. */
+  static SPEED = 80
+  /** How far away a boid can notice others, in pixels. */
+  static NOTICE_RADIUS = 120
+  /** How quickly a boid can turn, in pixels per second, per second. */
+  static STEER = 60
+  /** How far off course a boid typically flies, in radians. */
+  static ERROR_SPREAD = 0.1
+  /** The chance a boid is distracted, each time it changes its mind. */
+  static DISTRACTION_CHANCE = 0.1
+  /**
+   * How often a boid leaves a bubble behind, in ms. At SPEED, that puts the
+   * bubbles about 40 pixels apart.
+   **/
+  static BUBBLE_INTERVAL_MS = 500
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+  /** How big this boid is, in pixels. */
+  diameter
+  /** How fast this boid travels, in pixels per second. */
+  speed
+  /** How far off course this boid is flying right now, in radians. */
+  velocityError
+  /** Time until this boid picks a new velocityError, in ms. */
+  velocityErrorNextUpdate
+  /** While true, this boid ignores other boids. */
+  isDistracted
+  /** Time until this boid decides whether to be distracted, in ms. */
+  isDistractedNextUpdate
+  /** Time since this boid last left a bubble, in ms. */
+  sinceBubbleMs
+
+  constructor(x, y, bodyColor, diameter, speed) {
+    this.x = x
+    this.y = y
+    this.bodyColor = bodyColor
+    this.diameter = diameter
+    this.speed = speed
+    // head off in a random direction, at this boid's speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * this.speed
+    this.dy = Math.sin(angle) * this.speed
+    this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+    this.velocityErrorNextUpdate = Boid.randomDuration()
+    this.isDistracted = false
+    this.isDistractedNextUpdate = Boid.randomDuration()
+    this.sinceBubbleMs = 0
+  }
+
+  /**
+   * A random duration between 2 and 4 seconds, in ms. Most are close to 3
+   * seconds, because it's from a gaussian (bell curve) distribution.
+   **/
+  static randomDuration() {
+    return constrain(randomGaussian(3000, 500), 2000, 4000)
+  }
+
+  /** Draws this boid. Near an edge, it's drawn on both sides. */
+  draw() {
+    const radius = this.diameter / 2
+    for (const position of wrappedPositions(this.x, this.y, radius)) {
+      push()
+      translate(position.x, position.y)
+      if (this.isDistracted) {
+        Boid.drawDistractionBubble(this.diameter)
+      } else if (debug) {
+        Boid.drawNoticeCircle()
+      }
+      Boid.drawBoid(this.bodyColor, this.diameter, this.dx, this.dy)
+      pop()
+    }
+  }
+
+  /**
+   * Draws a thought bubble above and to the right of a boid of the given
+   * diameter, centered at (0, 0): this boid is lost in thought.
+   **/
+  static drawDistractionBubble(diameter) {
+    push()
+    noStroke()
+    fill("white")
+    circle(diameter * 0.5, -diameter * 0.6, 5)
+    circle(diameter * 0.75, -diameter * 0.9, 8)
+    ellipse(diameter * 1.2, -diameter * 1.3, 22, 15)
+    pop()
+  }
+
+  /**
+   * Draws a ring around (0, 0) showing how far a boid can see. NOTICE_RADIUS
+   * is a radius, so the circle's diameter is twice that.
+   **/
+  static drawNoticeCircle() {
+    push()
+    noFill()
+    stroke("#444")
+    circle(0, 0, 2 * Boid.NOTICE_RADIUS)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, diameter, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, diameter)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(diameter * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, diameter * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, diameter * 0.15)
+    pop()
+  }
+
+  /**
+   * Counts down this boid's timers. When one runs out, the boid picks a new
+   * value for it and starts the timer over.
+   **/
+  changeMind(delta) {
+    this.velocityErrorNextUpdate -= delta
+    if (this.velocityErrorNextUpdate <= 0) {
+      this.velocityError = randomGaussian(0, Boid.ERROR_SPREAD)
+      this.velocityErrorNextUpdate = Boid.randomDuration()
+    }
+    this.isDistractedNextUpdate -= delta
+    if (this.isDistractedNextUpdate <= 0) {
+      this.isDistracted = random() < Boid.DISTRACTION_CHANCE
+      this.isDistractedNextUpdate = Boid.randomDuration()
+    }
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    this.changeMind(delta)
+    const seconds = delta / 1000
+    // fly in the direction of (dx, dy), but a little off course
+    const velocity = createVector(this.dx, this.dy).rotate(this.velocityError)
+    this.x += velocity.x * seconds
+    this.y += velocity.y * seconds
+    if (this.x < 0) this.x += worldWidth
+    if (this.x >= worldWidth) this.x -= worldWidth
+    if (this.y < 0) this.y += worldHeight
+    if (this.y >= worldHeight) this.y -= worldHeight
+  }
+
+  /**
+   * Every BUBBLE_INTERVAL_MS, adds a new bubble to `bubbles` at this boid's
+   * position. After that, the bubble is on its own.
+   **/
+  leaveTrail(delta, bubbles) {
+    this.sinceBubbleMs += delta
+    if (this.sinceBubbleMs >= Boid.BUBBLE_INTERVAL_MS) {
+      this.sinceBubbleMs -= Boid.BUBBLE_INTERVAL_MS
+      bubbles.push(new Bubble(this.x, this.y, this.bodyColor))
+    }
+  }
+
+  /**
+   * The shortest way to get from this boid to the other one, as a vector.
+   * Since the world wraps around, the shortest way might cross an edge.
+   **/
+  offsetTo(other) {
+    let offsetX = other.x - this.x
+    let offsetY = other.y - this.y
+    if (offsetX > worldWidth / 2) offsetX -= worldWidth
+    if (offsetX < -worldWidth / 2) offsetX += worldWidth
+    if (offsetY > worldHeight / 2) offsetY -= worldHeight
+    if (offsetY < -worldHeight / 2) offsetY += worldHeight
+    return createVector(offsetX, offsetY)
+  }
+
+  /** The distance from this boid's center to the other boid's, in pixels. */
+  distanceTo(other) {
+    return this.offsetTo(other).mag()
+  }
+
+  /**
+   * Turns this boid's velocity a little toward (targetDx, targetDy). `steer`
+   * is how quickly it can turn, in pixels per second, per second. Speed stays
+   * the same; only the direction changes.
+   **/
+  steerToward(targetDx, targetDy, steer, delta) {
+    const maxChange = steer * (delta / 1000)
+    const nudge = createVector(targetDx - this.dx, targetDy - this.dy)
+    nudge.limit(maxChange)
+    const velocity = createVector(this.dx + nudge.x, this.dy + nudge.y)
+    velocity.setMag(this.speed)
+    this.dx = velocity.x
+    this.dy = velocity.y
+  }
+
+  /**
+   * If the other boid is close enough to notice, turn a little toward its
+   * heading. A distracted boid doesn't notice anything.
+   **/
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      this.steerToward(other.dx, other.dy, Boid.STEER, delta)
+    }
+  }
+}
+
+/** A boid that turns away from any boid it notices. */
+class ShyBoid extends Boid {
+  static COLOR = "#48f"
+  /** Shy boids turn away quickly, in pixels per second, per second. */
+  static STEER = 120
+
+  constructor(x, y) {
+    super(x, y, ShyBoid.COLOR, Boid.DIAMETER, Boid.SPEED)
+  }
+
+  /** Instead of matching the other boid's heading, head away from it. */
+  notice(other, delta) {
+    if (this.isDistracted) {
+      return
+    }
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      const away = this.offsetTo(other).mult(-1)
+      away.setMag(this.speed)
+      this.steerToward(away.x, away.y, ShyBoid.STEER, delta)
+    }
+  }
+}
+
+/** A boid that follows any boid it notices, and never gets distracted. */
+class CodependentBoid extends Boid {
+  static COLOR = "#eaf"
+  /** Codependent boids turn quickly, in pixels per second, per second. */
+  static STEER = 120
+
+  constructor(x, y) {
+    super(x, y, CodependentBoid.COLOR, Boid.DIAMETER, Boid.SPEED)
+  }
+
+  /** Changes its mind like any boid, except it's never distracted. */
+  changeMind(delta) {
+    super.changeMind(delta)
+    this.isDistracted = false
+  }
+
+  /** Instead of matching the other boid's heading, head right for it. */
+  notice(other, delta) {
+    if (this.distanceTo(other) < Boid.NOTICE_RADIUS) {
+      const toward = this.offsetTo(other)
+      toward.setMag(this.speed)
+      this.steerToward(toward.x, toward.y, CodependentBoid.STEER, delta)
+    }
+  }
+}
+
+/** A small, fast boid that wiggles all over the place. */
+class ToddlerBoid extends Boid {
+  static COLOR = "#fd5"
+  /** How big a toddler boid is, in pixels. */
+  static DIAMETER = 16
+  /** How fast a toddler boid travels, in pixels per second. */
+  static SPEED = 100
+  /** How sharply a toddler boid wiggles, in radians per second. */
+  static WIGGLE = 10
+
+  constructor(x, y) {
+    super(x, y, ToddlerBoid.COLOR, ToddlerBoid.DIAMETER, ToddlerBoid.SPEED)
+  }
+
+  /** Turns a random amount, then moves like any other boid. */
+  move(delta) {
+    const turn = random(-1, 1) * ToddlerBoid.WIGGLE * (delta / 1000)
+    const velocity = createVector(this.dx, this.dy).rotate(turn)
+    this.dx = velocity.x
+    this.dy = velocity.y
+    super.move(delta)
+  }
+}
+
+const boids = []
+let bubbles = []
+
+function setup() {
+  // fill the whole window (in the book, that's the sketch's pane)
+  createCanvas(windowWidth, windowHeight)
+  worldWidth = width / VIEW_SCALE
+  worldHeight = height / VIEW_SCALE
+  for (let i = 0; i < NUM_REGULAR_BOIDS; i++) {
+    const x = random(0, worldWidth)
+    const y = random(0, worldHeight)
+    // a regular boid passes in the regular color, size, and speed
+    boids.push(new Boid(x, y, Boid.COLOR, Boid.DIAMETER, Boid.SPEED))
+  }
+  // a few of each of the others, to shake things up
+  for (let i = 0; i < 2; i++) {
+    boids.push(new ShyBoid(random(0, worldWidth), random(0, worldHeight)))
+    boids.push(
+      new CodependentBoid(random(0, worldWidth), random(0, worldHeight)),
+    )
+    boids.push(new ToddlerBoid(random(0, worldWidth), random(0, worldHeight)))
+  }
+}
+
+/**
+ * p5 calls this whenever the window changes size, like when you switch to full
+ * screen. Grow or shrink the canvas and the world to match.
+ **/
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight)
+  worldWidth = width / VIEW_SCALE
+  worldHeight = height / VIEW_SCALE
+  // if the world shrank, bring any boids that are now outside it back in
+  for (const boid of boids) {
+    boid.x = boid.x % worldWidth
+    boid.y = boid.y % worldHeight
+  }
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+    boid.leaveTrail(delta, bubbles)
+  }
+  // age the bubbles, and keep only the ones that haven't popped yet
+  for (const bubble of bubbles) {
+    bubble.age(delta)
+  }
+  bubbles = bubbles.filter((bubble) => !bubble.isPopped())
+  // every boid notices every other boid, but not itself
+  for (const boid of boids) {
+    for (const other of boids) {
+      if (boid !== other) {
+        boid.notice(other, delta)
+      }
+    }
+  }
+  // shrink the whole world so it fits on the canvas
+  push()
+  scale(VIEW_SCALE)
+  // bubbles first, so the boids are drawn on top of them
+  for (const bubble of bubbles) {
+    bubble.draw()
+  }
+  for (const boid of boids) {
+    boid.draw()
+  }
+  pop()
+}
+
+/** Toggles debug graphics with ~ (or backtick, the same key unshifted). */
+function keyPressed() {
+  if (key === "~" || key === "`") {
+    debug = !debug
+  }
+}
+```
+
+</Ask>
+
+<Callout intent="note">
+**These aren't quite Reynolds' Boids.**
+
+Craig Reynolds' original Boids follow three rules, each based on the flockmates
+a Boid can see nearby:
+
+1. _Separation_: steer to avoid crowding them.
+2. _Alignment_: steer toward their average heading.
+3. _Cohesion_: steer toward their average position.
+
+Our regular Boids only do something like alignment. They turn toward each
+neighbor's heading, one neighbor at a time. With nothing pulling them together
+or pushing them apart, they tend to end up all flying the same way in one big
+sheet, rather than forming the swirling clumps that Reynolds' Boids are famous
+for. Our shy and codependent Boids aren't from Reynolds at all.
+
+</Callout>
+
+The new `wrappedPositions` function does the tic-tac-toe trick. It tries all
+nine squares, and returns each copy of a position that would spill into the
+middle one. Most of the time that's just the Boid's real position. Near an edge
+there are two copies, and near a corner there are four. `Boid` and `Bubble` each
+draw themselves once at every position in that list.
+
+The wrapping isn't only about looks. A Boid near the right edge should be able
+to notice a Boid just across the edge on the left, since on screen they're
+neighbors. The new `offsetTo` method finds the shortest way from one Boid to
+another, even if it crosses an edge, and `distanceTo`, `ShyBoid`, and
+`CodependentBoid` all use it.
+
+{/* prettier-ignore-start */}
+
+To get the flock to come together, a few numbers changed, too. Boids fly a
+little faster and turn a little more quickly, and they wander off course and get
+distracted less often. Debugging graphics start out off, since 56 notice circles
+make a mess. Press <Kbd>~</Kbd> to see them.
+
+{/* prettier-ignore-end */}

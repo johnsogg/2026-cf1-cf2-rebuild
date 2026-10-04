@@ -10,6 +10,8 @@ function parseMeta(meta: string | null | undefined) {
     autorun: /\bautorun\b/.test(str),
     sound: /\bsound\b/.test(str),
     hoverInfo: hoverInfoMatch ? hoverInfoMatch[1] !== "false" : undefined,
+    allowFullScreenEditor: /\ballowFullScreenEditor\b/.test(str),
+    allowFullScreenSketch: /\ballowFullScreenSketch\b/.test(str),
     hasObsoleteAttrs: /\b(id|title|solutionTo)="/.test(str),
   }
 }
@@ -44,12 +46,16 @@ function makeExerciseAttr(
   autorun?: boolean,
   hoverInfo?: boolean,
   sound?: boolean,
+  allowFullScreenEditor?: boolean,
+  allowFullScreenSketch?: boolean,
 ) {
   const properties = [
     ...(size != null ? [makeStringProp("size", size)] : []),
     ...(autorun ? [makeBoolProp("autorun")] : []),
     ...(hoverInfo != null ? [makeBoolProp("hoverInfo", hoverInfo)] : []),
     ...(sound ? [makeBoolProp("sound")] : []),
+    ...(allowFullScreenEditor ? [makeBoolProp("allowFullScreenEditor")] : []),
+    ...(allowFullScreenSketch ? [makeBoolProp("allowFullScreenSketch")] : []),
     makeStringProp("initialCode", initialCode),
   ]
 
@@ -92,8 +98,15 @@ export function makeExerciseFencePlugin(lang: string, componentName: string) {
         (node: Code, index: number | undefined, parent: Parent | undefined) => {
           if (node.lang !== lang || !parent || index == null) return
 
-          const { size, autorun, hoverInfo, sound, hasObsoleteAttrs } =
-            parseMeta(node.meta)
+          const {
+            size,
+            autorun,
+            hoverInfo,
+            sound,
+            allowFullScreenEditor,
+            allowFullScreenSketch,
+            hasObsoleteAttrs,
+          } = parseMeta(node.meta)
           if (hasObsoleteAttrs) {
             console.warn(
               `[${lang}] id=/title=/solutionTo= on the fence are ignored — wrap it in <Ask id="..." mode="..." title="..."> instead`,
@@ -102,7 +115,15 @@ export function makeExerciseFencePlugin(lang: string, componentName: string) {
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const attributes: any[] = [
-            makeExerciseAttr(node.value, size, autorun, hoverInfo, sound),
+            makeExerciseAttr(
+              node.value,
+              size,
+              autorun,
+              hoverInfo,
+              sound,
+              allowFullScreenEditor,
+              allowFullScreenSketch,
+            ),
           ]
 
           parent.children.splice(index, 1, {

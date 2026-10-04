@@ -13,6 +13,7 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .toolbar {
@@ -69,4 +70,52 @@
   padding: 0.5rem;
   border-radius: 4px;
   margin: 0;
+}
+
+/* Full-screen takeover: the exercise stays where it is in the page (so the
+ * editor and running sketch keep their state) and is restyled to cover
+ * everything else. */
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  padding: 0.75rem;
+  background: var(--bg, white);
+  /* Being a scroll container that doesn't chain stops wheel events from
+   * scrolling the page hidden behind the takeover. */
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.fullScreen .row {
+  flex: 1;
+  min-height: 0;
+}
+
+.fullScreen .header {
+  justify-content: space-between;
+}
+
+.sketchOnly .editorPane {
+  display: none;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  border-color: var(--accent);
 }

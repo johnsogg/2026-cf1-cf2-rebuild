@@ -111,7 +111,14 @@ export type P5ExerciseProps = {
   hoverInfo?: boolean
   /** Also load p5.sound into the sketch iframe (loadSound, p5.Oscillator, …). */
   sound?: boolean
+  /** Show a button that expands the editor and sketch to fill the window. */
+  allowFullScreenEditor?: boolean
+  /** Show a button that fills the window with just the sketch, scaled to fit. */
+  allowFullScreenSketch?: boolean
 }
+
+/** Which full-screen takeover is showing, if any. */
+type FullScreenMode = "editor" | "sketch" | null
 
 type TranspilerResponse = {
   js?: string
@@ -133,10 +140,20 @@ type SketchError = {
  * which owns identity, numbering, and completion tracking.
  **/
 export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
-  const { initialCode, hoverInfo = true, sound = false } = exercise
-  const height = { small: "200px", medium: "400px", large: "80vh" }[
-    exercise.size ?? "medium"
-  ]
+  const {
+    initialCode,
+    hoverInfo = true,
+    sound = false,
+    allowFullScreenEditor = false,
+    allowFullScreenSketch = false,
+  } = exercise
+  const [fullScreen, setFullScreen] = useState<FullScreenMode>(null)
+  // In a takeover, the panes stretch to fill the window instead.
+  const height = fullScreen
+    ? "100%"
+    : { small: "200px", medium: "400px", large: "80vh" }[
+        exercise.size ?? "medium"
+      ]
   const [code, setCode] = useState(initialCode)
   const [srcdoc, setSrcdoc] = useState<string | null>(null)
   const [error, setError] = useState<SketchError | null>(null)
@@ -144,6 +161,7 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
   const [autoStop, setAutoStop] = useState(true)
   const [timeLeft, setTimeLeft] = useState(AUTOSTOP_SECONDS)
   const workerRef = useRef<Worker | null>(null)
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const [appTheme] = useTheme()
   const monacoTheme = monacoThemeName(appTheme)
 
@@ -239,6 +257,48 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
     if (exercise.autorun) runSketchRef.current()
   }, [exercise.autorun])
 
+  // Tell the sketch whether to scale its canvas up to fill the window.
+  const sendFit = useCallback(() => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "immerse-fit", fit: fullScreen === "sketch" },
+      "*",
+    )
+  }, [fullScreen])
+
+  useEffect(() => {
+    sendFit()
+  }, [sendFit])
+
+  // While a takeover is showing: Esc closes it (unless the code editor has
+  // focus, since Monaco uses Esc itself), and the page behind can't scroll.
+  useEffect(() => {
+    if (!fullScreen) return
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      if (e.key === "Escape" && !target?.closest(".monaco-editor")) {
+        setFullScreen(null)
+      }
+    }
+    // The sketch iframe swallows key presses, so it forwards Esc to us.
+    const onMessage = (e: MessageEvent) => {
+      if (
+        e.data?.type === "sketch-escape" &&
+        e.source === iframeRef.current?.contentWindow
+      ) {
+        setFullScreen(null)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    window.addEventListener("message", onMessage)
+    const oldOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      window.removeEventListener("keydown", onKey)
+      window.removeEventListener("message", onMessage)
+      document.body.style.overflow = oldOverflow
+    }
+  }, [fullScreen])
+
   const handleMount = useCallback<OnMount>((editor, monaco) => {
     // Dynamic keybindings share one global registry across every Monaco
     // instance on the page; without this, only the last-mounted exercise's
@@ -261,8 +321,26 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
   }, [])
 
   return (
-    <div className={s.wrap}>
+    <div
+      className={[
+        s.wrap,
+        fullScreen && s.fullScreen,
+        fullScreen === "sketch" && s.sketchOnly,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className={s.header}>
+        {fullScreen && (
+          <button
+            className={s.closeButton}
+            onClick={() => setFullScreen(null)}
+            title="Close full screen (Esc)"
+          >
+            <SvgIcon name="close" size={22} />
+            Close
+          </button>
+        )}
         <div className={s.toolbar}>
           <IconButton
             onClick={runSketch}
@@ -307,6 +385,24 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
               running={running}
             />
           </IconButton>
+          {allowFullScreenEditor && !fullScreen && (
+            <IconButton
+              onClick={() => setFullScreen("editor")}
+              aria-label="Full screen: code and sketch"
+              title="Full screen: code and sketch"
+            >
+              <SvgIcon name="fullscreen" size={20} />
+            </IconButton>
+          )}
+          {allowFullScreenSketch && !fullScreen && (
+            <IconButton
+              onClick={() => setFullScreen("sketch")}
+              aria-label="Full screen: sketch only"
+              title="Full screen: sketch only"
+            >
+              <SvgIcon name="monitor" size={20} />
+            </IconButton>
+          )}
         </div>
       </div>
 
@@ -327,6 +423,8 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
               hover: { enabled: hoverInfo },
               fontSize: 14,
               scrollBeyondLastLine: false,
+              // re-measure when a full-screen takeover resizes the pane
+              automaticLayout: true,
             }}
           />
         </div>
@@ -334,6 +432,8 @@ export function P5Exercise({ exercise }: { exercise: P5ExerciseProps }) {
         <div className={s.outputPane}>
           {srcdoc ? (
             <iframe
+              ref={iframeRef}
+              onLoad={sendFit}
               key={srcdoc}
               srcDoc={srcdoc}
               sandbox="allow-scripts allow-same-origin"

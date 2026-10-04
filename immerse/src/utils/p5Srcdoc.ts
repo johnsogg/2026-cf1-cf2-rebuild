@@ -19,6 +19,13 @@ export function buildSrcdoc(
     <style>
       body { margin: 0; overflow: hidden; }
       canvas { display: block; }
+      /* Full-screen sketch mode: center the canvas and scale it to fit. */
+      body.fit {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     </style>
   </head>
   <body>
@@ -40,7 +47,30 @@ export function buildSrcdoc(
         var t = e.target;
         var editable = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
         if (!editable && scrollKeys.indexOf(e.code) !== -1) e.preventDefault();
+        // Let the book close a full-screen takeover even while the sketch has
+        // focus. p5 still sees the key, too.
+        if (e.key === 'Escape') parent.postMessage({ type: 'sketch-escape' }, '*');
       });
+      // The book turns fit mode on and off with { type: 'immerse-fit', fit }.
+      // A CSS transform scales the canvas without touching its real size, and
+      // p5 accounts for it when reporting mouseX/mouseY.
+      var fit = false;
+      function applyFit() {
+        var c = document.querySelector('canvas');
+        if (!c) return;
+        var k = Math.min(innerWidth / c.offsetWidth, innerHeight / c.offsetHeight);
+        c.style.transform = fit ? 'scale(' + k + ')' : '';
+      }
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'immerse-fit') {
+          fit = !!e.data.fit;
+          document.body.classList.toggle('fit', fit);
+          applyFit();
+        }
+      });
+      window.addEventListener('resize', applyFit);
+      // The canvas may not exist yet (it's made in setup), so watch for it.
+      new MutationObserver(applyFit).observe(document.documentElement, { childList: true, subtree: true });
     <\/script>
     <script>
 ${studentJS}

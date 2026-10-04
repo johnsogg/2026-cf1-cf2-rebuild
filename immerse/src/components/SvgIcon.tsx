@@ -16,6 +16,8 @@ export type SvgName =
   | "check"
   | "close"
   | "trash"
+  | "fullscreen"
+  | "monitor"
 
 export type Intent =
   | "default"
@@ -53,6 +55,10 @@ const paths: Record<SvgName, string> = {
     "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
   trash:
     "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z",
+  fullscreen:
+    "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z",
+  monitor:
+    "M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z",
 }
 
 const intentColors: Record<Intent, string> = {
