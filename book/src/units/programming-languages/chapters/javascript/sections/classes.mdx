@@ -2,135 +2,694 @@ export const title = "Classes"
 
 # Classes
 
-> Intro: classes are like blueprints for making lots of things that share the
-> same basic format: they all include the same member data (fields) and
-> functions (methods). Given a single class you can make a zillion instances,
-> and they are all independent.
+A class is a blueprint for making lots of things that share the same basic
+format. Every thing made from a class has the same data (called _fields_) and
+the same functions (called _methods_). Given a single class, you can make a
+zillion of these things, and each one is independent of the others.
 
-> In this section we're going to look at classes by developing a type of digital
-> creature called a Boid. Boids have history (need two sentences of history).
+In this section we'll learn about classes by building a kind of digital creature
+called a _Boid_. Craig Reynolds invented Boids in 1986 to simulate flocking
+birds: the name is short for "bird-oid object." Each Boid follows a few simple
+rules about the neighbors it can see, and yet a whole group of them swoops and
+swirls like a real flock of birds or a school of fish.
 
 ## The `class` keyword
 
-> Think of a category of thing: cars, kitties, electronic medical records. These
-> are all defined by their shape: what data they hold and what behaviors they
-> exhibit. You can make a class to define that shape, and then create instances
-> of that class that are independent. If you know an object's class, you know a
-> lot about how to work with it.
+Think of a category of things: cars, kitties, electronic medical records. Each
+category is defined by its shape: what data its members hold, and what they can
+do. A class defines that shape. Then you create _instances_ of the class, and
+each instance is independent. If you know an object's class, you know a lot
+about how to work with it.
 
-> For example, we could make a class that represents students: you all have a
-> major or two, optionally a minor, you have a student ID, you can enrol in or
-> drop classes, you have some historical grades, and so on. That's the class for
-> students. But you as an individual have your own _specific_ data: your major,
-> your grades, your schedule.
+For example, we could make a class that represents students. Every student has a
+name and a student ID. You have a major or two, and maybe a minor. You can
+enroll in classes and drop them. That's the Student class. But you as an
+individual have your own _specific_ data: your name, your major, your schedule.
 
-> Before we show Boids (which are more fun to look at), let's look at a Student
-> type: class Student with some of the fields I mentioned
+Before we get to Boids (which are more fun to look at), here is a `Student`
+class with some of those fields:
 
-> You can then create _instances_ of this Student type: const alice = new
-> Student(..) const bob = new Student(..)
+<Ask id="classes-student" mode="untracked" title="A Student class">
 
-> These are two different objects that have the same features, even though the
-> particular data values they have are probably different.
+```jsconsole size="medium"
+class Student {
+  name
+  studentId
+  majors
+  minor
+  courses
+
+  constructor(name, studentId, majors) {
+    this.name = name
+    this.studentId = studentId
+    this.majors = majors
+    this.minor = null // optional, so it starts out empty
+    this.courses = []
+  }
+
+  enroll(course) {
+    this.courses.push(course)
+  }
+
+  drop(course) {
+    this.courses = this.courses.filter((c) => c !== course)
+  }
+}
+
+const alice = new Student("Alice", 1001, ["Computer Science"])
+const bob = new Student("Bob", 1002, ["Art", "Physics"])
+
+alice.enroll("Intro to Programming")
+bob.enroll("Ceramics")
+bob.enroll("Quantum Mechanics")
+bob.drop("Quantum Mechanics")
+
+console.log(alice.name, alice.courses)
+console.log(bob.name, bob.courses)
+```
+
+</Ask>
+
+The class starts by listing its fields: `name`, `studentId`, and so on. Then
+comes a special function called the `constructor`, which sets up a brand new
+student. Last are the methods `enroll` and `drop`, which are things a student
+can do.
+
+The two lines that say `new Student(...)` each create an _instance_ of the
+`Student` class. `alice` and `bob` are two different objects with the same
+features, even though the data in each one is different. When Bob drops a
+course, Alice's schedule doesn't change.
 
 ## Classes work nicely in graphics contexts
 
-> Object oriented programming was arguably developed because it mapped so nicely
-> to graphic-based applications like CAD. There are other programming paradigms
-> but "Object Oriented" is one of the most popular. It isn't the only good one,
-> and it isn't always appropriate for some given task. But it is often a great
-> choice for modeling graphical applications and interactive systems.
+Object-oriented programming grew up alongside computer graphics and simulation.
+One of the earliest programs to use the idea of a reusable "master" drawing,
+with lots of independent copies, was Ivan Sutherland's Sketchpad, an early CAD
+system from 1963. Object-oriented programming isn't the only good way to
+program, and it isn't the right choice for every task. But it is often a great
+choice for graphical applications and interactive systems.
 
-> Here's a class that represents a primitive Boid. let's get introduced to these
-> little critters:
+Let's meet our first Boid. Here's a class that represents a simple one:
 
-> p5 sketch of a Boid
+<Ask id="classes-one-boid" mode="untracked" title="One Boid">
 
-> This is a Boid, and it moves around the screen at random. We have a class
-> definition, but only one _instance_. We make that instance by using
-> `new Boid(..)` with arguments. This invokes the class's _constructor_
-> function, which is responsible for creating and assembling a new instance.
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
 
-> Since this one is lonely, we can add friends:
+class Boid {
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  diameter
+  bodyColor
 
-> p5 sketch of three Boids
+  constructor(x, y, diameter, bodyColor) {
+    this.x = x
+    this.y = y
+    this.dx = random(-60, 60)
+    this.dy = random(-60, 60)
+    this.diameter = diameter
+    this.bodyColor = bodyColor
+  }
 
-> This shows three unique boids in the same little Boid world. They are
-> _instances_.
+  draw() {
+    push()
+    noStroke()
+    fill(this.bodyColor)
+    circle(this.x, this.y, this.diameter)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(this.dx, this.dy).setMag(this.diameter * 0.3)
+    fill("white")
+    circle(this.x + eye.x, this.y + eye.y, this.diameter * 0.25)
+    fill("black")
+    circle(this.x + eye.x, this.y + eye.y, this.diameter * 0.15)
+    pop()
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    const seconds = delta / 1000
+    this.x += this.dx * seconds
+    this.y += this.dy * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+}
+
+let boid
+
+function setup() {
+  createCanvas(400, 300)
+  boid = new Boid(200, 150, 40, "#f66")
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  boid.move(delta)
+  boid.draw()
+}
+```
+
+</Ask>
+
+This Boid drifts across the screen in a random direction, wrapping around at the
+edges. We have one class definition, and one _instance_ of it. We make that
+instance with `new Boid(...)`, passing in a position, a size, and a color. Using
+`new` calls the class's _constructor_, which builds and sets up the new
+instance.
+
+This sketch uses `deltaTime`, as we saw in the animation section. Each time
+`draw` runs, it calculates `delta`, the number of milliseconds since the last
+frame, and passes it to `move`. The Boid's velocity is in pixels per _second_,
+so `move` turns `delta` into seconds before using it. (`MAX_DELTA_MS` is a
+safety net. If you switch tabs and come back, `deltaTime` might be huge, and the
+Boid would teleport.) Game engines like Godot and Unity work the same way, and
+so does the Space Junk homework.
+
+This Boid is lonely. Let's give it some friends:
+
+<Ask id="classes-three-boids" mode="interacted" title="Three Boids">
+
+Try adding a fourth color to the `colors` list to get a fourth Boid.
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+class Boid {
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  diameter
+  bodyColor
+
+  constructor(x, y, diameter, bodyColor) {
+    this.x = x
+    this.y = y
+    this.dx = random(-60, 60)
+    this.dy = random(-60, 60)
+    this.diameter = diameter
+    this.bodyColor = bodyColor
+  }
+
+  draw() {
+    push()
+    noStroke()
+    fill(this.bodyColor)
+    circle(this.x, this.y, this.diameter)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(this.dx, this.dy).setMag(this.diameter * 0.3)
+    fill("white")
+    circle(this.x + eye.x, this.y + eye.y, this.diameter * 0.25)
+    fill("black")
+    circle(this.x + eye.x, this.y + eye.y, this.diameter * 0.15)
+    pop()
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    const seconds = delta / 1000
+    this.x += this.dx * seconds
+    this.y += this.dy * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+}
+
+const boids = []
+
+function setup() {
+  createCanvas(400, 300)
+  const colors = ["#f66", "#8f8", "#48f"]
+  for (const bodyColor of colors) {
+    const x = random(0, width)
+    const y = random(0, height)
+    const diameter = random(20, 50)
+    boids.push(new Boid(x, y, diameter, bodyColor))
+  }
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+    boid.draw()
+  }
+}
+```
+
+</Ask>
+
+Now there are three Boids sharing the same little Boid world. The `Boid` class
+didn't change at all. We just called `new Boid(...)` three times.
 
 ## Instances
 
-> Each Boid has its own color, its own position, its own heading. They are their
-> own little people! Whenever we create objects based on classes, we call them
-> _instances_. Each boid is independent, but they have the same fields and
-> functions. We can say they have the same _type_, or _shape_.
+Each Boid has its own color, its own position, and its own heading. They are
+their own little people! Every object created from a class is an _instance_ of
+that class. Each Boid is independent, but they all have the same fields and
+methods. We say they have the same _type_, or the same _shape_.
 
-> Each Boid has its own behavior in the form of functions that are defined
-> inside the class block. Those functions are called `methods` in OO-speak, and
-> when you use them, they operate on some particular instance. `move` is one
-> such method; there is also `draw`. We will see many examples of methods later
-> on.
+Each Boid gets its behavior from the functions defined inside the class block.
+In object-oriented terms these functions are called _methods_, and when you call
+one, it works on one particular instance. `move` is a method, and so is `draw`.
+Calling `boid.move(delta)` moves that one Boid and none of the others.
 
-> Each Boid can refer to its own personal data (its position, its color) using
-> the `this` keyword. Whenever you see `this`, it means "the current object
-> instance". Inside the `move` method, for example, we write `this.x` to refer
-> to the X position of a particular Boid. Data fields associated with instances
-> are called `members` in object-oriented vernacular.
+Inside a method, a Boid refers to its own personal data (its position, its
+color) with the `this` keyword. `this` means "the instance this method was
+called on." Inside the `move` method, for example, `this.x` is the X position of
+whichever Boid is moving right now. The data fields that belong to an instance
+are often called _instance fields_. Together, a class's fields and methods are
+called its _members_.
 
-> Classes work nicely with graphics contexts because they compartmentalize the
-> data for various unique items, while recognizing that many of those items also
-> share structure. So we create a class for Boids, and then use it to create
-> many independent Boids.
+That's why classes work so well for graphics. They give each item on screen its
+own compartment of data, while capturing the structure that all of those items
+share. We write one class for Boids, and then use it to make as many independent
+Boids as we like.
 
 ## `static` members and methods
 
-> Sometimes you want to create data that is common to the entire class of
-> things. For example, with humans, the expected number of eyes and hands and
-> feet are all two; but for some other creatures, we might have Octopuses with
-> eight feet and two eyes, or mythical spider creatures with eight feet and
-> seventeen eyes.
+Sometimes you want data that is common to the entire class of things. For
+example, humans are expected to have two eyes, two hands, and two feet. Other
+creatures are different: octopuses have eight arms and two eyes, and some
+mythical spider creature might have eight legs and seventeen eyes.
 
-> Whenever you want to hold data that is common to the entire class, you can
-> mark that data as `static`. For example, for our Octopus type, we'd write it
-> like so: (insert an Octopus class with a static const for number of feet = 8).
+When some data belongs to the whole class rather than any one instance, mark it
+`static`. Here's an `Octopus` class:
 
-> This is useful if we want to add tunable parameters to a class, like the
-> default width or height.
+<Ask id="classes-octopus-static" mode="untracked" title="Static fields">
 
-> p5 sketch of boids that use static values for their radius, color, speed
+```jsconsole size="medium"
+class Octopus {
+  static NUM_ARMS = 8
+  static NUM_EYES = 2
 
-> Isn't this nicer to read? instead of hard-coded literals for things like
-> radius,color, speed we have nicely named constants like BOID_RADIUS.
+  name
 
-> Static functions can be useful for doing heavy lifting, especially if we think
-> we might want to re-use that function with arbitrary data. For example, the
-> draw function could defer to a static `drawBoid` function, so we can render a
-> boid without needing a specific boid instance.
+  constructor(name) {
+    this.name = name
+  }
 
-> p5 sketch of boid with a static draw function. show one boid instance moving
-> around, and at the bottom show text that says "Welcome to the Boid Show" and
-> render two static boids to the left and right of that text.
+  describe() {
+    console.log(
+      this.name +
+        " has " +
+        Octopus.NUM_ARMS +
+        " arms and " +
+        Octopus.NUM_EYES +
+        " eyes",
+    )
+  }
+}
 
-> This example shows how we can use the static `drawBoid` function from an
-> instance's draw() method, _and_ use that same `drawBoid` function from any
-> other location via `Boid.drawBoid` if all we want is to render a Boid image.
+const inky = new Octopus("Inky")
+const blinky = new Octopus("Blinky")
+inky.describe()
+blinky.describe()
 
-## File organization - one class per file
+console.log(Octopus.NUM_ARMS) // 8: static fields live on the class
+console.log(inky.NUM_ARMS) // undefined: not on the instance
+```
 
-> It is common but not required to put classes in their own files. For example,
-> `boid.js` should contain a `Boid` class. Good naming conventions can make your
-> life easier because you can find code faster. It also helps to prevent you
-> from reaching into other classes when you don't intend to (creating what
-> programmers affectionately call "spaghetti code", owing to the mess of
-> connections between them).
+</Ask>
+
+Notice that we get static values through the class name, as in
+`Octopus.NUM_ARMS`, and not through `this` or an instance. There's only one
+`NUM_ARMS`, and every octopus shares it.
+
+JavaScript has no `static const`, so nothing actually stops you from changing a
+static field. Instead, we use a naming convention: names in `SCREAMING_CASE`
+mean "this is a constant, please don't change it."
+
+Static fields are a great place for _tunable parameters_: numbers like a default
+size or speed that you might want to tweak later. Here are our Boids again, with
+their size, speed, and colors pulled out into static fields:
+
+<Ask id="classes-boid-static-fields" mode="interacted" title="Static Boid settings">
+
+Try changing the static fields: make every Boid twice as big, or half as fast.
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+const NUM_BOIDS = 8
+
+class Boid {
+  /** How big every boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast every boid travels, in pixels per second. */
+  static SPEED = 50
+  /** Each boid picks its body color from this list. */
+  static COLORS = ["#f66", "#8f8", "#48f", "#eaf", "#fd5"]
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+    // head off in a random direction, at the standard speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * Boid.SPEED
+    this.dy = Math.sin(angle) * Boid.SPEED
+    this.bodyColor = random(Boid.COLORS)
+  }
+
+  draw() {
+    push()
+    noStroke()
+    fill(this.bodyColor)
+    circle(this.x, this.y, Boid.DIAMETER)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(this.dx, this.dy).setMag(Boid.DIAMETER * 0.3)
+    fill("white")
+    circle(this.x + eye.x, this.y + eye.y, Boid.DIAMETER * 0.25)
+    fill("black")
+    circle(this.x + eye.x, this.y + eye.y, Boid.DIAMETER * 0.15)
+    pop()
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    const seconds = delta / 1000
+    this.x += this.dx * seconds
+    this.y += this.dy * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+}
+
+const boids = []
+
+function setup() {
+  createCanvas(400, 300)
+  for (let i = 0; i < NUM_BOIDS; i++) {
+    boids.push(new Boid(random(0, width), random(0, height)))
+  }
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+    boid.draw()
+  }
+}
+```
+
+</Ask>
+
+Isn't this nicer to read? Instead of numbers scattered through the code, we have
+named constants like `Boid.DIAMETER` and `Boid.SPEED`. And if you want bigger or
+faster Boids, there's exactly one place to change.
+
+Methods can be static, too. A static method belongs to the class, so you call it
+without needing any particular instance. That makes it handy for heavy lifting
+that you might want to reuse with arbitrary data. For example, a Boid's `draw`
+method could hand the real drawing work off to a static `drawBoid` method. Then
+we can draw a Boid picture anywhere, even when there is no actual Boid.
+
+<Ask id="classes-boid-static-draw" mode="untracked" title="The Boid Show">
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+class Boid {
+  /** How big every boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast every boid travels, in pixels per second. */
+  static SPEED = 50
+  /** Each boid picks its body color from this list. */
+  static COLORS = ["#f66", "#8f8", "#48f", "#eaf", "#fd5"]
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+    // head off in a random direction, at the standard speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * Boid.SPEED
+    this.dy = Math.sin(angle) * Boid.SPEED
+    this.bodyColor = random(Boid.COLORS)
+  }
+
+  draw() {
+    push()
+    translate(this.x, this.y)
+    Boid.drawBoid(this.bodyColor, this.dx, this.dy)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, Boid.DIAMETER)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(Boid.DIAMETER * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.15)
+    pop()
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    const seconds = delta / 1000
+    this.x += this.dx * seconds
+    this.y += this.dy * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+}
+
+let boid
+
+function setup() {
+  createCanvas(400, 300)
+  boid = new Boid(200, 120)
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  boid.move(delta)
+  boid.draw()
+
+  // the marquee: no Boid instances here, just Boid pictures
+  const signY = height - 30
+  fill("white")
+  noStroke()
+  textAlign(CENTER, CENTER)
+  textSize(18)
+  text("Welcome to the Boid Show", width / 2, signY)
+
+  push()
+  translate(60, signY)
+  Boid.drawBoid("#fd5", 1, 0) // looking right, toward the sign
+  pop()
+
+  push()
+  translate(width - 60, signY)
+  Boid.drawBoid("#eaf", -1, 0) // looking left, toward the sign
+  pop()
+}
+```
+
+</Ask>
+
+The moving Boid's `draw` method calls `Boid.drawBoid`, passing in its own color
+and direction. The two Boids flanking the sign aren't instances at all. They're
+just pictures, drawn by calling `Boid.drawBoid` directly. Notice that `drawBoid`
+never mentions `this`. Static methods don't have an instance to refer to, so
+everything they need comes in through their parameters (or from other static
+members, like `Boid.DIAMETER`).
+
+## File organization: one class per file
+
+It's common, but not required, to put each class in its own file. For example, a
+file called `boid.js` would contain the `Boid` class. The Space Junk homework
+does this: the `Junk` class is in `junk.js`, `Mothership` is in `mothership.js`,
+and so on. Good naming conventions make your life easier, because you can find
+code faster.
+
+Separate files also make it harder to reach into another class's business when
+you didn't mean to. When every part of a program pokes at every other part, the
+connections turn into a tangled mess that programmers affectionately call
+"spaghetti code."
+
+(The sketches in this book put everything in one file, because each example runs
+in a single editor.)
 
 ## Object interactions
 
-> You can make two boids interact. The traditional concept of a Boid is that
-> they recognize each other and adjust their velocities so they move in tandem.
-> If you have many Boids, they exhibit flocking behavior, all based on simple
-> logic. Here is a sketch of two Boids that notice each other and attempt to
-> move in more similar directions:
+Things get interesting when Boids interact. In Reynolds' original idea, each
+Boid notices the others nearby and adjusts its own velocity to match. Put many
+Boids together and you get flocking, all from simple logic. Here are two Boids
+that notice each other and gradually steer toward the same heading. The gray
+ring around each one shows how far it can see.
 
-> p5 sketch of two boids that can notice one another and slightly adjust their
-> movement to align.
+<Ask id="classes-boids-align" mode="untracked" title="Boids that notice">
+
+```p5exercise autorun size="large"
+/** The longest frame we'll simulate, in ms. */
+const MAX_DELTA_MS = 50
+
+class Boid {
+  /** How big every boid is, in pixels. */
+  static DIAMETER = 30
+  /** How fast every boid travels, in pixels per second. */
+  static SPEED = 50
+  /** How far away a boid can notice others, in pixels. */
+  static NOTICE_RADIUS = 120
+  /** How quickly a boid can turn, in pixels per second, per second. */
+  static STEER = 30
+
+  x
+  y
+  /** Velocity, in pixels per second. */
+  dx
+  dy
+  bodyColor
+
+  constructor(x, y, bodyColor) {
+    this.x = x
+    this.y = y
+    // head off in a random direction, at the standard speed
+    const angle = random(0, 2 * Math.PI)
+    this.dx = Math.cos(angle) * Boid.SPEED
+    this.dy = Math.sin(angle) * Boid.SPEED
+    this.bodyColor = bodyColor
+  }
+
+  draw() {
+    push()
+    translate(this.x, this.y)
+    // how far this boid can see. It's a radius, so the circle's
+    // diameter is twice that.
+    noFill()
+    stroke("#444")
+    circle(0, 0, 2 * Boid.NOTICE_RADIUS)
+    Boid.drawBoid(this.bodyColor, this.dx, this.dy)
+    pop()
+  }
+
+  /**
+   * Draws a boid picture around (0, 0), with its eye facing the direction
+   * (dx, dy). The caller moves the transform to wherever it should appear.
+   **/
+  static drawBoid(bodyColor, dx, dy) {
+    push()
+    noStroke()
+    fill(bodyColor)
+    circle(0, 0, Boid.DIAMETER)
+    // the eye sits near the edge, facing the direction of travel
+    const eye = createVector(dx, dy).setMag(Boid.DIAMETER * 0.3)
+    fill("white")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.25)
+    fill("black")
+    circle(eye.x, eye.y, Boid.DIAMETER * 0.15)
+    pop()
+  }
+
+  /** Moves the boid for `delta` milliseconds, wrapping at the edges. */
+  move(delta) {
+    const seconds = delta / 1000
+    this.x += this.dx * seconds
+    this.y += this.dy * seconds
+    if (this.x < 0) this.x += width
+    if (this.x >= width) this.x -= width
+    if (this.y < 0) this.y += height
+    if (this.y >= height) this.y -= height
+  }
+
+  /**
+   * If the other boid is close enough to notice, nudge this boid's velocity
+   * a little toward the other's. Speed stays the same; only the direction
+   * changes.
+   **/
+  notice(other, delta) {
+    const distance = Math.hypot(other.x - this.x, other.y - this.y)
+    if (distance < Boid.NOTICE_RADIUS) {
+      const maxChange = Boid.STEER * (delta / 1000)
+      const nudge = createVector(other.dx - this.dx, other.dy - this.dy)
+      nudge.limit(maxChange)
+      const velocity = createVector(this.dx + nudge.x, this.dy + nudge.y)
+      velocity.setMag(Boid.SPEED)
+      this.dx = velocity.x
+      this.dy = velocity.y
+    }
+  }
+}
+
+const boids = []
+
+function setup() {
+  createCanvas(400, 300)
+  boids.push(new Boid(150, 150, "#f66"))
+  boids.push(new Boid(250, 150, "#48f"))
+}
+
+function draw() {
+  const delta = Math.min(deltaTime, MAX_DELTA_MS)
+  background("black")
+  for (const boid of boids) {
+    boid.move(delta)
+  }
+  // every boid notices every other boid, but not itself
+  for (const boid of boids) {
+    for (const other of boids) {
+      if (boid !== other) {
+        boid.notice(other, delta)
+      }
+    }
+  }
+  for (const boid of boids) {
+    boid.draw()
+  }
+}
+```
+
+</Ask>
+
+`notice` is a method that takes _another_ Boid as its argument. Inside it,
+`this` is the Boid doing the noticing and `other` is the one being noticed, so
+the method can compare the two: how far apart they are, and how different their
+velocities are. If they're close enough, `this` Boid turns a little toward
+`other`'s heading. Since every Boid runs the same code, both of them turn toward
+each other's heading until they're flying side by side.
+
+The nested loops in `draw` have each Boid notice every other Boid. The check
+`boid !== other` keeps a Boid from noticing itself.
