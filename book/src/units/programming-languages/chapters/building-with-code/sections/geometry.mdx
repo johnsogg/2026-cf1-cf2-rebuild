@@ -2,20 +2,424 @@ export const title = "Geometry"
 
 import { TransformPlayground } from "immerse/components/TransformPlayground"
 
-_Still a WIP, but check out this graphics transform thing!_
+> Intro: interactive programs constantly ask spatial questions. Did the user
+> click on this shape? Did the asteroid hit the ship? How far is the boid from
+> its neighbor? This section covers the basic geometric primitives and the
+> handful of tools for asking questions about them. Goal is knowing what tools
+> exist and when to reach for them, not deriving formulas from scratch.
+
+## Points
+
+> A point is an (x, y) pair. Everything else in this section is built from
+> points.
+
+> Representing a point in code: two loose variables vs. an object `{ x, y }` vs.
+> a `Point` class (callback to the classes section). Pick one convention for the
+> rest of the section.
+
+## Lines
+
+> Two points define a line. Stub for how we represent one in code (a pair of
+> points).
+
+> Flag that "line" is doing a lot of work here; we'll get precise about it later
+> in the section. For now, think of the line through two points.
+
+## Polygons
+
+> A polygon is an ordered list of points, connected in order, with the last
+> point connecting back to the first. Drawing one with `beginShape()` /
+> `vertex()` / `endShape(CLOSE)`.
+
+> Rectangles and triangles are just polygons with special shortcuts in p5.
+> Circles aren't polygons, but they're simple primitives too: a center point and
+> a radius.
+
+## How primitives interact
+
+> Most geometric questions are about how two primitives relate to each other.
+
+### Distance between two points
+
+> Pythagorean theorem. Good spot for LaTeX:
+> $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$. Then the code version, and p5's
+> built-in `dist(x1, y1, x2, y2)`.
+
+> New PointPlayground:Show two points and give information about where they are.
+> What the Delta X is between them. What the Delta Y is between them what is the
+> line segment forming their hypotenuse and also show the Pythagorean theorem in
+> action dynamically updating as the user moves the points. The user is allowed
+> to drag either point in the field please give a P5.JS style coordinate system
+> where why points down and show the positive X and Y coordinate space only
+
+### Distance between a point and a line
+
+> The shortest distance is along the perpendicular from the point to the line.
+> Give the formula/function; don't derive it. Use case: "did the user click near
+> this line?" is distance < some tolerance.
+
+> PointLinePlayground: make a new point to line playground that lets the user
+> move around a free floating point and the two end points of a line segment and
+> show computer information about the relationship between the point and that
+> line segment, you can compute the distance in terms of XNY also as the
+> shortest path from the point to the line using the Pythagorean theorem the
+> point on the line segment that is closest to the point might or might not fall
+> between the two end points of the line segment also show that
+
+### Where two lines intersect
+
+> Two lines either cross at exactly one point, or they're parallel and never
+> cross (or they're the same line). A reusable function that returns the
+> intersection point, or `null` if there isn't one. Keep this one light: the
+> parametric version later in the section gives us a better function.
+
+> LinePlayground: create a new line playground that lets the user drag around
+> and points of two line segments show the interior of the line segments with a
+> solid line and the extensions with a dash line as the user drags points around
+> show computed information about their relationship. This includes the
+> parameters relating the intersection point if any the dot product formed by
+> the two line segments as though they were vectors the cross product of the two
+> line segments as though they were vectors and the distance between the lines
+> as defined as line segments. Provide toggles for both line segments to
+> transform them into abstract, infinite lines that continue forever raise that
+> have one definite start point and extend off into infinity only in One
+> Direction and of course the line segments that have an interior region only.
+
+## Lines, segments, and rays
+
+> The nuance flagged earlier. A _line_ extends to infinity in both directions. A
+> _segment_ has two definite endpoints. A _ray_ has one endpoint and extends to
+> infinity in one direction.
+
+> Why it matters: the line/line intersection above was for infinite lines. Two
+> segments drawn on screen might not touch, even though the lines through them
+> do. Same for point-to-line distance: the closest point on a segment might be
+> one of its endpoints.
+
+> Figure idea: the same two pairs of points drawn as lines, segments, and rays,
+> showing that whether they intersect changes.
+
+> Most things you draw are segments. Lines and rays are mostly useful as tools
+> for computing things (e.g. the ray in the next section).
+
+### Parametric form
+
+> A different way to write down a line: start at point A and travel toward B. A
+> parameter `t` says how far you've gone. `t = 0` is at A, `t = 1` is at B,
+> `t = 0.5` is the midpoint. Good spot for LaTeX: $P(t) = A + t\,(B - A)$.
+
+> In code, this is two lines: `x = ax + t * (bx - ax)` and the same for y.
+> Callback: this is the same idea as `lerp()` (if lerp has come up already).
+
+> The payoff: lines, segments, and rays are the same formula with different
+> allowed values of `t`. Segment: `0 <= t <= 1`. Ray: `t >= 0`. Line: any `t`.
+
+> Ask idea: a slider for `t` that moves a dot along a segment, and keeps going
+> past the endpoints when `t` goes below 0 or above 1.
+
+> Revisit point-to-segment distance: find the `t` of the closest point on the
+> infinite line, clamp it to `[0, 1]`, and measure to that point. Clamping is
+> exactly the "closest point might be an endpoint" case from above.
+
+### Intersecting segments, parametrically
+
+> Write both segments parametrically, with `t` for the first and `u` for the
+> second, and solve for where they're equal: $A + t\,(B - A) = C + u\,(D - C)$.
+> Give the solution; don't derive it. (It's two equations in two unknowns; uses
+> the 2D cross product.)
+
+> What you get back is more than a point. The values of `t` and `u` tell you how
+> the segments relate:
+>
+> - Both `t` and `u` in `[0, 1]`: the segments cross, on the interior of both.
+> - Only one in `[0, 1]`: the infinite lines cross on one segment but off the
+>   end of the other.
+> - Neither: the lines cross, but off the ends of both segments.
+> - `t` or `u` exactly 0 or 1: the segments touch at an endpoint.
+> - Denominator is zero: the lines are parallel, so no single `t`. A second
+>   check tells you if they're also collinear (on the same line), in which case
+>   they might overlap.
+
+> The reusable function returns all of this (e.g. `{ point, t, u }`, or a result
+> that says "parallel" or "collinear"), not just a point or `null`. Callers pick
+> the case they care about: hit tests want "interior of both", ray casting wants
+> `t >= 0` and `u` in `[0, 1]`.
+
+> Note on floating point: "exactly 0" and "exactly parallel" rarely happen with
+> real numbers, so compare against a small tolerance.
+
+> Ask idea: drag the four endpoints and show `t`, `u`, and which case you're in,
+> live.
+
+## Curves and splines
+
+> Straight segments only get you so far. p5 has two built-in families of smooth
+> curves: Bézier curves (`bezier()`, `bezierVertex()`) and cardinal splines
+> (`spline()`, `splineVertex()`). Goal of this section: remove the magic. Both
+> are parametric, just like the segment above, and both are built from the same
+> `lerp` idea.
+
+> Note on p5 versions: the book uses p5 v2, where these are `spline()` /
+> `splineVertex()`. Older tutorials online call them `curve()` /
+> `curveVertex()`.
+
+> CurvePlayground: make a new playground called curve playground that lets the
+> user playground with Bezier curves and splines. For Bezier curves, it's
+> important to show the distinction between the segment and points, which are
+> definitely on the curve and the two internal control points, which specify the
+> tangent to the Bezier curve at its end points. Students will have seen these
+> before in graphic editors, but probably have never thought about what is
+> actually going on mathematically so we need to show that the two internal
+> control handles specify that tangent direction. For the Cardinal spline, we
+> need to show the important property of control points necessarily falling on
+> the resulting curve.
+
+### Bézier curves
+
+> A cubic Bézier has four points: two endpoints (often called anchors) and two
+> control points (often called handles). Like the segment, it's parametric:
+> `t = 0` is the first anchor, `t = 1` is the last.
+
+> Removing the magic, de Casteljau's construction: lerp between each pair of
+> neighboring points at the same `t` (three points), lerp between those (two
+> points), lerp once more (one point). That last point is on the curve. Sweep
+> `t` from 0 to 1 and you trace out the whole thing. It's just segments within
+> segments.
+
+> Ask idea: interactive figure with a `t` slider that shows the three levels of
+> lerp lines and the point they produce, with draggable control points.
+> (Candidate for a custom immerse component, like TransformPlayground.)
+
+> What the control points mean: the curve starts at the first anchor heading
+> toward the first handle, and arrives at the last anchor coming from the
+> direction of the second handle. Further-out handles pull the curve harder in
+> that direction. The handles generally aren't on the curve; they pull it rather
+> than pin it.
+
+> The whole curve stays inside the shape (convex hull) formed by its four
+> points. Handy for quick hit-test rejection.
+
+> Optional, for the math-curious: the closed-form polynomial (Bernstein form),
+> $B(t) = (1-t)^3 P_0 + 3(1-t)^2 t\,P_1 + 3(1-t)t^2 P_2 + t^3 P_3$. It's the de
+> Casteljau construction multiplied out.
+
+> p5: `bezier(x1, y1, ..., x4, y4)` for one curve. In v2, `bezierVertex()` takes
+> one point per call, three calls per cubic segment (after a starting
+> `vertex()`). `bezierPoint()` / `bezierTangent()` evaluate the curve at a given
+> `t`.
+
+### Cardinal splines
+
+> A cardinal spline is defined by a list of points, and the curve passes through
+> every one of them. No off-curve handles.
+
+> How it decides its direction at each point: the tangent at a point is parallel
+> to the line between its two neighbors (figure idea: segment A→C drawn parallel
+> to the tangent at B). A tightness setting scales how strong that tangent is.
+> Tightness 0 is the common Catmull-Rom spline (p5's default); tightness 1 gives
+> straight segments.
+
+> Consequence: each piece of the curve between two points depends on four points
+> (the two it connects plus one neighbor on each side). The first and last
+> points have only one neighbor, so something special has to happen at the ends.
+> p5 v2 passes through them by default (`splineProperty('ends', INCLUDE)`), or
+> you can use them only as direction guides that aren't drawn (`EXCLUDE`, which
+> matches old `curveVertex()` behavior).
+
+> Removing the magic: each piece of a cardinal spline is a cubic Bézier in
+> disguise. The handles are computed from the neighboring points. (Optional:
+> show the conversion.)
+
+> p5: `splineVertex()` inside `beginShape()` / `endShape()`,
+> `splineProperty('tightness', ...)`, `splinePoint()` / `splineTangent()`.
+
+### Control and continuity
+
+> Perception of control. Bézier: handles are off the curve, which can feel
+> indirect at first, but they give you direct control over direction and pull at
+> each end. This is what the pen tool in Illustrator/Figma/Inkscape is.
+> Cardinal: what you click is what you get, since every point is on the curve,
+> but you can't set the direction at a point on its own. Moving one point also
+> bends the pieces next to it, and the curve can overshoot between points.
+
+> Continuity: when you chain curves together, does the joint look smooth? Define
+> informally: connected (no gap), same direction (no corner), same speed.
+> (Optional: the C0 / G1 / C1 names.)
+
+> Chained Béziers: connected if each curve starts where the last one ended, but
+> smooth only if the handles on either side of the joint line up with it
+> (collinear). That's your job. Design tools enforce this with "smooth" vs.
+> "corner" points.
+
+> Cardinal splines: smooth through every interior point automatically, since the
+> tangent there is computed from the same neighbors on both sides. You get
+> smoothness for free, and give up the ability to make a sharp corner without
+> tricks.
+
+> Ask idea: the same set of points drawn as a chain of Béziers and as a cardinal
+> spline; drag a point and watch which parts of each curve move.
+
+## Hit tests
+
+> A hit test asks whether two primitives intersect. Usually one of them is a
+> point (the mouse), so the question becomes "is this point inside this shape?"
+
+> Point in circle: `dist(px, py, cx, cy) < radius`.
+
+> Point in rectangle: axis-aligned bounding box (AABB) check with four
+> comparisons. Previews the data structures chapter.
+
+> Point near a segment: point-to-segment distance < tolerance.
+
+> Point in polygon: cast a ray from the point in any direction and count how
+> many polygon edges it crosses. Odd means inside, even means outside. Nice
+> payoff for rays.
+
+> Ask idea: a sketch with several shapes that highlight when the mouse is over
+> them.
+
+> HitTestPlayground: create another playground called hit test playground that
+> lets the user pick between two input geometric entities and compare how they
+> intersect entities include those just mentioned above this paragraph such as
+> points, circles, rectangles lines let the user manipulate these objects by
+> either dragging their vertices control points, or in the case of polygons the
+> entire object by dragging from the middle as output show if they intersect,
+> and if so, where if the intersection is a region color it differently if they
+> don't intersect state that as much as well.
+
+> Bridge to the next section: all of these tests assume the shape and the mouse
+> are in the same coordinate system. But a ship that's been moved, rotated, and
+> scaled draws itself in its own local coordinates. To hit-test it, we need a
+> way to move between coordinate systems. That's what affine transforms are for.
+
+## Affine transforms
+
+> Intro: anything you draw can have its own local coordinate system. So far
+> every shape has been placed using the canvas's (world) coordinates. Affine
+> transforms let a drawing live in its own frame of reference, and then get
+> placed into the world.
+
+### Drawing relative to your own origin
+
+> The Magpie (from Space Junk) knows how to draw itself around its own (0, 0),
+> which sits in the middle of its hull. The platform, the window, and every
+> other part are computed relative to that origin.
+
+> Why this is a big deal: the drawing code doesn't need to know or care where
+> the ship is, which way it faces, or how big it is. It just does its thing in
+> its own frame of reference. Cognitive win; laziness in the programmer-virtue
+> sense.
+
+> Figure/sketch: the Magpie translated and rotated, world axes in gray, object
+> axes in blue.
+
+### The three common transforms
+
+> Translate: move by some dx and dy. Rotate: spin the coordinate system by an
+> angle (in radians). Scale: stretch or squish, either uniformly or with
+> separate x and y factors.
+
+> Brief mention that others exist (skew/shear) but these three cover nearly
+> everything.
+
+> Note: because y points down on the canvas, a positive rotation looks
+> clockwise. (Ties back to the earlier coordinate-system discussion.)
+
+### The current matrix in p5
+
+> p5 (like most graphics libraries) keeps a "current" transform that applies to
+> everything you draw. Calling `translate(dx, dy)`, `rotate(angle)`, `scale(s)`
+> / `scale(sx, sy)` combines a new transform with what's already there; it
+> doesn't replace it.
+
+> The current matrix is subject to `push()` / `pop()`, just like fill and
+> stroke. `pop()` throws away everything since the matching `push()`.
+
+<Ask id="geometry-push-pop-transforms" mode="untracked">
+
+```p5exercise size="small" autorun
+function setup() {
+  createCanvas(300, 300)
+}
+
+function draw() {
+  background(240)
+
+  push()
+  translate(50, 150)
+  drawThing()
+  pop()
+
+  push()
+  translate(150, 150)
+  scale(3)
+  drawThing()
+  pop()
+
+  push()
+  translate(250, 150)
+  scale(2)
+  rotate(0.25 * PI)
+  drawThing()
+  pop()
+}
+
+// draws around its own (0, 0)
+function drawThing() {
+  rectMode(CENTER)
+  rect(0, 0, 10, 10)
+  line(0, 0, 10, 0)
+}
+```
+
+</Ask>
+
+> Walk through the three blocks: same `drawThing()` each time, three different
+> placements.
+
+### Order matters
+
+> Transforms are applied in sequence, so translate-then-rotate is not the same
+> as rotate-then-translate. Typical recipe for placing an object: translate to
+> where it goes, rotate it to face the right way, scale it to the right size,
+> then draw at (0, 0).
+
+> Playground: build a stack of transforms and watch the object (and its grid)
+> move. Toggle between object view and world view. Try reordering the same
+> transforms to see that order matters.
 
 <TransformPlayground />
 
-> Simple spatial math for making things interact with space. Goals:
->
-> - dist(x1, y1, x2, y2) — distance between two points
-> - Point-in-circle test: dist(px, py, cx, cy) < radius
-> - Point-in-rectangle test: axis-aligned bounding box check (px gte rx && px
->   lte rx+rw && py gte ry && py lte ry+rh)
-> - Line/line intersection: the math and a reusable function for it
-> - Angle between two points: atan2(dy, dx)
-> - Connecting geometry to interactivity: "did the user click on this shape?" is
->   a geometry question These are the building blocks of hit-testing, collision
->   detection, and spatial queries. Students don't need to derive the formulas
->   from scratch — they need to know what tools exist, what they do, and how to
->   reach for them. The AABB check previews the data structures chapter.
+> Ask idea: a short "predict where it ends up" exercise, e.g. given
+> `translate(100, 0)` + `rotate(HALF_PI)` vs. the reverse, which picture is
+> which? (Possibly a MultipleChoiceExercise.)
+
+### Under the hood: matrices
+
+> In 2D, a 3x3 matrix transforms points from one coordinate system into another.
+> Each of translate/rotate/scale has its own matrix shape. You won't write these
+> by hand in p5, but it's useful to know they're there.
+
+$$
+\text{Identity} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}
+\qquad
+\text{Translate} = \begin{bmatrix} 1 & 0 & t_x \\ 0 & 1 & t_y \\ 0 & 0 & 1 \end{bmatrix}
+$$
+
+$$
+\text{Scale} = \begin{bmatrix} s_x & 0 & 0 \\ 0 & s_y & 0 \\ 0 & 0 & 1 \end{bmatrix}
+\qquad
+\text{Rotate} = \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix}
+$$
+
+> The identity matrix is the "do nothing" default: transforming a point by it
+> gives back the same point. It's what the current matrix starts as (and what
+> the playground's empty stack means).
+
+> Why "affine": these transforms preserve parallel lines. Parallel lines in
+> object space are still parallel after translating, rotating, or scaling.
+
+> Combining: multiplying two 3x3 matrices gives another 3x3 matrix, so any chain
+> of transforms collapses into one matrix. That's what p5's current matrix is.
+
+> Aside: 3D uses 4x4 matrices, and GPUs are built to crunch these fast.
