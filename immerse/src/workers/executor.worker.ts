@@ -1,4 +1,5 @@
 import * as ts from "typescript"
+import { p5Globals } from "./p5Headless"
 
 type TestResult = {
   name: string
@@ -41,8 +42,16 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
     const script = buildScript(studentJS, testJS, moduleName)
 
-    const fn = new Function(script)
-    const results: TestResult[] = fn()
+    // Student and test code can use p5's math (p5.Vector, createVector, dist,
+    // ...) as globals. They're passed in as parameters of an outer function;
+    // the script runs in an inner one, so a top-level `const min` in a test
+    // shadows p5's `min` instead of colliding with it.
+    const globals = p5Globals()
+    const fn = new Function(
+      ...Object.keys(globals),
+      `return (function () {${script}})()`,
+    )
+    const results: TestResult[] = fn(...Object.values(globals))
 
     const response: WorkerResponse = { results, logs }
     self.postMessage(response)

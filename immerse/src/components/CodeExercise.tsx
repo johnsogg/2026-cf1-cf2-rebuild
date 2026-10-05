@@ -5,6 +5,7 @@ import ExecutorWorker from "../workers/executor.worker?worker"
 import { useTheme } from "../hooks/useTheme"
 import { registerMonacoThemes, monacoThemeName } from "../utils/monacoThemes"
 import { isolateMonacoTypescriptFiles } from "../utils/monacoIsolation"
+import { registerMonacoP5Globals } from "../utils/monacoP5Globals"
 import type { Monaco } from "@monaco-editor/react"
 import s from "./CodeExercise.module.css"
 import btn from "../styles/buttons.module.css"
@@ -15,6 +16,7 @@ import { useAsk } from "./Ask"
 function handleBeforeMount(monaco: Monaco) {
   registerMonacoThemes(monaco)
   isolateMonacoTypescriptFiles(monaco)
+  registerMonacoP5Globals(monaco)
 }
 
 export type CodeExerciseProps = {

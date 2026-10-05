@@ -30,21 +30,27 @@ Greek letter $\theta$ (theta) for an angle, so you'll see it a lot. In code it
 usually gets spelled out as `theta` or `angle`.
 
 p5 measures angles in _radians_, not degrees. A full turn is $2\pi$ radians
-(about 6.283), so a half turn is $\pi$ and a quarter turn is $\pi / 2$. p5
-has constants for the common ones: `TWO_PI`, `PI`, `HALF_PI`, and
-`QUARTER_PI`. If you'd rather think in degrees, `radians(90)` converts degrees
-to radians, and `degrees(HALF_PI)` goes the other way.
+(about 6.283), so a half turn is $\pi$ and a quarter turn is $\pi / 2$. p5 has
+constants for the common ones: `TWO_PI`, `PI`, `HALF_PI`, and `QUARTER_PI`. If
+you'd rather think in degrees, `radians(90)` converts degrees to radians, and
+`degrees(HALF_PI)` goes the other way.
 
 Two functions connect an angle to a direction. Imagine an arrow of length 1
 pointing at angle $\theta$. Then `cos(theta)` is how far that arrow reaches
 along x, and `sin(theta)` is how far it reaches along y. For a longer arrow,
 multiply both by its length. You've already used this: it's how the planets in
-the animation section move around their sun, and how each Boid in the classes
-section turns its heading into a velocity.
+the
+[animation section](/programming-languages/javascript/animation#using-millis-and-trig)
+move around their sun, and how each Boid in the
+[classes section](/programming-languages/javascript/classes#classes-work-nicely-in-graphics-contexts)
+turns its heading into a velocity.
 
 Drag the arrow around below. The colored bars along the axes are the arrow's
 "shadows" on x and y, and they're exactly `cos(theta)` and `sin(theta)` times
-the arrow's length.
+the arrow's length. The marks around the circle show what radians look like: an
+eighth of a turn is $\pi / 4$, a quarter turn is $\pi / 2$, a half turn is
+$\pi$, and all the way around is $2\pi$, right back where you started. The
+arrow snaps to these marks when you get close.
 
 <AnglePlayground />
 
@@ -52,8 +58,8 @@ A few things to notice as you spin it:
 
 - At $\theta = 0$, the arrow points straight along x, so cosine is 1 and sine
   is 0. A quarter turn later, it's the other way around.
-- Cosine and sine are never bigger than 1 or smaller than -1. The arrow can
-  only reach as far as its own length.
+- Cosine and sine are never bigger than 1 or smaller than -1. The arrow can only
+  reach as far as its own length.
 - The angle grows _clockwise_ on screen. That's because y points down in p5. In
   a math class, where y points up, the same angle would turn counterclockwise.
 
@@ -62,16 +68,16 @@ Now flip the toggle so that $\theta = 0$ points up. Measuring angles from +x
 it's what p5's `cos()`, `sin()`, and `rotate()` all assume. But it's not the
 only way to reckon about angles. Compass headings start from north, and lots of
 games treat "up" as the natural direction for a ship to face. When $\theta = 0$
-points up, the roles of cosine and sine switch: x comes from `sin(theta)`, and
-y comes from `-cos(theta)`. Neither convention is wrong. What matters is
-knowing which one your code is using. Mixing them up is a classic bug: the
-ship's picture points up, but it flies off to the right.
+points up, the roles of cosine and sine switch: x comes from `sin(theta)`, and y
+comes from `-cos(theta)`. Neither convention is wrong. What matters is knowing
+which one your code is using. Mixing them up is a classic bug: the ship's
+picture points up, but it flies off to the right.
 
 You can also go the other way, from a direction to an angle. Given how far
-something is in x and y, `atan2(dy, dx)` gives you the angle it points at,
-measured from +x. Note the order: y comes first. For example,
-`atan2(mouseY - shipY, mouseX - shipX)` is the angle that points from the ship
-toward the mouse.
+something is in x and y, you can use the `atan2` trig function to give you the
+angle it points at, measured from +x. Note the order: y comes first. For
+example, `atan2(mouseY - shipY, mouseX - shipX)` is the angle that points from
+the ship toward the mouse.
 
 ## Points
 
@@ -82,7 +88,8 @@ You could store a point as two separate variables, like `shipX` and `shipY`.
 That works for one point, but it gets clumsy fast: a triangle needs six
 variables, and a function that works on two points needs four parameters. It's
 much tidier to keep each point's x and y together in one value. We already have
-a tool for that: the p5 vector you met in the arithmetic section.
+a tool for that: the p5 vector you met in the
+[arithmetic section](/programming-languages/javascript/arithmetic#vectors).
 
 ```js
 let a = createVector(40, 200)
@@ -91,10 +98,15 @@ let b = createVector(240, 50)
 console.log(a.x, a.y) // 40 200
 ```
 
-A vector made with `createVector` has `x` and `y` properties, so for our
-purposes it's just a point with a few handy methods attached. Any function in
-this section that takes a point would work just as well with a plain object like
-`{ x: 40, y: 200 }`, since all it ever looks at is `x` and `y`.
+A vector made with `createVector` has `x` and `y` properties, so at heart it's
+just a point. But it also comes with methods like `sub`, `dot`, `cross`, and
+`lerp`, which do the vector math in the rest of this section for you. The
+examples here use those helpers. If you store points as plain objects like
+`{ x: 40, y: 200 }`, the ideas are the same, but you'd have to write those
+helpers yourself.
+
+Outside of p5, you'll have some other strategies for working with vectors. All
+of the concepts presented here are portable outside of p5.
 
 ## Lines
 
@@ -197,8 +209,8 @@ The shortest path from a point to a line meets the line at a right angle. So the
 distance from a point to a line is the length of the perpendicular from the
 point to the line.
 
-With A and B on the line and P the point, there's a compact formula for this.
-It uses two vectors: $B - A$, which points along the line, and $P - A$, which
+With A and B on the line and P the point, there's a compact formula for this. It
+uses two vectors: $B - A$, which points along the line, and $P - A$, which
 points from A to P. Divide the cross product of these two vectors by the length
 of the line's vector:
 
@@ -207,7 +219,8 @@ d = \frac{|(B - A) \times (P - A)|}{|B - A|}
 $$
 
 (If you want a refresher on vector subtraction and dot and cross products, see
-the Vectors part of the Arithmetic section.)
+the
+[Vectors part of the Arithmetic section](/programming-languages/javascript/arithmetic#vectors).)
 
 You don't need to memorize this formula. Just know that it exists. One bonus:
 without the absolute value bars, the cross product's sign tells you which side
@@ -245,7 +258,8 @@ Use the toggles above the canvas to turn each segment into a _ray_ or a _line_.
 We'll define those properly in a moment, but you can probably guess from the
 picture.
 
-The readout treats each segment as a vector, like in the arithmetic section:
+The readout treats each segment as a vector, like in the
+[arithmetic section](/programming-languages/javascript/arithmetic#vectors):
 $r = B - A$ and $s = D - C$. Their products tell you a lot about the lines:
 
 - The **cross product** $r \times s$ is zero exactly when the lines are
@@ -276,13 +290,13 @@ Now for the nuance we promised. There are three different things people call a
 
 Why does it matter? The intersection of two infinite lines might be nowhere near
 the segments you've actually drawn on the screen. When you saw the hollow circle
-in the playground above, the lines crossed, but the segments didn't. The same
+in the [playground above](#where-two-lines-intersect), the lines crossed, but the segments didn't. The same
 goes for distance: the closest point on a segment might be one of its endpoints,
 but a line has no endpoints.
 
 Most of the things you draw are segments. Lines and rays are mostly useful as
-tools for computing things. You'll see a ray do real work in the hit testing
-section below.
+tools for computing things. You'll see a ray do real work in the
+[hit testing section](#hit-tests) below.
 
 ### Parametric form
 
@@ -302,7 +316,9 @@ let x = a.x + t * (b.x - a.x)
 let y = a.y + t * (b.y - a.y)
 ```
 
-If that looks familiar, it should: it's lerp! You're mapping `t` from the range
+If that looks familiar, it should: it's
+[lerp](/programming-languages/javascript/repetition-with-variation#mapping-numbers)!
+You're mapping `t` from the range
 0 to 1 onto the range from A to B. p5 even has a shortcut for doing this to
 vectors, `p5.Vector.lerp(a, b, t)`.
 
@@ -328,7 +344,8 @@ Parametric form gives us a neat way to find the closest point on a segment.
 First find the `t` of the closest point on the infinite line (the foot of the
 perpendicular). Then _clamp_ it to the range 0 to 1, and plug it back into
 $P(t)$. Clamping is exactly the "closest point might be an endpoint" case from
-the point-to-line playground. If the perpendicular lands at `t = 1.4`, clamping
+the [point-to-line playground](#distance-between-a-point-and-a-line). If the
+perpendicular lands at `t = 1.4`, clamping
 pulls it back to `t = 1`, which is B.
 
 The `t` of the closest point on the infinite line through A and B is the dot
@@ -348,10 +365,10 @@ shadow lands at the closest point.
   you get `x * x + y * y`, which is the Pythagorean theorem without the square
   root.)
 - $(P - A) \cdot r$ is how far P's shadow lands from A, multiplied by the
-  segment's length. That comes from the $\|A\|\|B\| \cos \theta$ form of the
-  dot product.
+  segment's length. That comes from the $\|A\|\|B\| \cos \theta$ form of the dot
+  product.
 
-Dividing the second by the first leaves the shadow's distance from A divided by
+Dividing the third by the second leaves the shadow's distance from A divided by
 the segment's length. That's the fraction of the way from A to B, which is
 exactly what `t` means. In code:
 
@@ -374,8 +391,9 @@ above P. Now move P to `(50, 40)`, past the end of the segment. This time `ap`
 is `(40, 30)`, so `t` is `800 / 400 = 2`. Clamping pulls that back to `t = 1`,
 and the closest point is B.
 
-If your points are plain objects instead of p5 vectors, write the dot products
-out by hand. For example, `ap.dot(r)` is
+In the exercise below, the points are p5 vectors, so you can use code like the
+lines above. If you'd rather work with plain `x` and `y`, that's fine too: for
+example, `ap.dot(r)` is the same as
 `(p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)`.
 
 <Ask
@@ -418,7 +436,8 @@ how the two segments relate:
 - If neither is between 0 and 1, the lines cross off the ends of both segments.
 - If `t` or `u` is exactly 0 or 1, the segments just touch at an endpoint.
 
-Try to make each of these cases happen in the parametric playground above. The
+Try to make each of these cases happen in the
+[parametric playground](#parametric-form) above. The
 `t` and `u` readouts tell you which case you're in.
 
 This makes for a much more useful function than one that returns a point or
@@ -512,7 +531,8 @@ through them. Like a segment, the curve is parametric: at `t = 0` it's at the
 first anchor, and at `t = 1` it's at the last.
 
 So how do you find the point at some other `t`? The answer is a recipe called
-_de Casteljau's algorithm_, and all it does is lerp, over and over:
+[_de Casteljau's algorithm_](https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm),
+and all it does is lerp, over and over:
 
 1. Lerp between each pair of neighboring points (P0 to P1, P1 to P2, P2 to P3)
    at the same `t`. That gives you three new points.
@@ -539,9 +559,9 @@ the direction the curve is going.
 
 Two more facts worth knowing:
 
-- The whole curve stays inside the polygon made by its four points (its _convex
-  hull_). That's handy for a quick "is the mouse anywhere near this curve?"
-  check.
+- The whole curve stays inside the _convex hull_ of its four points: the shape
+  a rubber band would make if you snapped it around them. That's handy for a
+  quick "is the mouse anywhere near this curve?" check.
 - If you multiply out all three rounds of lerp, you get a polynomial in `t`:
   $B(t) = (1-t)^3 P_0 + 3(1-t)^2 t\,P_1 + 3(1-t)t^2 P_2 + t^3 P_3$. You'll see
   this formula in other places, but it's the same thing as the construction you
@@ -608,7 +628,7 @@ between two pieces look smooth? There are a few levels of smooth:
 (Graphics people call these $C^0$, $G^1$, and $C^1$ continuity, if you want to
 look them up.)
 
-Go back to the Bézier playground and check "Chain two curves." Chained Béziers
+Go back to the [Bézier playground](#curves-and-splines) and check "Chain two curves." Chained Béziers
 are connected as long as each one starts at the last one's ending anchor. But
 they only meet without a corner if the handles on either side of the joint line
 up, pointing in opposite directions. That's your job, not p5's. With "Smooth
@@ -650,7 +670,8 @@ You'll see them again in the data structures chapter.
   <CodeExercise exercise={pointInRectExercise} />
 </Ask>
 
-**Point near a segment:** as we saw earlier, a segment is too thin to click on
+**Point near a segment:** as we saw
+[earlier](#distance-between-a-point-and-a-line), a segment is too thin to click on
 exactly. Instead, find the closest point on the segment, and check if it's
 within a few pixels.
 
@@ -666,8 +687,8 @@ Here are all four tests in one sketch. The polygon test uses a ray pointing to
 the right, which makes the math simple: for each edge that spans the point's y
 coordinate, find the x where the edge crosses that height, and count it if it's
 to the right of the point. The sketch flips an `inside` boolean at each
-crossing. You could just as well count the crossings and check
-`count % 2 === 1` at the end; it's the same test.
+crossing. You could just as well count the crossings and check `count % 2 === 1`
+at the end; it's the same test.
 
 <Ask id="geometry-hit-tests" mode="interacted" title="Hit tests">
 
@@ -771,7 +792,8 @@ reference, and then get placed into the world wherever you want it.
 
 ### Drawing relative to your own origin
 
-In the Space Junk homework, you'll fly a ship called the Magpie, and it gets
+In the [Space Junk homework](/homework/space-junk-game/description), you'll
+fly a ship called the Magpie, and it gets
 placed in the world using affine transforms. The Magpie knows how to draw itself
 around its own `(0, 0)`, which sits right in the middle of its hull. The
 platform, the window, and the tractor beam are all drawn relative to that
@@ -974,17 +996,17 @@ You'll rarely write these by hand in p5, since `translate`, `rotate`, and
 
 The _identity_ matrix is the "do nothing" transform: multiplying a point by it
 gives you back the same point. It's what the current matrix starts out as, and
-it's what an empty stack means in the playground above.
+it's what an empty stack means in the [playground above](#order-matters).
 
 Why are these called _affine_ transforms? The name goes back to the
 mathematician Leonhard Euler, who in 1748 used the Latin word _affinis_, meaning
 "related" (the same root as the English word _affinity_). Two shapes are
-affine-related if an affine transform turns one into the other. These
-transforms can move, turn, and stretch things, but some things always survive:
-straight lines stay straight, parallel lines stay parallel, and a point halfway
-along a segment stays halfway along it. So shapes that look quite different can
-still be relatives. A square and any parallelogram are related this way, and so
-are a circle and any ellipse.
+affine-related if an affine transform turns one into the other. These transforms
+can move, turn, and stretch things, but some things always survive: straight
+lines stay straight, parallel lines stay parallel, and a point halfway along a
+segment stays halfway along it. So shapes that look quite different can still be
+relatives. A square and any parallelogram are related this way, and so are a
+circle and any ellipse.
 
 Here's the part that makes it all work: multiplying two 3x3 matrices together
 gives you another 3x3 matrix. So any chain of transforms, no matter how long,

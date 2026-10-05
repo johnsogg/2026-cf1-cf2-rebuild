@@ -60,14 +60,17 @@ const ZEROS: { value: Zero; label: string }[] = [
 ]
 
 const TWO_PI = Math.PI * 2
+
+// labels for the radian marks, k eighths of a turn from θ = 0
+const PI_MARKS = ["0, 2π", "π/4", "π/2", "3π/4", "π", "5π/4", "3π/2", "7π/4"]
 const SNAP = (2 * Math.PI) / 180 // within 2° of a 45° multiple
 
 // angle in [0, 2π)
 const wrap = (a: number) => ((a % TWO_PI) + TWO_PI) % TWO_PI
 
 export const AnglePlayground: React.FC<AnglePlaygroundProps> = ({
-  width = 340,
-  height = 340,
+  width = 360,
+  height = 360,
   radius = 100,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -144,15 +147,33 @@ export const AnglePlayground: React.FC<AnglePlaygroundProps> = ({
     drawLine(
       ctx,
       { x: 0, y: 0 },
-      { x: zeroDir.x * (radius + 18), y: zeroDir.y * (radius + 18) },
+      { x: zeroDir.x * radius, y: zeroDir.y * radius },
       colors.muted,
       { dashed: true },
     )
-    const zeroLabel = {
-      x: zeroDir.x * (radius + 34) + (zero === "up" ? 0 : -6),
-      y: zeroDir.y * (radius + 30) + (zero === "up" ? 0 : -12),
-    }
-    drawLabel(ctx, "θ = 0", zeroLabel, colors.muted, colors)
+
+    // radian marks every eighth of a turn, measured from the zero direction;
+    // the one the arrow sits on exactly is highlighted
+    ctx.font = SMALL_FONT
+    const tickBoxes: { c: Point; hw: number; hh: number }[] = []
+    PI_MARKS.forEach((text, k) => {
+      const a = zeroAngle + (k * Math.PI) / 4
+      const dir = { x: Math.cos(a), y: Math.sin(a) }
+      drawLine(
+        ctx,
+        { x: dir.x * (radius - 5), y: dir.y * (radius - 5) },
+        { x: dir.x * (radius + 5), y: dir.y * (radius + 5) },
+        colors.muted,
+        { width: 1.5 },
+      )
+      // push wider labels out far enough that they don't touch the circle
+      const hw = ctx.measureText(text).width / 2 + 3
+      const r = radius + 12 + Math.abs(dir.x) * hw + Math.abs(dir.y) * 8
+      const c = { x: dir.x * r, y: dir.y * r }
+      const on = Math.abs(theta - (k * Math.PI) / 4) < 1e-9
+      drawLabel(ctx, text, c, on ? colors.derived : colors.muted, colors)
+      tickBoxes.push({ c, hw, hh: 8 })
+    })
 
     // the angle, as an arc from the zero direction
     const arcR = 34
@@ -197,9 +218,7 @@ export const AnglePlayground: React.FC<AnglePlaygroundProps> = ({
       Math.sign(bar) * Math.max(Math.abs(bar) / 2, min)
     // label boxes drawn so far, as center + half sizes, for the θ label to
     // steer around
-    const boxes: { c: Point; hw: number; hh: number }[] = [
-      { c: zeroLabel, hw: halfWidth("θ = 0"), hh: 8 },
-    ]
+    const boxes = [...tickBoxes]
     if (Math.abs(tip.x) > 20) {
       const offset = tip.y > 0 ? -12 : 12
       const c = {
@@ -290,6 +309,12 @@ export const AnglePlayground: React.FC<AnglePlaygroundProps> = ({
   })
 
   const deg = (theta * 180) / Math.PI
+  // θ in terms of π: exact at the marks, approximate in between
+  const eighth = Math.round(theta / (Math.PI / 4))
+  const piText =
+    Math.abs(theta - (eighth * Math.PI) / 4) < 1e-9
+      ? `= ${PI_MARKS[eighth % 8].replace("0, 2π", "0")}`
+      : `≈ ${fmt(theta / Math.PI, 2)}π`
   const xCode = zero === "right" ? "cos(theta)" : "sin(theta)"
   const yCode = zero === "right" ? "sin(theta)" : "-cos(theta)"
 
@@ -334,6 +359,14 @@ export const AnglePlayground: React.FC<AnglePlaygroundProps> = ({
               <tr>
                 <td></td>
                 <td>{fmt(deg, 1)}°</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>{piText}</td>
+              </tr>
+              <tr>
+                <td>fraction of a full turn</td>
+                <td>{fmt(theta / TWO_PI, 3)}</td>
               </tr>
               <tr>
                 <td>

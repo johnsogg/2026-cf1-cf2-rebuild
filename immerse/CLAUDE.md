@@ -96,7 +96,12 @@ import** — noted per component below. The rest need the explicit
   grade), `MultipleChoiceExercise` (single-answer, reports a real grade),
   `P5Exercise` (editable sketch, visual only, no grading),
   `ConsoleExercise` (editable JS/TS, plain `console.log` output, no
-  grading). They read their storage-key `id` from the wrapping `Ask` via
+  grading). `CodeExercise` code and tests can use p5's math as globals
+  (`p5.Vector`, `createVector`, `dist`, `constrain`, `sin`, `PI`, ...) via a
+  headless copy of `p5/math` in the worker (`workers/p5Headless.ts`), with
+  matching editor types (`utils/monacoP5Globals.ts`). No canvas or drawing
+  functions. Tests comparing a returned point should check `.x`/`.y`, not
+  `toEqual`, since a p5 vector doesn't serialize as `{ x, y }`. They read their storage-key `id` from the wrapping `Ask` via
   `useAsk()`, not from their own props. No import needed. The
   `p5exercise`/`jsconsole` fenced code blocks are shorthand for
   `P5Exercise`/`ConsoleExercise` inline — they carry no
