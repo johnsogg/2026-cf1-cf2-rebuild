@@ -1,5 +1,20 @@
 export const title = "Description"
 
+import snailShell from "./assets/snail-shell.jpg"
+import dendrobium from "./assets/dendrobium.jpg"
+import dahlia from "./assets/dahlia.jpg"
+import coconutPalmDay from "./assets/coconut-palm-day.jpg"
+import coconutPalmNight from "./assets/coconut-palm-night.jpg"
+import hibiscus from "./assets/hibiscus.jpg"
+import noni from "./assets/noni.jpg"
+import birdOfParadise from "./assets/bird-of-paradise.jpg"
+import laceFern from "./assets/lace-fern-maybe.jpg"
+import wartFern from "./assets/wart-fern.jpg"
+import lobsterClaw from "./assets/lobster-claw.jpg"
+import pinkQuill from "./assets/pink-quill.jpg"
+import gardenia from "./assets/gardenia.jpg"
+import volcano from "./assets/volcano.jpg"
+
 # What Do You See?
 
 <Callout intent="danger">
@@ -11,3 +26,215 @@ export const title = "Description"
 - Learning objectives:
 - Submission requirements:
 - Grading breakdown:
+
+## Rough notes: photo identifications
+
+(Hawaii trip photos, mostly Kaua&#x02BB;i. Notes only; not student-facing yet.)
+
+### snail-shell.jpg
+
+<ZoomImage src={snailShell} alt="A snail shell" width={300} />
+
+- Most likely an apple snail, _Pomacea canaliculata_ (channeled apple snail).
+- The shell is a logarithmic spiral, but the growth ratio is not the golden
+  ratio.
+- Student idea: measure the whorl expansion rate from the photo (width ratio of
+  successive whorls along a line through the apex) and fit r = a·e^(bθ).
+- 3D extension: Raup's shell coiling model generates the shape from three
+  parameters: whorl expansion rate, distance from the axis, and translation
+  along the axis.
+
+### dendrobium.jpg
+
+<ZoomImage src={dendrobium} alt="A dendrobium plant" width={300} />
+
+- Leaves grow on alternating sides at predictable intervals (alternate
+  phyllotaxis, distichous).
+- Here the leaves look equidistant, but that isn't always so in similar-looking
+  plants.
+- Leaf size varies, possibly in a predictable way.
+
+### dahlia.jpg
+
+<ZoomImage src={dahlia} alt="A dahlia flower head" width={300} />
+
+- A dahlia in the cactus or semi-cactus form (_Dahlia_ hybrid, family
+  Asteraceae).
+- Each "petal" is an individual flower, called a ray floret. The whole head is a
+  colony of them.
+- Math: concentric layers, where each "petal" sits distance d from the center at
+  angle theta. Good use of rotate-then-translate, like turtle graphics.
+- Color gradient runs from yellow to pink.
+- No two petals are identical. Add variation with random numbers or noise.
+
+### coconut-palm-day.jpg / coconut-palm-night.jpg
+
+<div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "1rem",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    margin: "1.5rem 0",
+  }}
+>
+  <ZoomImage
+    src={coconutPalmDay}
+    alt="A coconut palm in daylight"
+    width={300}
+  />
+  <ZoomImage
+    src={coconutPalmNight}
+    alt="The same coconut palm at night"
+    width={300}
+  />
+</div>
+
+- Coconut palm, _Cocos nucifera_ (Hawaiian: niu).
+- Same scene taken about 12 hours apart. A study in the geometry _and_ the
+  passage of time, for an animated result.
+- One of the "canoe plants" the original Polynesian voyagers brought with them.
+- 20-25ish fronds grow out of the crown in various directions, looped all around
+  like the dahlia.
+- Gravity pulls each frond downward.
+- The trunk is a smooth curve with a bend: a good candidate for a Bézier curve.
+- Wind for an animated result: the fronds sway, and the entire tree sways to a
+  lesser degree, driven by a randomly changing wind source.
+
+### hibiscus.jpg
+
+<ZoomImage src={hibiscus} alt="A Chinese hibiscus flower" width={300} />
+
+- Chinese hibiscus, _Hibiscus rosa-sinensis_. Hawaiian word for hibiscus:
+  aloalo. The state flower is a (different) hibiscus.
+- Petals are arranged in a pentaradial pattern (the zoologists' term, from
+  echinoderms like starfish) or, near-synonymously, a pentamerous one (the
+  botanists' term, "five parts", often written 5-merous). Pentaradial stresses
+  the five-fold radial symmetry; pentamerous stresses the parts coming in fives.
+- Color changes as a function of distance from the center.
+- Petals overlap like a pinwheel. A quick web search should turn up more obvious
+  photos of this.
+- How might you model the ruffly outer edge of the petals?
+- Stamens: where they emerge from the staminal column jutting out of the flower,
+  how long they are, the angle they grow out at, and the little yellow
+  pollen-producing bits at the end of each.
+- The "micro-flower" at the tip of the column isn't a flower. It's the female
+  part: five fuzzy red pads called stigmas.
+- The pentaradial configuration is everywhere on this flower.
+
+### noni.jpg
+
+<ZoomImage src={noni} alt="Noni fruit and leaves" width={300} />
+
+- Noni, _Morinda citrifolia_ (Hawaiian: noni; also called Indian mulberry).
+- The photo shows fruit with "eyes". Each polygon on the surface was at one
+  point a flower, and they fused together to form the fruit.
+- The little fruit still has a flower visible.
+- The leaves are glossy and green, with an alternating pattern of veins.
+- Another canoe plant.
+
+### bird-of-paradise.jpg
+
+<ZoomImage src={birdOfParadise} alt="A bird of paradise flower" width={300} />
+
+- Bird of paradise, _Strelitzia reginae_ (also called crane flower).
+- Native to South Africa, and related to bananas. A common ornamental in Hawaii.
+- So much math going on here! No rotational symmetry, but a regular pattern in
+  how the orange parts grow out.
+- A decent approximation is possible using triangles and quads.
+- Colors: green, red, orange, purple.
+- Stretch goal: find other images of this in different states of growth, and
+  create an animation that shows the flower growing.
+
+### lace-fern-maybe.jpg
+
+<ZoomImage src={laceFern} alt="A fern frond" width={300} />
+
+- Unsure if this is exactly palapalai, _Microlepia strigosa_ (lace fern), but it
+  is certainly some kind of fern.
+- A single long vein from which leaves emerge, in what looks like an alternating
+  pattern.
+- Each leaf is composed of smaller leaflets.
+- Leaf size: longer toward the base, tapering to small leaves at the tip. The
+  overall leaf length cuts a nice curve as well.
+- The self-similarity lends itself to recursion, or even recursive fractals. Two
+  well-known options: the Barnsley fern (an iterated function system that plots
+  a fern from random points) and L-systems (Lindenmayer systems, which grow a
+  plant by repeatedly rewriting a string of drawing commands).
+
+### wart-fern.jpg
+
+<ZoomImage src={wartFern} alt="A wart fern frond" width={300} />
+
+- Laua&#x02BB;e, _Microsorum grossum_ (synonym _Phymatosorus grossus_; often
+  labeled _M. scolopendria_; also called wart fern or maile-scented fern).
+- Not all examples show this pattern of lobes. In this picture the lobes seem to
+  emit from the central vein, but that isn't always the case.
+- Along each lobe's vein, the dots are positioned nearby, usually
+  non-overlapping, but you can see examples of overlap. The dots are sori
+  (singular: sorus), clusters of spore-producing structures.
+- The thing I love about this one is the irregularity: it seems to follow a
+  general plan, but with lots of random variation.
+
+### lobster-claw.jpg
+
+<ZoomImage
+  src={lobsterClaw}
+  alt="A hanging lobster claw heliconia"
+  width={300}
+/>
+
+- Hanging lobster claw, _Heliconia rostrata_. A South American plant, and one of
+  Bolivia's national flowers.
+- Fun words to describe this one: a pendant chain of red _bracts_ that abruptly
+  change from red towards the main chain to yellow at the tips.
+- Each bract is slightly smaller than the one above it (maybe 90%).
+- Each bract is self-similar, so creating a `drawBract` function makes sense.
+- The overall structure grows _downward_ with gravity.
+- What can you say about how large the bottom-most bract is? How might you use
+  that as a stopping condition for rendering these?
+
+### pink-quill.jpg
+
+<ZoomImage src={pinkQuill} alt="A pink quill bromeliad" width={300} />
+
+- Pink quill, _Wallisia cyanea_ (long known as _Tillandsia cyanea_, and still
+  usually sold under that name). Commonly found in Ecuador, and a relative of
+  pineapple.
+- This plant also features bracts, but these grow upwards, alternating
+  left/right in a herringbone pattern. Each bract's angle and size is somewhat
+  less than the previous one.
+- The color shifts in a lovely gradient from green at the bottom to pink at the
+  top.
+- The flower isn't quite legible in this photo, but if you wanted to include it
+  I'm sure you can find examples with a google search. It has three petals.
+
+### gardenia.jpg
+
+<ZoomImage src={gardenia} alt="A gardenia flower" width={300} />
+
+- A gardenia, most likely tiare, _Gardenia taitensis_ (Tahitian gardenia).
+- The radial petal pattern is cool. This one has seven petals, but that number
+  is variable. You'd get the angular offset by using `360 / n` for `n` petals.
+- Each petal overlaps the one next to it slightly, and each petal seems to have
+  a slight tilt where it veers off in a consistent direction, which reminds me
+  of a circular saw blade or a propeller. Good use for Bézier curves.
+- There's a little stigma (female part) in the middle.
+
+### volcano.jpg
+
+<ZoomImage src={volcano} alt={"Makana ridge above Hāʻena"} width={300} />
+
+- Makana ridge above H&amacr;&#x02BB;ena, taken from Limahuli Garden.
+- Included as an example of a 1D boundary function: the various ridges of the
+  volcano have been shaped by wind and water over millions of years.
+- If this was a volcano from the Big Island of Hawai&#x02BB;i, it would be a
+  fairly flat dome. But this is quite spiky and makes for a more dynamic
+  function.
+- I do not think you can find a parametric function to approximate this, but
+  instead will need to look into noise functions.
+- You could model this using a 1-dimensional noise function, and allow the curve
+  to rise or fall based on what that noise function says.
+- You might even combine different noise functions: one to determine the overall
+  peaks/valleys, and another to determine the bumpiness between them.
