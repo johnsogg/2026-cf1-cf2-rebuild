@@ -21,17 +21,97 @@ import volcano from "./assets/volcano.jpg"
   This homework is not yet defined. Check back later.
 </Callout>
 
-- Topics (per calendar, same week): Seeing and modeling with software
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+This week's homework is about analyzing what you see in nature and translating
+that into code. For this to work, you need to let your mind work on different
+levels. Yes, there are objects and all their parts, colors and shapes. But there
+are also patterns that emerge if you are curious enough to look for them.
 
-## Rough notes: photo identifications
+The photos I show below happen to mostly be of plants and flowers. If you look
+at a daisy, you'll see a bunch of white petals growing out of a yellow mass, and
+below that is a stem and leaves and roots and all that. But look closer. The
+yellow mass isn't a solid homogenous dot - it is actually dozens or hundreds of
+tiny yellow dots, all of slightly different size, packed in a configuration that
+seems to show its own structure. And you could make similar observations of the
+petals: how long they are, how they overlap, how densely they grow.
 
-(Hawaii trip photos, mostly Kaua&#x02BB;i. Notes only; not student-facing yet.)
+To some of you, this might seem like taking a beautiful thing and tearing it
+down into some mathematical malnourishment. I can't possibly address this point
+better than Richard Feynman, so please watch this:
 
-### snail-shell.jpg
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/VSG9q_YKZLI?si=KzZPtFlUk8DrhAnl"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
+
+## This homework
+
+Go out into nature with a camera. (Yes, going for a hike is officially part of
+your computer science homework!) I want you to look for nice things to look at,
+and photograph them. Don't just idly glance - look deeply. Study the structure.
+What parts do you see? How do they relate? Are there patterns? How might you
+describe them?
+
+The "describe" part is vitally important. The code part is something that
+follows the description. You might be surprised at how difficult it is to
+describe familiar items in detail. Your prose description is half the homework
+grade.
+
+Rely on your photographs. Do measurements. Mark them up with lines, circles,
+angles, lengths. Observe what colors are present, and where. Is there a
+gradient? A sudden change in color? What about textures? What about how elements
+are oriented?
+
+The goal with all of this is to really decompose _and reassemble_ what you see,
+and then to realize that vision in a software model.
+
+## What to do
+
+Go for a hike, or at least outside somewhere. Take pictures, analyze what you
+see, write prose.
+
+Then, write code to match your observation. It is more important that your
+_observations_ be complete and accurate than it is for your _code_ to perfectly
+implement it.
+
+At the same time, it is important that your code implement your actual
+observations, not your artistic spin on what you see. E.g. no blue daisies, no
+red honeybees, no Dr. Seuss trees. (Though... that gives me an idea for another
+homework!) Try to make a straight line between what you've seen, captured in a
+photo, analyzed, described, and implemented in code.
+
+## Rubric
+
+5 points for a coherent description of what you observed.
+
+2 points for a runnable p5 sketch.
+
+3 points for the sketch matching the description.
+
+## What to turn in
+
+Turn in either a p5.js web editor link, or (if you've started using GitHub), a
+link to your GitHub repo. Please include your prose description _at the top of
+`sketch.js`_ - this is important so we can find it. The worked example shows
+what this might look like.
+
+## Sample photos
+
+Most of these photos were taken on the Hawaiian island of Kaua&#x02BB;i. You
+obviously don't need to go to a tropical island to see examples of biological
+algorithms making neat patterns. That's just where I was when I was thinking
+through this homework assignment.
+
+I'll just show photos and a brief outline for what might go into the
+description, and some identifying remarks. For your homework, I'll want
+paragraphs of proper English.
+
+### Snail shell
 
 <ZoomImage src={snailShell} alt="A snail shell" width={300} />
 
@@ -39,12 +119,12 @@ import volcano from "./assets/volcano.jpg"
 - The shell is a logarithmic spiral, but the growth ratio is not the golden
   ratio.
 - Student idea: measure the whorl expansion rate from the photo (width ratio of
-  successive whorls along a line through the apex) and fit r = a·e^(bθ).
-- 3D extension: Raup's shell coiling model generates the shape from three
-  parameters: whorl expansion rate, distance from the axis, and translation
-  along the axis.
+  successive whorls along a line through the apex) and fit `r = a·e^(bθ)`.
+- In that formula, `a` is the overall scale (the radius at θ = 0) and `b` is the
+  growth rate (how quickly the spiral opens up per radian of turn). See
+  [the Wikipedia page on Logarithmic spirals](https://en.wikipedia.org/wiki/Logarithmic_spiral)
 
-### dendrobium.jpg
+### Dendrobium
 
 <ZoomImage src={dendrobium} alt="A dendrobium plant" width={300} />
 
@@ -54,12 +134,13 @@ import volcano from "./assets/volcano.jpg"
   plants.
 - Leaf size varies, possibly in a predictable way.
 
-### dahlia.jpg
+### Dahlia
 
 <ZoomImage src={dahlia} alt="A dahlia flower head" width={300} />
 
 - A dahlia in the cactus or semi-cactus form (_Dahlia_ hybrid, family
   Asteraceae).
+- This was taken in California, in the Mendocino Botanical Gardens.
 - Each "petal" is an individual flower, called a ray floret. The whole head is a
   colony of them.
 - Math: concentric layers, where each "petal" sits distance d from the center at
@@ -67,7 +148,7 @@ import volcano from "./assets/volcano.jpg"
 - Color gradient runs from yellow to pink.
 - No two petals are identical. Add variation with random numbers or noise.
 
-### coconut-palm-day.jpg / coconut-palm-night.jpg
+### Coconut Palm (day / night)
 
 <div
   style={{
@@ -95,23 +176,21 @@ import volcano from "./assets/volcano.jpg"
 - Same scene taken about 12 hours apart. A study in the geometry _and_ the
   passage of time, for an animated result.
 - One of the "canoe plants" the original Polynesian voyagers brought with them.
-- 20-25ish fronds grow out of the crown in various directions, looped all around
-  like the dahlia.
+- 20-25ish fronds grow out of the crown in various directions, arranged in a
+  ring.
 - Gravity pulls each frond downward.
 - The trunk is a smooth curve with a bend: a good candidate for a Bézier curve.
 - Wind for an animated result: the fronds sway, and the entire tree sways to a
   lesser degree, driven by a randomly changing wind source.
 
-### hibiscus.jpg
+### Hibiscus
 
 <ZoomImage src={hibiscus} alt="A Chinese hibiscus flower" width={300} />
 
 - Chinese hibiscus, _Hibiscus rosa-sinensis_. Hawaiian word for hibiscus:
   aloalo. The state flower is a (different) hibiscus.
-- Petals are arranged in a pentaradial pattern (the zoologists' term, from
-  echinoderms like starfish) or, near-synonymously, a pentamerous one (the
-  botanists' term, "five parts", often written 5-merous). Pentaradial stresses
-  the five-fold radial symmetry; pentamerous stresses the parts coming in fives.
+- Petals are arranged in a pentaradial pattern (or, "pentamerous" to use a
+  botanical term). This means five evenly distributed items around a circle.
 - Color changes as a function of distance from the center.
 - Petals overlap like a pinwheel. A quick web search should turn up more obvious
   photos of this.
@@ -121,33 +200,31 @@ import volcano from "./assets/volcano.jpg"
   pollen-producing bits at the end of each.
 - The "micro-flower" at the tip of the column isn't a flower. It's the female
   part: five fuzzy red pads called stigmas.
-- The pentaradial configuration is everywhere on this flower.
 
-### noni.jpg
+### Noni
 
 <ZoomImage src={noni} alt="Noni fruit and leaves" width={300} />
 
 - Noni, _Morinda citrifolia_ (Hawaiian: noni; also called Indian mulberry).
 - The photo shows fruit with "eyes". Each polygon on the surface was at one
   point a flower, and they fused together to form the fruit.
-- The little fruit still has a flower visible.
+- The smaller of the two fruits has a flower visible that hasn't yet fused.
 - The leaves are glossy and green, with an alternating pattern of veins.
 - Another canoe plant.
 
-### bird-of-paradise.jpg
+### Bird of paradise
 
 <ZoomImage src={birdOfParadise} alt="A bird of paradise flower" width={300} />
 
 - Bird of paradise, _Strelitzia reginae_ (also called crane flower).
 - Native to South Africa, and related to bananas. A common ornamental in Hawaii.
-- So much math going on here! No rotational symmetry, but a regular pattern in
-  how the orange parts grow out.
+- No rotational symmetry, but a regular pattern in how the orange parts grow.
 - A decent approximation is possible using triangles and quads.
 - Colors: green, red, orange, purple.
 - Stretch goal: find other images of this in different states of growth, and
   create an animation that shows the flower growing.
 
-### lace-fern-maybe.jpg
+### Lace fern (maybe)
 
 <ZoomImage src={laceFern} alt="A fern frond" width={300} />
 
@@ -163,7 +240,7 @@ import volcano from "./assets/volcano.jpg"
   a fern from random points) and L-systems (Lindenmayer systems, which grow a
   plant by repeatedly rewriting a string of drawing commands).
 
-### wart-fern.jpg
+### Wart fern
 
 <ZoomImage src={wartFern} alt="A wart fern frond" width={300} />
 
@@ -171,13 +248,13 @@ import volcano from "./assets/volcano.jpg"
   labeled _M. scolopendria_; also called wart fern or maile-scented fern).
 - Not all examples show this pattern of lobes. In this picture the lobes seem to
   emit from the central vein, but that isn't always the case.
-- Along each lobe's vein, the dots are positioned nearby, usually
+- Along each lobe's vein, the dots sit close to the vein, usually
   non-overlapping, but you can see examples of overlap. The dots are sori
   (singular: sorus), clusters of spore-producing structures.
 - The thing I love about this one is the irregularity: it seems to follow a
   general plan, but with lots of random variation.
 
-### lobster-claw.jpg
+### Lobster claw
 
 <ZoomImage
   src={lobsterClaw}
@@ -195,7 +272,7 @@ import volcano from "./assets/volcano.jpg"
 - What can you say about how large the bottom-most bract is? How might you use
   that as a stopping condition for rendering these?
 
-### pink-quill.jpg
+### Pink Quill
 
 <ZoomImage src={pinkQuill} alt="A pink quill bromeliad" width={300} />
 
@@ -208,25 +285,27 @@ import volcano from "./assets/volcano.jpg"
 - The color shifts in a lovely gradient from green at the bottom to pink at the
   top.
 - The flower isn't quite legible in this photo, but if you wanted to include it
-  I'm sure you can find examples with a google search. It has three petals.
+  I'm sure you can find examples with a Google search. It has three petals.
 
-### gardenia.jpg
+### Gardenia
 
 <ZoomImage src={gardenia} alt="A gardenia flower" width={300} />
 
 - A gardenia, most likely tiare, _Gardenia taitensis_ (Tahitian gardenia).
-- The radial petal pattern is cool. This one has seven petals, but that number
-  is variable. You'd get the angular offset by using `360 / n` for `n` petals.
+- Radial petals: this one has seven, but that number is variable. You'd get the
+  angular offset by using `360 / n` for `n` petals.
 - Each petal overlaps the one next to it slightly, and each petal seems to have
   a slight tilt where it veers off in a consistent direction, which reminds me
   of a circular saw blade or a propeller. Good use for Bézier curves.
 - There's a little stigma (female part) in the middle.
 
-### volcano.jpg
+### Volcano
 
 <ZoomImage src={volcano} alt={"Makana ridge above Hāʻena"} width={300} />
 
 - Makana ridge above H&amacr;&#x02BB;ena, taken from Limahuli Garden.
+- If you go to Kaua&#x02BB;i I highly recommend you make the trip to this
+  garden. It is amazing.
 - Included as an example of a 1D boundary function: the various ridges of the
   volcano have been shaped by wind and water over millions of years.
 - If this was a volcano from the Big Island of Hawai&#x02BB;i, it would be a

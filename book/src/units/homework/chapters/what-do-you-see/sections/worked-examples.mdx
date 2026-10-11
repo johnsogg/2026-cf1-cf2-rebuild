@@ -2,5 +2,216 @@ export const title = "Worked Examples"
 
 # What Do You See? — Worked Examples
 
-- Example 1:
-- Example 2:
+## Example 1: Daisy
+
+Here is a sketch containing a description and a highly refined implementation of
+that description.
+
+```p5exercise autorun size="large"
+
+/*
+This flower is a daisy with 23 white petals. They are
+all approximately 1.5cm in length, varying maybe by five
+percent of that length. Approximately 60% of them have
+scalloped tips, with two or three bumps in equal
+distribution. It looks some petals obscure others, so
+they somewhat overlap. I do not see an obvious "pinwheel"
+bias for how they overlap. They are not perfectly
+distributed, so you can't just take 360 divided by 23.
+Add some random variation in both the angles that they
+grow out of the middle. Also, they are maybe 4mm wide,
+with about 10% variation. The petals have some lines
+on them - they're not veins but more like ruffles or
+ridges. Looks like this is a regular pattern with each
+petal having two lines, positioned at 1/3 and 2/3 of
+the width across.
+
+In the center of the flower is a mass of yellow dots,
+which I assume contain pollen that attracts bees and
+the like. The overall mass is about a centimeter in
+diameter. The dots are all distinct domes, packed in
+an arrangement that looks to be like a spiral. Their
+sizes vary, which breaks the perfection of the spiral.
+In the center they are small (maybe these are the baby
+dots?), but outside the middle third they seem to max
+out in size. There are too many to count, but I'm
+guessing there are about 150 dots.
+
+Around the outside of the pollen dots, but before the
+white petals, there is a faint green boundary.
+*/
+
+const CM = 85 // pixels per centimeter
+const NUM_PETALS = 23
+const PETAL_LENGTH = 1.5 * CM
+const PETAL_WIDTH = 0.4 * CM
+const DISC_RADIUS = 0.5 * CM // the mass is about 1cm across
+const NUM_DOTS = 150
+
+let petals = []
+
+function setup() {
+  // this runs once, so here's our chance to establish all
+  // the random items, mostly the petals
+  createCanvas(400, 400)
+  randomSeed(Date.now()) // milliseconds since 1970: new flower every run
+
+  const spacing = TWO_PI / NUM_PETALS
+  // populate a petals array with positioned, varied items
+  for (let i = 0; i < NUM_PETALS; i++) {
+    petals.push({
+      // Not evenly distributed: nudge each petal off its even slot
+      angle: i * spacing + random(-0.4, 0.4) * spacing,
+      length: PETAL_LENGTH * random(0.95, 1.05),
+      halfWidth: (PETAL_WIDTH * random(0.9, 1.1)) / 2,
+      // ~60% scalloped, with 2 or 3 bumps in equal distribution.
+      // Apologies for the ternary expression, but it works!
+      bumps: random() < 0.6 ? (random() < 0.5 ? 2 : 3) : 0,
+    })
+  }
+  // Shuffle the draw order so the overlaps have no pinwheel bias.
+  petals.sort(() => random() - 0.5)
+}
+
+function draw() {
+  push()
+  background(70, 110, 60)
+  // put our origin at the canvas center
+  translate(width / 2, height / 2)
+
+  // use painter's algo: distant objects first, then work your
+  // way forward towards the viewer. Petals are farthest, then
+  // the green boundary, then the pollen dots on top.
+  for (const petal of petals) {
+    drawPetal(petal)
+  }
+
+  drawGreenBoundary()
+  drawDisc()
+  pop()
+  noLoop() // this is a static image, so only need to draw one time
+}
+
+// Half the petal's width at fraction t (0 = base, 1 = tip) of its length
+function petalHalfWidth(petal, t) {
+  const base = petal.halfWidth * 0.4
+  const widest = 0.7
+  if (t <= widest) {
+    const s = t / widest
+    return lerp(base, petal.halfWidth, s * s * (3 - 2 * s))
+  }
+  // Rounded tip
+  const u = (t - widest) / (1 - widest)
+  return petal.halfWidth * sqrt(max(0, 1 - u * u))
+}
+
+function drawPetal(petal) {
+  const len = petal.length
+
+  push()
+  rotate(petal.angle)
+  translate(DISC_RADIUS * 0.6, 0)
+
+  fill(255)
+  stroke(205)
+  strokeWeight(1)
+  beginShape()
+  if (petal.bumps === 0) {
+    // Smooth rounded petal: down one side, back up the other
+    for (let t = 0; t <= 1.0001; t += 0.02) {
+      vertex(t * len, -petalHalfWidth(petal, t))
+    }
+    for (let t = 1; t >= -0.0001; t -= 0.02) {
+      vertex(t * len, petalHalfWidth(petal, t))
+    }
+  } else {
+    // Scalloped petal: sides up to 85% of the length, then n round bumps
+    const tipT = 0.85
+    const hw = petalHalfWidth(petal, tipT)
+    for (let t = 0; t <= tipT; t += 0.02) {
+      vertex(t * len, -petalHalfWidth(petal, t))
+    }
+    const bumpWidth = (2 * hw) / petal.bumps
+    for (let i = 0; i < petal.bumps; i++) {
+      const center = -hw + (i + 0.5) * bumpWidth
+      for (let a = 0; a <= PI; a += PI / 12) {
+        vertex(
+          tipT * len + sin(a) * bumpWidth * 0.45,
+          center - cos(a) * bumpWidth * 0.5
+        )
+      }
+    }
+    for (let t = tipT; t >= -0.0001; t -= 0.02) {
+      vertex(t * len, petalHalfWidth(petal, t))
+    }
+  }
+  endShape(CLOSE)
+
+  // Two ridges, at 1/3 and 2/3 of the way across the petal
+  stroke(215)
+  noFill()
+  for (const side of [-1, 1]) {
+    beginShape()
+    for (let t = 0.05; t <= 0.8; t += 0.02) {
+      vertex(t * len, (side * petalHalfWidth(petal, t)) / 3)
+    }
+    endShape()
+  }
+  pop()
+}
+
+function drawGreenBoundary() {
+  // Faint green boundary between the petals and the pollen dots
+  push()
+  noStroke()
+  fill(120, 160, 70, 110)
+  circle(0, 0, 2 * (DISC_RADIUS + 0.1 * CM))
+  pop()
+}
+
+function drawDisc() {
+  push()
+  // Dark backing so gaps between dots seem like shadows
+  noStroke()
+  fill(150, 110, 20)
+  circle(0, 0, 2 * DISC_RADIUS)
+
+  // If you're having a hard time sleeping, check out
+  // https://en.wikipedia.org/wiki/Fermat%27s_spiral
+  // This code implements it - look for 'Vogel model'.
+  //
+  // Dot i goes at distance r = spacing * sqrt(i), turned 137.5
+  // degrees (the golden angle) from the previous dot. The sqrt
+  // keeps the dots evenly spaced instead of crowding the middle,
+  // and the golden angle makes them line up in the interlocking
+  // spiral arcs you see on a real daisy or sunflower.
+  const goldenAngle = radians(137.5)
+  const spacing = DISC_RADIUS / sqrt(NUM_DOTS)
+  const maxDot = spacing * 1.05
+
+  for (let i = 0; i < NUM_DOTS; i++) {
+    const r = spacing * sqrt(i + 0.5)
+    const a = i * goldenAngle
+    const x = r * cos(a)
+    const y = r * sin(a)
+
+    // Small in the middle, full size from the outer two thirds
+    const growth = constrain(r / (DISC_RADIUS / 3), 0, 1)
+    // Position is NOT jittered, since that would hide the spiral;
+    // only the size varies.
+    const d = lerp(maxDot * 0.4, maxDot, growth) * random(0.8, 1.05)
+
+    // A dome: darker rim, bright body, small highlight
+    stroke(190, 140, 10)
+    strokeWeight(0.5)
+    fill(245, 195, 30)
+    circle(x, y, d)
+    noStroke()
+    fill(255, 235, 130)
+    circle(x - d * 0.12, y - d * 0.12, d * 0.4)
+  }
+  pop()
+}
+```
+
+## Example 2:
