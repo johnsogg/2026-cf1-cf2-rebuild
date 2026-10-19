@@ -1,10 +1,272 @@
 export const title = "Description"
 
+import spaceJunkP5Files from "./assets/p5-editor-files.png"
+import githubCreateRepo from "./assets/github-create-repo.png"
+import githubCreateRepoDetails from "./assets/github-create-repo-details.png"
+import githubNewRepo from "./assets/github-new-repo.png"
+import githubCloneDialog from "./assets/github-clone-dialog.png"
+import githubRepo from "./assets/github-repo.png"
+import localFiles from "./assets/local-files.png"
+import localFilesCopy from "./assets/local-files-copy.png"
+import githubWithFiles from "./assets/github-with-files.png"
+
 # Space Junk, Local Edition
 
-<Callout intent="danger">
-  This homework is not yet defined. Check back later.
+This homework revisits the
+[Space Junk homework](/homework/space-junk-game/description). The purpose of the
+first one was to have you write code to a spec, rather than following your own
+creative instincts.
+
+The purpose of this evolution of the homework is to kick off the p5.js web
+editor training wheels by working from a locally edited git repository. This
+will be a different way of working, and you will likely find it uncomfortable.
+
+In this homework, you will (1) port your earlier homework to be managed in a git
+repository. You'll then (2) edit the code with a local editor, and (3) round out
+the game with a little more code.
+
+## Why work locally?
+
+Writing code locally gives you access to a host of additional tooling beyond the
+p5 web editor:
+
+- Use your choice of editor (of which there are many options)
+- Source control for easily creating save points
+- ... and for collaborating with others
+- Automated testing
+- Automated code checking ("linting")
+- Automated code formatting
+- Access to the full capabilities of your computer beyond the browser
+- Install and use 3rd party libraries easily with package managers
+- Configure everything to work as you want
+
+If you're just starting to code, most or all of this might not seem particularly
+compelling. I get that, and my response is probably not super satisfying: you'll
+learn to appreciate the added control these tools give you, and through them,
+you'll learn a lot about how computers actually work.
+
+Above, I mentioned several reasons to work locally, but for now we're only going
+to add git into the mix. Testing, linting, and package management are not in
+scope here. Of course, you can go the extra mile(s) if you want to start using
+those things!
+
+## Install an editor and a git client
+
+You can install any code editor you want. I recommend
+[VS Code](https://code.visualstudio.com/), though it is laden with AI that will
+want to do your homework for you. Find a way to turn all that off.
+
+You'll also need a git client. There are many, but for consistency I'll
+recommend [GitHub Desktop](https://code.visualstudio.com/). I don't personally
+use it aside from showing students how to use it - I use the command line `git`
+client. You will need to sign in to your GitHub account with this in order to
+see your repositories.
+
+## Porting your earlier Space Junk homework
+
+Assuming you have a p5.js web editor sketch that implements the Space Junk
+homework, you will have a file structure that looks like this, inside their web
+editor:
+
+<ZoomImage
+  src={spaceJunkP5Files}
+  width={157}
+  alt="p5.js web editor file structure for Space Junk"
+/>
+
+These files comprise everything that is needed for a web browser to run this p5
+sketch. Now your goal is to create a new git repository, make a local
+re-creation of that structure with all of your files, and push it to git.
+
+### Create a new git repository
+
+The first step is to create the landing spot for your code. There are many ways
+to do this, but I'll show you a straightforward way that I use myself. Put
+simply, use the GitHub UI to create an empty repository, then clone it and put
+your files into it.
+
+<Callout intent="note">
+  There are many ways to use `git`, and the GitHub service is just one of them.
+  GitLab and BitBucket are two popular alternatives, and there are others. These
+  examples use GitHub because that is the most ubiquitous. If you want to use
+  something else, go for it.
 </Callout>
+
+Once you have a GitHub account, create a new repository on the main screen using
+the plus icon then choosing "New Repository":
+
+<ZoomImage
+  src={githubCreateRepo}
+  width={800}
+  alt="Creating a new git repository on GitHub"
+/>
+
+Then you can give it a name (the most important part), like `space-junk-local`.
+This name is unique to your user account, so every one of your peers can call it
+the same thing. The description is only for your benefit. Don't touch the
+Copilot stuff (that's AI, and it will gladly do your homework for you).
+
+<ZoomImage
+  src={githubCreateRepoDetails}
+  width={800}
+  alt="Detailing a new git repository on GitHub"
+/>
+
+Click the candylike button at the bottom to create your repo. You'll then see
+something that looks like this:
+
+<ZoomImage
+  src={githubNewRepo}
+  width={800}
+  alt="A new empty GitHub repository"
+/>
+
+This created an empty repository that exists on GitHub's servers. In order to
+bring it to your own computer, you have to _clone_ it. You can do this in a few
+ways, but the easiest is with the GitHub Desktop app. Press the "Set up in
+GitHub Desktop" button. You'll see a dialog like this:
+
+<ZoomImage
+  src={githubCloneDialog}
+  width={400}
+  alt="Selecting location for cloning a GitHub repo in GitHub Desktop"
+/>
+
+Here's a decision point for you, and it is important: choose a good location on
+your local disk to store your work. I put everything in one big `code` folder in
+my home directory. You might want to organize it by course code. Whatever you
+do, you'll need to be able to find this later.
+
+Once you've picked a good name and tattooed it to an important section of your
+mind, go ahead and clone it. After all that, you'll see the innocuous screen:
+
+<ZoomImage
+  src={githubRepo}
+  width={400}
+  alt="Locally cloned repo in GitHub Desktop"
+/>
+
+You now have a local copy of this repository, and the git tooling will help you
+manage changes.
+
+The next steps are to use an editor to add your files.
+
+### Add your Space Junk files to the local repository
+
+This part is actually straightforward once you get into it. Open your first
+Space Junk homework in the p5 web editor, and use `File > Download` to save a
+zip file containing all of your files. Open the zip file, and you'll see all
+your files: `sketch.js`, `magpie.js`, and so on. You'll also see all the files
+you didn't write, like the `p5.js` bundle, and the `index.html` file that you
+edited but didn't create. Here's what it looks like on my computer:
+
+<ZoomImage
+  src={localFiles}
+  width={600}
+  alt="Files unpacked from the p5 web editor"
+/>
+
+Now that you have the files somewhere on your disk (Downloads?) you can copy
+those over to your fresh clone of your new repo.
+
+Inside your editor, all you need to do is open the folder that contains your
+repo (the one that you tattooed to your mind). Then, drag files from your file
+explorer into the editor:
+
+<ZoomImage
+  src={localFilesCopy}
+  width={800}
+  alt="Copy Space Junk files into your editor"
+/>
+
+That should simply copy the files into the directory that your editor is working
+from. From here you can go back to your git client and see that it sees that
+you've added a bunch of files. GitHub Desktop now looks like this:
+
+<ZoomImage
+  src={githubWithFiles}
+  width={800}
+  alt="GitHub Desktop shows new files"
+/>
+
+At this point, you can commit and push these changes. Just add a Summary (bottom
+left), and then press the "Commit N files to main" down below. This creates a
+local save point that you can return to later. But you're not done yet - you
+need to send these changes up to GitHub's server also. To do this, use the
+'Publish branch' at the top right.
+
+This will spin for a few seconds, then it will look pretty empty again. This is
+good, because this screen is showing you differences - any edits that you've
+made that haven't been committed. And we've committed everything, so it rightly
+shows nothing.
+
+If you go to the GitHub web page in your browser, you'll see this commit appears
+in the web app. This might help you feel better that you've done something
+useful.
+
+## Finish the remaining Space Junk coding
+
+Once you've done that, you're halfway done. There are still some additional
+coding tasks to round out the game. This will give you some practice creating
+git commits, pushing your code to GitHub, and doing all the editing and running
+locally. I'll go over that in a little bit. But for now, let's stick to what is
+involved with git.
+
+> **Phase 4: Deliver the junk (? points)**
+>
+> - Recap: Phase 3 ends with caught junk simply vanishing. Now the Magpie
+>   carries it to the Mothership.
+> - Edit: `Magpie.captureJunk`, `Magpie.draw` (cargo part), `Game.resolveDropoff`,
+>   `Game.updateScore`
+> - `captureJunk(junk)`: store in `this.capturedJunk`, turn the beam off
+>   (`enableBeam` already refuses to turn it on while carrying)
+> - `Magpie.draw`: draw carried junk _before_ the ship so the ship is on top.
+>   `push`, rotate by Magpie rotation, translate to `(0, Magpie.CARGO_Y)`,
+>   `Junk.drawJunk()`, `pop`. (Why is this in the Magpie's frame? Link back to
+>   Geometry section.)
+> - `resolveDropoff(delta)`: mirror of `resolveBeam`, but for one junk
+>   - not carrying → `false`
+>   - carried junk within `Mothership.PICKUP_DIAMETER / 2` of the Mothership →
+>     `dropoffTime += delta`; else drain by `delta`, floor at 0
+>   - `true` when `dropoffTime > Game.JUNK_DROPOFF_TIME_MS`
+>   - Hint: `dist()`; `Magpie.move` already syncs the junk's real position to the
+>     cargo spot (explain why that matters, maybe a callout)
+> - `updateScore(reason)`: `"dropoff"` adds `Game.SCORE_DROPOFF`
+> - Done when: carried junk rides below the ship; hovering in the pickup circle
+>   (try `~` debug mode) ~1s delivers it; beam works again afterward; after all
+>   junk is delivered "All clear!" shows
+> - Screenshot of carrying junk, maybe a worked-example embed like the first
+>   homework
+>
+> **Phase 5: Timer, score, and lives (? points)**
+>
+> - Edit: `timeToStringParts` (utils.js), `Level.timeLeft`, `Level.draw`
+> - `timeLeft()`: initial minus elapsed, never below 0
+> - `timeToStringParts(ms)`: round _up_ to whole seconds, split into minutes and
+>   seconds, seconds always two digits (`"4"`, `"03"`). Both are strings.
+> - `Level.draw`: before the junk, so HUD sits underneath
+>   - Timer: top left, `m:ss`, using `Level.HUD_TEXT_SIZE` / `Level.HUD_PAD`
+>   - Score: top right, same text style
+>   - Lives: bottom left, `lives - 1` small Magpies (current ship isn't a
+>     spare). `translate` + `scale(Level.LIVES_SCALE)`, space by
+>     `Level.LIVES_GAP`, padding from `LIVES_PAD_LEFT` / `LIVES_PAD_BOTTOM`.
+>     `push`/`pop` per ship.
+> - Edge cases to mention: timer hitting 0:00 (nothing happens yet, no
+>   game-over in this version), `textAlign`
+> - Done when: timer counts down and freezes at "All clear!", score goes up by
+>   100 per delivery, two spare ships shown at start
+>
+> **Git checkpoints**
+>
+> - Commit after each phase with a meaningful message; push to GitHub
+> - How to run locally (VS Code Live Server? `npx serve`? decide) since the p5
+>   web editor's play button is gone
+> - Using GitHub Desktop's History tab to see your phases as save points
+>
+> **Rubric / submission** (see stubs below)
+>
+> - Suggest: git repo ported & pushed (3), Phase 4 (3), Phase 5 (3), turned in (1)
+> - Submit the GitHub repo URL on Canvas
 
 - Topics (per calendar, same week): JS tooling: npm, node, libraries
 - What students are asked to build/do:
