@@ -212,64 +212,206 @@ git commits, pushing your code to GitHub, and doing all the editing and running
 locally. I'll go over that in a little bit. But for now, let's stick to what is
 involved with git.
 
-> **Phase 4: Deliver the junk (? points)**
->
-> - Recap: Phase 3 ends with caught junk simply vanishing. Now the Magpie
->   carries it to the Mothership.
-> - Edit: `Magpie.captureJunk`, `Magpie.draw` (cargo part), `Game.resolveDropoff`,
->   `Game.updateScore`
-> - `captureJunk(junk)`: store in `this.capturedJunk`, turn the beam off
->   (`enableBeam` already refuses to turn it on while carrying)
-> - `Magpie.draw`: draw carried junk _before_ the ship so the ship is on top.
->   `push`, rotate by Magpie rotation, translate to `(0, Magpie.CARGO_Y)`,
->   `Junk.drawJunk()`, `pop`. (Why is this in the Magpie's frame? Link back to
->   Geometry section.)
-> - `resolveDropoff(delta)`: mirror of `resolveBeam`, but for one junk
->   - not carrying → `false`
->   - carried junk within `Mothership.PICKUP_DIAMETER / 2` of the Mothership →
->     `dropoffTime += delta`; else drain by `delta`, floor at 0
->   - `true` when `dropoffTime > Game.JUNK_DROPOFF_TIME_MS`
->   - Hint: `dist()`; `Magpie.move` already syncs the junk's real position to the
->     cargo spot (explain why that matters, maybe a callout)
-> - `updateScore(reason)`: `"dropoff"` adds `Game.SCORE_DROPOFF`
-> - Done when: carried junk rides below the ship; hovering in the pickup circle
->   (try `~` debug mode) ~1s delivers it; beam works again afterward; after all
->   junk is delivered "All clear!" shows
-> - Screenshot of carrying junk, maybe a worked-example embed like the first
->   homework
->
-> **Phase 5: Timer, score, and lives (? points)**
->
-> - Edit: `timeToStringParts` (utils.js), `Level.timeLeft`, `Level.draw`
-> - `timeLeft()`: initial minus elapsed, never below 0
-> - `timeToStringParts(ms)`: round _up_ to whole seconds, split into minutes and
->   seconds, seconds always two digits (`"4"`, `"03"`). Both are strings.
-> - `Level.draw`: before the junk, so HUD sits underneath
->   - Timer: top left, `m:ss`, using `Level.HUD_TEXT_SIZE` / `Level.HUD_PAD`
->   - Score: top right, same text style
->   - Lives: bottom left, `lives - 1` small Magpies (current ship isn't a
->     spare). `translate` + `scale(Level.LIVES_SCALE)`, space by
->     `Level.LIVES_GAP`, padding from `LIVES_PAD_LEFT` / `LIVES_PAD_BOTTOM`.
->     `push`/`pop` per ship.
-> - Edge cases to mention: timer hitting 0:00 (nothing happens yet, no
->   game-over in this version), `textAlign`
-> - Done when: timer counts down and freezes at "All clear!", score goes up by
->   100 per delivery, two spare ships shown at start
->
-> **Git checkpoints**
->
-> - Commit after each phase with a meaningful message; push to GitHub
-> - How to run locally (VS Code Live Server? `npx serve`? decide) since the p5
->   web editor's play button is gone
-> - Using GitHub Desktop's History tab to see your phases as save points
->
-> **Rubric / submission** (see stubs below)
->
-> - Suggest: git repo ported & pushed (3), Phase 4 (3), Phase 5 (3), turned in (1)
-> - Submit the GitHub repo URL on Canvas
+### Run it locally
 
-- Topics (per calendar, same week): JS tooling: npm, node, libraries
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+The p5 web editor had a handy play button. Out here in the real world, you need
+something to serve your files to a web browser. We'll use a VS Code extension
+called Live Server (by Ritwick Dey) for this. Open the Extensions panel in VS
+Code (the stack of squares on the left), search for "Live Server" (be sure the
+author matches!), and install it.
+
+Then open `index.html` in your editor, right-click anywhere in it, and choose
+"Open with Live Server". Your default browser will open with the game running.
+There is also a "Go Live" button in the bottom right of the VS Code window that
+does the same thing. Live Server watches your files, so when you save an edit,
+the page reloads by itself.
+
+{/* prettier-ignore-start */}
+
+You can also use the Integrated Browser. Use <Kbd>Cmd</Kbd>+<Kbd>Shift</Kbd>+<Kbd>P</Kbd> 
+and then type "Integrated Browser", and it should appear as one of
+the options. This opens a browser embedded inside VS Code. If you drag this to
+one side, the development experience is similar to the P5 web editor.
+
+{/* prettier-ignore-end */}
+
+Before you write any new code, make sure this works. You should see exactly what
+you had in the p5 web editor when you finished the first homework: junk
+floating, a Mothership drifting, and a Magpie you can fly and beam with. If it
+doesn't work, something went wrong with the port, and it's much easier to sort
+that out now than after you've changed a bunch of code.
+
+{/* prettier-ignore-start */}
+
+As before, the p5 editor's console is gone, so errors show up in your browser's
+DevTools console (Chrome: <Kbd>Cmd</Kbd>+<Kbd>Opt</Kbd>+<Kbd>J</Kbd> on Mac,
+<Kbd>Ctrl</Kbd>+<Kbd>Shift</Kbd>+<Kbd>J</Kbd> on Windows).
+
+{/* prettier-ignore-end */}
+
+### Commit early, commit often
+
+Your starting point is wherever you left off in the first homework: a game where
+junk can be caught in the beam, but then just vanishes. You'll add two more
+phases, continuing the numbering from before. Each phase should end with a
+commit and a push.
+
+A commit is a save point, and the best time to make one is when you've gotten
+something working. Do this often, and try to develop a habit of it. Write a
+summary that tells future-you what changed, like "Phase 4: carry junk to the
+Mothership". Avoid summaries like "stuff" or "asdf", which save time now but are
+also kinda dumb and unhelpful. After committing, the button at the top right
+changes from 'Publish branch' to 'Push origin'. Press it to send your commit to
+GitHub, just like what we did with the original batch.
+
+If you switch to the History tab in GitHub Desktop, you'll see each of your
+commits listed, and you can click on any one to see exactly which lines changed.
+That list is the record of how your project evolved.
+
+## Phase 4: Deliver the junk (3 points)
+
+So far, junk you catch in the beam just disappears. Now the Magpie is going to
+carry it to the Mothership and drop it off, and you'll get points for it.
+
+You'll edit these functions:
+
+- `Magpie.captureJunk`
+- `Magpie.draw` (the part marked for Phase 4)
+- `Game.resolveDropoff`
+- `Game.updateScore`
+
+Search for `TODO (Phase 4)` comments in the code at each of these. Your game
+already calls these in the right places; it's just that they don't do anything
+yet.
+
+### Carrying the junk
+
+When `Game.move` catches a piece of junk, it calls `Magpie.captureJunk(junk)`.
+Your job is to remember that junk in `this.capturedJunk`, and to turn off the
+beam. A Magpie that is hauling cargo can't also be tractoring more, and
+`enableBeam` is already written to refuse to turn the beam back on while
+`capturedJunk` is set.
+
+Then, in `Magpie.draw`, show the junk hanging below the ship. It should be drawn
+before the Magpie so the ship is on top. The junk needs to follow the ship
+around as it turns, so rather than computing where it goes, do what we did for
+everything else: set up the transforms so you can draw as though the Magpie were
+at `(0, 0)` pointing up. Inside a `push()` and `pop()`, rotate by the Magpie's
+rotation, translate to `(0, Magpie.CARGO_Y)`, and call `Junk.drawJunk()`. If
+that sounds like a lot of moving parts, review the
+[Geometry section](/programming-languages/building-with-code/geometry).
+
+The `push` and `pop` matter here. Without them, your translate and rotate would
+also apply to the Magpie you draw next, and the ship would end up in the wrong
+place.
+
+### Dropping it off
+
+Delivery works much like catching. The Magpie has to hold the junk inside the
+Mothership's pickup circle for a little while. You can see this circle by
+pressing `~` to turn on debug mode.
+
+`Game.resolveDropoff(delta)` is called every frame, and returns `true` when the
+junk is delivered. It is the same idea as `resolveBeam`, but there is only ever
+one junk to worry about:
+
+_If the Magpie isn't carrying junk, return false. If the carried junk is within
+`Mothership.PICKUP_DIAMETER / 2` of the Mothership, add `delta` to the junk's
+`dropoffTime`. Otherwise, reduce `dropoffTime` by `delta`, but not below zero.
+Return true if `dropoffTime` is more than `Game.JUNK_DROPOFF_TIME_MS`._
+
+p5's `dist()` function will help you measure the distance between two points.
+The junk's position is in `junk.physics`, and the Mothership's is in
+`this.mothership.physics`.
+
+You may wonder how the carried junk has a position when it was removed from the
+level's list. It still has a `Physics` object, and `Magpie.move` updates it to
+the cargo spot every frame. So as far as your distance calculation is concerned,
+the junk is wherever it's drawn.
+
+Once `resolveDropoff` returns true, `Game.move` clears the Magpie's cargo and
+calls `updateScore("dropoff")`. Fill that function in so a dropoff adds
+`Game.SCORE_DROPOFF` to `this.score`. You won't see the score on screen until
+the next phase, but you can check it with `console.log` if you'd like.
+
+### Done when
+
+- Caught junk rides below the Magpie, and stays below it as the ship turns
+- The beam turns off when you catch something, and can't be turned on while
+  carrying
+- Hovering over the Mothership for about a second delivers the junk, and the
+  beam works again afterward
+- Moving away before time is up doesn't deliver, and drains the timer slowly
+- Once all junk has been delivered, you see "All clear!"
+- You made a commit and pushed it to GitHub
+
+## Phase 5: Timer, score, and lives (2 points)
+
+The game works, but the player can't see how they're doing. This phase adds the
+heads-up display (the "HUD"), which is the timer, the score, and the number of
+spare ships.
+
+You'll edit these:
+
+- `timeToStringParts` in `utils.js`
+- `Level.timeLeft`
+- `Level.draw`
+
+### The timer
+
+`Level.timeLeft` gives the milliseconds remaining: the level's initial time
+minus the elapsed time. It should never go below zero, so that the display
+doesn't count into negative numbers.
+
+Then `timeToStringParts` turns milliseconds into something to show. It returns
+an object with two strings, `minutes` and `seconds`. A time of 125,000 ms
+becomes `{ minutes: "2", seconds: "05" }`. Two things to note:
+
+- Round _up_ to whole seconds first. A clock that says `0:00` should mean time
+  is really up, not that there's still half a second left. `Math.ceil` is your
+  friend.
+- Seconds always have two digits. JavaScript strings have a `padStart` method
+  that might come in handy.
+
+### Drawing the HUD
+
+In `Level.draw`, draw the HUD before the junk, so it sits underneath all the
+game objects. Use `Level.HUD_TEXT_SIZE` and `Level.HUD_PAD` for the text size
+and margins.
+
+- **Timer**: top left, as `minutes:seconds`
+- **Score**: top right, in the same style as the timer
+- **Lives**: bottom left, one small Magpie for each _spare_ life. The Magpie you
+  are currently flying is not a spare, so draw `lives - 1` of them.
+
+For the lives, `Magpie.drawMagpie()` draws around `(0, 0)`, so you'll need to
+`translate` to where you want it and `scale` it down by `Level.LIVES_SCALE`.
+Start `Level.LIVES_PAD_LEFT` from the left edge and `Level.LIVES_PAD_BOTTOM`
+from the bottom. Each ship after that goes `Level.LIVES_GAP` further to the
+right, measured center to center. Wrap each one in `push` and `pop` so the
+transforms don't pile up.
+
+There is no game over in this version of the game, so don't worry about what
+happens when time runs out or lives hit zero. It's OK if the timer sits at
+`0:00`.
+
+### Done when
+
+- The timer counts down from 2:00, and stops when you see "All clear!"
+- The score is shown, and goes up by 100 each time you deliver junk
+- Two small Magpies are shown at the start
+- You made a commit and pushed it to GitHub
+
+## Rubric
+
+| Part                                            | Points |
+| ----------------------------------------------- | ------ |
+| Space Junk files in a fresh git repo, on GitHub | 5      |
+| 4. Deliver the junk                             | 3      |
+| 5. Timer, score, and lives                      | 2      |
+| **Total**                                       | **10** |
+
+## Turn it in on Canvas
+
+Submit the link to your GitHub repository. I'll look at the code, and I'll also
+look at your commit history, so I expect to see more than one commit.

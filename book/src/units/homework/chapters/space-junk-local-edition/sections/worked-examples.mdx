@@ -1,6 +1,220 @@
 export const title = "Worked Examples"
 
+import { phase4, phase5 } from "./embeds/phase-builds"
+
 # Space Junk, Local Edition — Worked Examples
 
-- Example 1:
-- Example 2:
+As with the first Space Junk homework, I'm giving you my solution code behind
+expandable areas labeled "My Phase N code". You won't see spoilers unless you
+want them. The same advice applies: if you get stuck, peek, get yourself
+un-stuck, then go back to working your code The Hard Way.
+
+The sketches on this page run in your browser, but your own version will run
+from your local repository using Live Server. These examples show what you're
+aiming for, not how to set up git. For that, you're on your own (with the
+description, anyway).
+
+## Phase 4: Carry it home
+
+{/* prettier-ignore-start */}
+
+In this phase the Magpie finally gets to do its job: catch junk, carry it to the
+Mothership, and drop it off for points. Try it out below. Catch some junk with
+<Kbd>Space</Kbd>, then fly it into the Mothership's pickup circle and wait.
+Press `~` to see the pickup circle if you'd like.
+
+{/* prettier-ignore-end */}
+
+<P5Sketch code={phase4} allowReset title="Space Junk at the end of Phase 4" />
+
+Capturing junk is a matter of remembering it. The Magpie holds a direct
+reference to the junk in `capturedJunk`. That one variable does a lot of work:
+it's how the Magpie knows to draw cargo, it's how `enableBeam` knows to refuse
+to turn the beam on, and it's how `resolveDropoff` knows there's something to
+deliver.
+
+The cargo is drawn inside the Magpie's `drawFn`, which has already moved the
+transform to the ship's center. So we don't want to call `capturedJunk.draw()`,
+as that would translate to the junk's own position a second time. Instead we use
+the shape-only `Junk.drawJunk()`, after rotating and translating into the right
+spot in the ship's frame of reference. It's drawn first so the ship covers it.
+
+Dropoff is a charge-and-drain timer, just like catching in the beam. The same
+pattern shows up again with a different trigger: instead of 'is the junk in the
+beam?', it's 'is the junk in the pickup circle?'. Because only one junk can be
+carried, there's no loop and no 'pick the best' step.
+
+<details>
+<summary>My Phase 4 code</summary>
+
+```js
+// magpie.js (inside class Magpie)
+
+draw() {
+  push();
+  drawEverywhere({
+    offset: this.physics,
+    drawFn: () => {
+      // Draw captured junk first so the ship is drawn on top of it. We're
+      // already at the Magpie's center, so use Junk's shape-only draw.
+      // Calling capturedJunk.draw() here would translate a second time.
+      if (this.capturedJunk) {
+        push();
+        rotate(this.physics.rotation);
+        translate(0, Magpie.CARGO_Y);
+        Junk.drawJunk();
+        pop();
+      }
+      Magpie.drawMagpie({ rotation: this.physics.rotation, beam: this.beam });
+      if (game.debug) {
+        this.physics.draw();
+      }
+    },
+  });
+  pop();
+}
+
+/** Sets the captured junk to the given one, and turns off the beam. */
+captureJunk(junk) {
+  this.capturedJunk = junk;
+  // switch off the beam. The player might still be holding Space, but
+  // enableBeam won't turn the beam back on until this junk is delivered.
+  // If Space is still held at that point, the beam comes right back.
+  this.beam = false;
+}
+```
+
+```js
+// game.js (inside class Game)
+
+/**
+ * Checks whether the junk the Magpie is carrying is inside the Mothership's
+ * pickup circle, and adds or drains its dropoff time to match. Returns true
+ * once it has been there longer than JUNK_DROPOFF_TIME_MS, meaning the junk
+ * is delivered.
+ **/
+resolveDropoff(delta) {
+  const junk = this.magpie.capturedJunk;
+  if (junk == null) {
+    return false;
+  }
+  const pickupRadius = Mothership.PICKUP_DIAMETER / 2;
+  if (
+    dist(
+      this.mothership.physics.x,
+      this.mothership.physics.y,
+      junk.physics.x,
+      junk.physics.y,
+    ) <= pickupRadius
+  ) {
+    junk.dropoffTime += delta;
+  } else {
+    // we have junk but not inside the drop zone. reduce elapsed time,
+    // floor is at zero like always.
+    junk.dropoffTime = Math.max(0, junk.dropoffTime - delta);
+  }
+  return junk.dropoffTime > Game.JUNK_DROPOFF_TIME_MS;
+}
+
+updateScore(reason) {
+  if (reason === "dropoff") {
+    this.score += Game.SCORE_DROPOFF;
+  }
+}
+```
+
+</details>
+
+## Phase 5: The HUD
+
+This is the last phase, and it finishes the game. The new work is almost all
+about putting information on the screen: the time left, the score, and the spare
+ships. This is the complete game, so go ahead and play it.
+
+<P5Sketch code={phase5} allowReset title="Space Junk at the end of Phase 5" />
+
+The timer takes two steps. `Level.timeLeft` figures out how many milliseconds
+remain, and `timeToStringParts` turns that into text. Splitting these apart
+means each function does one job, and you can reason about each by itself. It
+also means you could change how time is displayed without touching the code that
+decides how much is left.
+
+Rounding up with `Math.ceil` is a small choice with a noticeable effect. If you
+rounded down, the clock would say `0:00` for a whole second before time was
+really up. Seconds are padded to two digits so that five seconds reads `0:05`
+and not `0:5`.
+
+For the lives, the key detail is the `push` and `pop` _inside_ the loop. Each
+life is translated and scaled from scratch. If you pushed once outside the loop
+instead, each iteration would translate and scale on top of the last one, and
+the ships would march off the screen while shrinking. Also, notice that we draw
+`lives - 1` of them. The Magpie you're flying counts as a life, but it's not a
+_spare_.
+
+<details>
+<summary>My Phase 5 code</summary>
+
+```js
+// utils.js
+
+/**
+ * Returns an object { minutes, seconds } where both items are strings
+ * suitable for rendering. E.g. "4" minutes, "03" seconds.
+ */
+function timeToStringParts(timeMs) {
+  const secondsLeft = Math.ceil(timeMs / 1000);
+  const minutes = String(Math.trunc(secondsLeft / 60));
+  const seconds = String(secondsLeft % 60).padStart(2, "0");
+  return { minutes, seconds };
+}
+```
+
+```js
+// level.js (inside class Level)
+
+/** Give the remaining time for this level in milliseconds. */
+timeLeft() {
+  return Math.max(0, this.time.initial - this.time.elapsed);
+}
+
+draw(score, lives) {
+  push();
+  // timer and score share a text style: large, at the top corners
+  noStroke();
+  fill("#ffd342");
+  textSize(Level.HUD_TEXT_SIZE);
+  textAlign(LEFT, TOP);
+  const { minutes, seconds } = timeToStringParts(this.timeLeft());
+  text(`${minutes}:${seconds}`, Level.HUD_PAD, Level.HUD_PAD);
+
+  // score is right-aligned, so it grows leftward as digits are added
+  textAlign(RIGHT, TOP);
+  text(`${score}`, width - Level.HUD_PAD, Level.HUD_PAD);
+
+  // lives - the Magpie in play counts as one, so show the spares: one
+  // fewer icon than lives. On the last life, no icons are shown at all.
+  // Note the push/pop inside the loop, not outside. This allows each life
+  // render to start from the same conditions.
+  for (let i = 0; i < lives - 1; i++) {
+    push();
+    translate(
+      // X offset is padded in from the left edge, plus a gap for each life
+      Level.LIVES_PAD_LEFT + i * Level.LIVES_GAP,
+      // Y offset is relative to the bottom, so subtract from height
+      height - Level.LIVES_PAD_BOTTOM,
+    );
+    // Render an itty bitty Magpie, rotated a little to make it fun
+    scale(Level.LIVES_SCALE);
+    Magpie.drawMagpie({ rotation: 0.2, beam: false });
+    pop();
+  }
+
+  // junk
+  for (const junk of this.junk) {
+    junk.draw();
+  }
+  pop();
+}
+```
+
+</details>
