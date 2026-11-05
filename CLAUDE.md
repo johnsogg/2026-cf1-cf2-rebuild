@@ -8,80 +8,94 @@ The AABB homework in CF1 (and probably every homework in CF2) lives in
 separate git repos, not in this book. This repo holds only the book-side
 content: the `description.mdx` / `worked-examples.mdx` under
 `book/src/units/homework/chapters/<homework>/`. The code, tests, and
-autograding live elsewhere:
+autograding live elsewhere. AABB was traditionally the 2nd homework in the data
+structures course, after an initial "git + local editing" homework about how to
+get and finish homework.
 
-- GitHub org `codezeug` holds the pristine ("prime") copies, e.g.
-  `codezeug/hw-aabb` and `codezeug/hw-template` (the template and its setup
-  checklist). Local clones are in `~/courses/cf2-private/hw-*`. (`~/code/gen-homework-workflow`
-  is the older CLI that turned `autograde.json` into a GitHub Classroom workflow.)
-- AABB was traditionally the 2nd homework in the data structures course, after
-  an initial "git + local editing" homework about how to get and finish homework.
-- GitHub Classroom is sunset. Assignments stay on GitHub, but students fork the
-  repo, run the tests locally via npm scripts, and push to their fork; grading
-  uses our own mechanism instead of Classroom. Decided (2026-11-04): a central
-  instructor-owned grader repo in the `codezeug` org (GitHub Team, educator
-  discount, $0) runs a GitHub Actions matrix, one job per student repo. Each job
-  checks out the student's private repo at a pinned SHA, overlays the pristine
-  tests/config from the prime repo, and runs the tests on a GitHub-hosted
-  runner (so student code never runs on instructor/TA machines). Student repos
-  must stay private. Cheating/AI-use detection is explicitly out of scope, and
-  students modifying tests is not treated as suspicious. Scale: ~30-40
-  students x ~10 homeworks per semester. Students use "Use this template" to
-  make a private repo in their own account, then install the GitHub App
-  `codezeug-graderbot` (https://github.com/apps/codezeug-graderbot) on just
-  that repo; the grader reads repos via the App, not collaborator invites. The
-  App is installed on the `codezeug` org for the prime `hw-*` repos (selected
-  repos only; add each new homework repo). In-progress work is in
-  `~/courses/cf2-private/hw-aabb` (Classroom removed; `scripts/check-setup.mjs`
-  added). Still to build: the private `codezeug/grader` repo (publish
-  installations.json of sha256("owner/repo") hashes, grading matrix, CSV).
-- Classroom-generated student forks were archived (to `codezeug-archive`) and
-  deleted from `codezeug` on 2026-10-24.
+### How homework and grading work
 
-Where things live (local paths; GitHub org is `codezeug`):
+- Each homework has a **private prime repo** `codezeug/hw-<name>-private`
+  (holds the `solution` branch and full history; never shown to students) and a
+  **public template** `codezeug/hw-<name>` (a single-commit, history-free
+  snapshot of the prime repo's `main`). One public template serves both CF1 and
+  CF2 (aabb is the only planned CF1 assignment so far).
+- Students click "Use this template" to make a **private** repo in their own
+  account, install the GitHub App `codezeug-graderbot`
+  (https://github.com/apps/codezeug-graderbot) on just that repo, run
+  `npm run check-setup` to verify, then edit, test locally with npm, and push.
+  Student repos must stay private.
+- Grading is done by the private repo `codezeug/grader`: a GitHub Actions matrix
+  with one job per student repo. Each job checks out the student's repo at a
+  pinned SHA, overlays the pristine tests/config from the prime repo, and runs
+  the tests on a GitHub-hosted runner (so student code never runs on
+  instructor/TA machines). The grader reads repos through the App, not
+  collaborator invites. The grader finds a student's repo by GitHub's
+  `template_repository` field (the `templates` list in `homeworks.json`; quiet
+  fallback: package.json name `hw-<name>`), so students must use "Use this
+  template"; what they name their repo doesn't matter.
+- Cheating/AI-use detection is explicitly out of scope, and students modifying
+  tests is not treated as suspicious. Scale: ~30-40 students x ~10 homeworks per
+  semester.
+- `check-setup` reads https://codezeug.github.io/grader/installations.json
+  (published by the grader repo every ~2 hours, hashes only), so it can wrongly
+  report "not installed" for up to ~2 hours after a student installs the App;
+  the script says so.
+
+### Where things live (local paths; GitHub org is `codezeug`)
 
 - `~/courses/2026-cf1-cf2-rebuild` — this book repo (homework descriptions and
   worked examples only, under `book/src/units/homework/`).
+- `~/courses/2026-cf1-cf2-rebuild/scripts/publish-template.sh` — publishes the
+  public `hw-<name>` from `hw-<name>-private`:
+  `scripts/publish-template.sh hw-<name>-private [--execute]` (dry run unless
+  `--execute`). It finds the private repos at `../cf2-private` relative to this
+  book repo and says so if that directory is missing. It refuses to overwrite a
+  non-public target and refuses snapshots with solution-looking paths.
 - `~/courses/cf2-private/` — a plain directory, **not a git repo**, holding:
-  - `hw-<name>/` — one git repo per homework (private prime repos, remote
-    `git@github.com:codezeug/hw-<name>.git`): aabb, bst, bubbles, collide, fsm,
-    graph, hash, huffman, linked-lists, using-git. Each has a `solution` branch.
-  - `hw-template/` — template repo and `__checklist.md` (still describes the
-    old Classroom flow; update it when porting from `hw-aabb`).
-  - `publish-template.sh` — publishes a public `cf1-`/`cf2-` template from a
-    `hw-` repo (not versioned anywhere yet).
-  - `archive-student-repos.sh`, `delete-archived-originals.sh`,
-    `archive-until-done.sh`, logs/TSV — 2026-10-24 Classroom cleanup.
-  - `enter-grades.sh` — existing grade entry helper.
-  - `cf2-axis-aligned-bounding-boxes-hw-aarb/`, `cf2-huffman-coding-hw-huffman/`
-    — old Classroom-era copies; `js-refresher-jan-2*`, `exams/`, `slides/`,
-    `lectures/`, `schedule-2026-spring.md` — other course material.
-- `~/courses/cf2-private/grader/` — planned local dir for the (private)
-  `codezeug/grader` repo; not created yet.
-- `~/code/gen-homework-workflow` — old CLI that generated Classroom workflow
-  YAML from `autograde.json`. Obsolete under the new design.
-- `~/code/codezeug-ts-template`, `~/code/hw-01-aabb-johnsogg` — 2024 prototypes
-  of the TS homework template and the AABB homework; superseded by
-  `cf2-private/hw-template` and `cf2-private/hw-aabb`.
+  - `hw-<name>-private/` — one git repo per homework (remote
+    `git@github.com:codezeug/hw-<name>-private.git`): aabb, bst, bubbles,
+    collide, fsm, graph, hash, huffman, linked-lists, using-git. Each has a
+    `solution` branch.
+  - `hw-template/` — template repo for starting a new homework, plus its setup
+    `__checklist.md`. Not a homework itself, so no `-private` suffix.
+  - `grader/` — local clone of the private `codezeug/grader` repo: roster
+    (`roster.csv`: `email,github,section,name`, keyed on Canvas email),
+    `staff.csv` (teaching team, sections, times), `homeworks.json`, the
+    plan/test/collect grading workflow, and the installations-list publisher.
+    Its README has the one-time setup, how to grade, and the TA flow
+    (`./grade --hw aabb --section ta-a`, driven by the roster's `section`
+    column; before giving TAs write access, move the app key into the `grading`
+    environment and protect `main`).
+  - `enter-grades.sh` — grade entry helper; `js-refresher-jan-2*`, `exams/`,
+    `slides/`, `lectures/`, `schedule-2026-spring.md` — other course material.
 - GitHub App: `codezeug-graderbot` (settings:
-  https://github.com/organizations/codezeug/settings/apps/codezeug-graderbot,
-  public page: https://github.com/apps/codezeug-graderbot). The private key and
-  App ID go in the grader repo's Actions secrets `APP_ID` / `APP_PRIVATE_KEY`
-  and are never committed or pasted into chat.
+  https://github.com/organizations/codezeug/settings/apps/codezeug-graderbot).
+  App ID is 5622546 (not secret; hard-coded in the grader workflows). The
+  private key lives only as the grader repo's Actions secret `APP_PRIVATE_KEY`
+  and is never committed or pasted into chat. The App is installed on the
+  `codezeug` org for the prime `hw-*-private` repos (selected repos only).
 
-Repo naming: private prime repos are `hw-<name>` (hold the `solution` branch and
-full history; the grader App is installed on these). Public student-facing
-templates are `cf1-<name>` / `cf2-<name>`, published as single-commit
-history-free snapshots of the private repo's `main` by
-`~/courses/cf2-private/publish-template.sh hw-<name> cf1|cf2 [--execute]`.
-The same `hw-` repo can publish to both (aabb is both cf1-aabb and cf2-aabb;
-it is the only planned cf1 assignment so far).
+### Current status (2026-11-05)
 
-Per-homework reminders (the user wants these surfaced proactively): when a new
-`hw-*` repo is created, add it to the `codezeug-graderbot` App installation on
-the `codezeug` org, and make sure the `solution` branch/history is never
-reachable from the public template students copy. Every `hw-*` repo has a
-`solution` branch; all `codezeug/hw-*` repos were private as of 2026-11-04.
+The repos use the `-private` scheme, the public `codezeug/hw-aabb` is published,
+and the whole pipeline is verified against it (a pretend-student repo made from
+`hw-aabb` scored as expected via `./grade --hw aabb --all`; the App
+installation survived the renames). Note that the grader runs from the copy on
+GitHub: push `grader` changes (e.g. `homeworks.json`) before running `./grade`.
+Still to do: republish `hw-aabb` whenever `hw-aabb-private` changes (the public
+repo is a snapshot), port the same flow to the other homeworks (each needs the
+App installation, a `homeworks.json` entry, and a publish), and write the book
+prose. The roster is filled in; six students still owe the instructor their
+GitHub username.
+
+### Per-homework reminders
+
+The user wants these surfaced proactively: when a new `hw-*-private` repo is
+created, add it to the `codezeug-graderbot` App installation on the `codezeug`
+org, add it to the grader's `homeworks.json`, and make sure the `solution`
+branch/history is never reachable from the public template students copy
+(publish only via the script). Every `hw-*-private` repo has a `solution`
+branch and should be private.
 
 When working on a homework, read the external repo by absolute path rather
 than assuming it is in this repo; edits there need their own commits/pushes.

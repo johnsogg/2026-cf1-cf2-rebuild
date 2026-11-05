@@ -84,6 +84,22 @@ Each entry: date added, priority, note.
 
 > Ideas that don't clearly fit the above.
 
+- **2026-11-04 — P1** — AABB homework, student-facing text still to write: how
+  to get the homework (Use this template, private, keep the repo name
+  `cf1-aabb`/`cf2-aabb`, install the grader app, `npm run check-setup`) and how
+  to turn it in (`git push`; graded after the due date). The outline is in
+  `homework/chapters/axis-aligned-bounding-box/sections/description.mdx`; the
+  homework repo's `GENERAL.md` is the source of truth. Also decide due date and
+  late policy, and whether to say anything about AI use.
+
+- **2026-11-04 — P1** — Instructor runbook for "babysitting" the
+  `codezeug-graderbot` app (probably in the grader repo's README, not the
+  book): rotate the private key yearly, add each new `hw-*` repo to the app's
+  org installation, installations list refreshes every 2h (run the workflow by
+  hand to force it), keep `roster.csv` current, what the grade statuses mean,
+  Actions-minutes budget. Full status and the rest of the AABB to-do list:
+  see the `aabb-homework-status` memory note.
+
 - **2026-10-04 — P2** — `HitTestPlayground` for `geometry.mdx` (Hit tests
   section; placeholder MDX comment is there). Pick two primitives (point,
   circle, axis-aligned rect, segment, polygon), drag vertices or drag a shape
