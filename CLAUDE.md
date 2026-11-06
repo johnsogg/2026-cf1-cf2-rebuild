@@ -1,21 +1,24 @@
-Always read the CLAUDE.md file at the beginning of sessions for establishing context.
+Always read the CLAUDE.md file at the beginning of sessions for establishing
+context.
 
-The user will retain editorial control. Yours is a supporting role to provide feedback and criticism. You will also be asked to smooth out language, generate problems and problem sets.
+The user will retain editorial control. Yours is a supporting role to provide
+feedback and criticism. You will also be asked to smooth out language, generate
+problems and problem sets.
 
 ## External homework repositories
 
-The AABB homework in CF1 (and probably every homework in CF2) lives in
-separate git repos, not in this book. This repo holds only the book-side
-content: the `description.mdx` / `worked-examples.mdx` under
-`book/src/units/homework/chapters/<homework>/`. The code, tests, and
-autograding live elsewhere. AABB was traditionally the 2nd homework in the data
-structures course, after an initial "git + local editing" homework about how to
-get and finish homework.
+The AABB homework in CF1 (and probably every homework in CF2) lives in separate
+git repos, not in this book. This repo holds only the book-side content: the
+`description.mdx` / `worked-examples.mdx` under
+`book/src/units/homework/chapters/<homework>/`. The code, tests, and autograding
+live elsewhere. AABB was traditionally the 2nd homework in the data structures
+course, after an initial "git + local editing" homework about how to get and
+finish homework.
 
 ### How homework and grading work
 
-- Each homework has a **private prime repo** `codezeug/hw-<name>-private`
-  (holds the `solution` branch and full history; never shown to students) and a
+- Each homework has a **private prime repo** `codezeug/hw-<name>-private` (holds
+  the `solution` branch and full history; never shown to students) and a
   **public template** `codezeug/hw-<name>` (a single-commit, history-free
   snapshot of the prime repo's `main`). One public template serves both CF1 and
   CF2 (aabb is the only planned CF1 assignment so far).
@@ -59,13 +62,14 @@ get and finish homework.
   - `hw-template/` — template repo for starting a new homework, plus its setup
     `__checklist.md`. Not a homework itself, so no `-private` suffix.
   - `grader/` — local clone of the private `codezeug/grader` repo: roster
-    (`roster.csv`: `email,github,section,name`, keyed on Canvas email),
-    `staff.csv` (teaching team, sections, times), `homeworks.json`, the
-    plan/test/collect grading workflow, and the installations-list publisher.
-    Its README has the one-time setup, how to grade, and the TA flow
-    (`./grade --hw aabb --section ta-a`, driven by the roster's `section`
-    column; before giving TAs write access, move the app key into the `grading`
-    environment and protect `main`).
+    (`roster.csv`: `email,github,ta,section,name`, keyed on Canvas email; `ta`
+    is the grading TA's slug and `section` is the university code like
+    `ATLS 1300-112`), `staff.csv` (teaching team, sections, times),
+    `homeworks.json`, the plan/test/collect grading workflow, and the
+    installations-list publisher. Its README has the one-time setup, how to
+    grade, and the TA flow (`./grade --hw aabb --ta lucky`, driven by the
+    roster's `ta` column; before giving TAs write access, move the app key into
+    the `grading` environment and protect `main`).
   - `enter-grades.sh` — grade entry helper; `js-refresher-jan-2*`, `exams/`,
     `slides/`, `lectures/`, `schedule-2026-spring.md` — other course material.
 - GitHub App: `codezeug-graderbot` (settings:
@@ -79,12 +83,12 @@ get and finish homework.
 
 The repos use the `-private` scheme, the public `codezeug/hw-aabb` is published,
 and the whole pipeline is verified against it (a pretend-student repo made from
-`hw-aabb` scored as expected via `./grade --hw aabb --all`; the App
-installation survived the renames). Note that the grader runs from the copy on
-GitHub: push `grader` changes (e.g. `homeworks.json`) before running `./grade`.
-Still to do: republish `hw-aabb` whenever `hw-aabb-private` changes (the public
-repo is a snapshot), port the same flow to the other homeworks (each needs the
-App installation, a `homeworks.json` entry, and a publish), and write the book
+`hw-aabb` scored as expected via `./grade --hw aabb --all`; the App installation
+survived the renames). Note that the grader runs from the copy on GitHub: push
+`grader` changes (e.g. `homeworks.json`) before running `./grade`. Still to do:
+republish `hw-aabb` whenever `hw-aabb-private` changes (the public repo is a
+snapshot), port the same flow to the other homeworks (each needs the App
+installation, a `homeworks.json` entry, and a publish), and write the book
 prose. The roster is filled in; six students still owe the instructor their
 GitHub username.
 
@@ -94,29 +98,28 @@ The user wants these surfaced proactively: when a new `hw-*-private` repo is
 created, add it to the `codezeug-graderbot` App installation on the `codezeug`
 org, add it to the grader's `homeworks.json`, and make sure the `solution`
 branch/history is never reachable from the public template students copy
-(publish only via the script). Every `hw-*-private` repo has a `solution`
-branch and should be private.
+(publish only via the script). Every `hw-*-private` repo has a `solution` branch
+and should be private.
 
-When working on a homework, read the external repo by absolute path rather
-than assuming it is in this repo; edits there need their own commits/pushes.
+When working on a homework, read the external repo by absolute path rather than
+assuming it is in this repo; edits there need their own commits/pushes.
 
 ## TODO list
 
-`book/TODO.md` tracks deferred ideas the user notices while drafting but
-doesn't want to act on immediately (to preserve momentum). It has three
-sections — Easy Adds, Structural Notes, Other — each entry dated and given
-a priority (P1/P2/P3). Check it when the user wants a quick, self-contained
-task, and add to it when the user surfaces an idea they want to defer
-rather than act on now.
+`book/TODO.md` tracks deferred ideas the user notices while drafting but doesn't
+want to act on immediately (to preserve momentum). It has three sections — Easy
+Adds, Structural Notes, Other — each entry dated and given a priority
+(P1/P2/P3). Check it when the user wants a quick, self-contained task, and add
+to it when the user surfaces an idea they want to defer rather than act on now.
 
 ## Ask / Solution (presentation vs. progress tracking)
 
 Content (a `p5exercise`/`jsconsole` fence, a `CodeExercise`/
-`MultipleChoiceExercise`, plain prose, an image, any mixture) is always
-wrapped in `<Ask id="..." mode="untracked" | "interacted" | "graded">`.
-The fence/component itself carries no `id`, `title`, or `solutionTo` —
-identity and chrome (question number, reset, completion indicator) belong
-to the wrapping `Ask`, not the content:
+`MultipleChoiceExercise`, plain prose, an image, any mixture) is always wrapped
+in `<Ask id="..." mode="untracked" | "interacted" | "graded">`. The
+fence/component itself carries no `id`, `title`, or `solutionTo` — identity and
+chrome (question number, reset, completion indicator) belong to the wrapping
+`Ask`, not the content:
 
 ```mdx
 <Ask id="hello-world-colors" mode="interacted" title="Try it">
@@ -171,8 +174,8 @@ paragraph text:
 ```
 {/* prettier-ignore-start */}
 
-Your paragraph, with <Term>whatever</Term> JSX inline, all as one block with
-no blank line inside it.
+Your paragraph, with <Term>whatever</Term> JSX inline, all as one block with no
+blank line inside it.
 
 {/* prettier-ignore-end */}
 ```
@@ -194,9 +197,9 @@ import mySketch from "./assets/my-sketch.jpg"
 <img src={mySketch} alt="..." width={300} />
 ```
 
-Vite fingerprints/copies the file at build time and rewrites the `src`, so
-this works correctly under both dev and the GitHub Pages base path without
-any manual `import.meta.env.BASE_URL` handling. Set an explicit `width` (or
-CSS) to size the image — Vite doesn't generate responsive variants on its
-own. If chapters start needing resizing/`srcset` at scale, revisit adding
-`vite-imagetools` rather than resizing images by hand.
+Vite fingerprints/copies the file at build time and rewrites the `src`, so this
+works correctly under both dev and the GitHub Pages base path without any manual
+`import.meta.env.BASE_URL` handling. Set an explicit `width` (or CSS) to size
+the image — Vite doesn't generate responsive variants on its own. If chapters
+start needing resizing/`srcset` at scale, revisit adding `vite-imagetools`
+rather than resizing images by hand.
