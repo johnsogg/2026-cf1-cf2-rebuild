@@ -1,107 +1,68 @@
-import greetAndSquare from "./exercises/greet-and-square/index.ts"
-import typeAnnotationQuestion from "./exercises/type-annotation-question.ts"
-
 export const title = "New Syntax, New Powers"
 
 # New Syntax, New Powers
 
+Plain JavaScript is what we call a _dynamically typed_ language. This means that
+a variables type isn't fixed when you write the code, but instead is dynamically
+discovered when the program runs.
+
+```js
+let mystery // declare a variable that could hold anything!
+mystery = true // set it to a boolean value
+mystery = 611 // or a number
+mystery = "yes" // now it is a string!
+mystery = [true, 611, "yes", { x: 37, y: 42 }] // now it is a list of many things
+```
+
+Mystery is fun and exciting in many contexts like boxes of chocolates and first
+dates, but less fun and exciting when it comes to writing programs. We often see
+code like this:
+
+```js
+const result = combine(a, b) // what is result?
+```
+
+If you didn't write `combine`, you'll have to inspect the code to understand
+what the result looks like. Even if you _did_ write that function, maybe you did
+it last week, and it isn't fresh in your mind what it returns.
+
+Wouldn't it be cool if the language let you explicitly state what kind of things
+you're working with? This is what TypeScript lets you do.
+
 TypeScript adds <Term>static types</Term> to JavaScript. Among other things,
 this means functions can declare what types their arguments and return values
-must be. Static types can be applied to <Term>variables</Term>.
+must be. Say that our mysterious `combine` function I just mentioned has this
+definition in JavaScript:
 
-Practice writing a couple of typed functions below.
+```js
+function combine(a, b) {
+  return {
+    quantity: a.quantity + b.quantity,
+    capacity: a.capacity + b.capacity,
+  }
+}
+```
 
-<Ask
-  id={greetAndSquare.id}
-  mode="graded"
-  title={greetAndSquare.title}
-  hints={greetAndSquare.hints}
->
-  <CodeExercise exercise={greetAndSquare} />
-</Ask>
+This code is short and doesn't take much effort to read, but you still have to
+take the time to inspect it to know what `a` and `b` are, and what it returns.
+From looking at the above code, you will know that `a` and `b` are objects that
+are expected to have both `quantity` and `capacity` properties. With TypeScript,
+we can add annotations that tells us what we're working with:
 
-<Ask
-  id={typeAnnotationQuestion.id}
-  mode="graded"
-  title={typeAnnotationQuestion.title}
-  hints={typeAnnotationQuestion.hints}
->
-  <MultipleChoiceExercise exercise={typeAnnotationQuestion} />
-</Ask>
+```ts
+function combine(a: Jug, b: Jug): Jug {
+  return {
+    quantity: a.quantity + b.quantity,
+    capacity: a.capacity + b.capacity,
+  }
+}
+```
 
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
+With the type annotation, you can read this as "the `combine` function takes two
+`Jug` objects and returns another `Jug`". This is the function's _shape_: what
+kind of inputs it has and what its output is.
 
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so. This is some sample text, and everything is spelled correctly but it doesn't
-really say much. This is just for filling out the page. Do you like it? I hope
-so.
-
-This paragraph only exists so I can test what glossary term tooltips do at the
-very bottom of the page. <Term>recursion</Term>
-
-<ExpectedReadTime wordCount={wordCount} />
+Of course it doesn't tell you _how_ it does this. If you need to understand the
+implementation details, you'll still need to read the code or (if it is present
+and accurate) the documentation. Type annotations can be a huge mental speedup,
+but they're not a silver bullet.
