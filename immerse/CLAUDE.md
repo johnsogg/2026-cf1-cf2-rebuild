@@ -51,6 +51,11 @@ import** — noted per component below. The rest need the explicit
   new geometry playgrounds on those so they look and behave the same. Need
   an import.
 
+- **AabbPlayground** - Pure CSS/DOM (no canvas): a polygon with a hole, drawn
+  with an even-odd `clip-path`; hovering or focusing the filled part reveals
+  its axis-aligned bounding box (the outer div). Theme colors via CSS vars.
+  Needs an import.
+
 - **TransformPlayground** - Canvas sandbox for stacking 2D affine
   transforms (translate / rotate / scale, applied top to bottom like p5
   calls) with the Space Junk Magpie drawn in object space. Toggles between

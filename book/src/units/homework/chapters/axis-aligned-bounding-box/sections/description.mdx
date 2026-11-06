@@ -1,13 +1,110 @@
+import { AabbPlayground } from "immerse/components/AabbPlayground"
+import imgClickGraderBot from "./assets/github-click-grader-bot.png"
+import imgUseTemplate from "./assets/github-use-template.png"
+import imgNamePrivate from "./assets/github-name-and-private.png"
+import imgGrantAccess from "./assets/github-graderbot-access.png"
+import imgClone from "./assets/github-clone-repo.png"
+
 export const title = "Description"
 
 # Axis-Aligned Bounding Box
 
-<Callout intent="danger">
-  This homework is not yet defined. Check back later.
-</Callout>
+In interactive systems of any sort, we often want to know if you've clicked on a
+given item, or if two shapes intersect, among other geometric queries. If you
+have lots of objects with weird geometry, it can be computationally expensive to
+answer these questions without using tricks.
 
-- Topics (per calendar, same week): Data structures course tie-in
-- What students are asked to build/do:
-- Learning objectives:
-- Submission requirements:
-- Grading breakdown:
+An axis-aligned bounding box (AABB) is the smallest rectangle that encloses some
+shape while having edges that are parallel to the x and y axes. For example,
+here's a shape with weird contours and a hole. If you tap or hover this shape,
+it will reveal the axis-aligned bounding box.
+
+<AabbPlayground />
+
+The AABB is a very simple way to help you determine if a point _might_ be inside
+the shape. If your point isn't inside the AABB, it definitely isn't inside the
+shape that the AABB encloses. And this "no or maybe" trick might not sound like
+a huge benefit until you realize that of all the hundreds of things on the
+screen the user might be clicking on, probably only a small number of them are
+actually the user's target. You can get 99 very fast "no collision" answers, so
+you have time left over to test one "maybe" result. And _then_ you can use the
+computationally expensive method to know for sure.
+
+## Git repo for this assignment
+
+This homework is hosted on GitHub. It includes automated testing to let you know
+if your code works or not. When you're done, just commit and push your code back
+up to your own copy of the repo, and we have code on our side that will run our
+copy of those same tests to see how you did.
+
+To enable the magic to happen, you'll need to follow some steps:
+
+1. Go to [github.com/codezeug/hw-aabb](https://github.com/codezeug/hw-aabb) for
+   the homework repo. We're going to use this as a _template_ for your
+   repository so you can keep it private. Click the green 'Use this template'
+   button, and choose the 'Create a new repository' option.
+
+<ZoomImage
+  src={imgUseTemplate}
+  width={400}
+  alt="Make your own copy by using 'use template'"
+/>
+
+2. This will let you create your copy. You can name it anything you want but
+   (trust me) you'll be happy with yourself if you just name it after the
+   homework, like "hw-aabb". Also, change the visibility so it is private. This
+   is a homework, after all. This isn't strictly required, but it is a good
+   idea. Then create the repo with the big button at the bottom.
+
+<ZoomImage
+  src={imgNamePrivate}
+  width={400}
+  alt="Name it whatever you want, and make it private"
+/>
+
+3. You now have your own copy of this repo. In order for us to grade it, you
+   need to hook up this repo to our "Codezeug Grader Bot". Scroll down a little
+   ways to the README. You'll see a link surrounded by friendly, festive emoji.
+   Click it.
+
+<ZoomImage
+  src={imgClickGraderBot}
+  width={400}
+  alt="Click the link to grant access to the grader bot"
+/>
+
+4. The Codezeug Grader Bot is a "GitHub App". It will act as a bridge between
+   your homework repo and the one we use to grade things (you _do_ want credit
+   for the homework, right?). Grant it access to the repo you just made (in my
+   screenshot, it is `johnsogg/any-name-you-want` but you are smart and chose a
+   good name like `hw-aabb` so you could find it easily).
+
+<ZoomImage
+  src={imgGrantAccess}
+  width={400}
+  alt="Configure the grader bot to know about this particular repo"
+/>
+
+5. Finally, you can back up to your homework code repo (mash the back button a
+   few times because there won't be a link to it after you grant access). From
+   there, use the big green button to clone your repo locally in whichever way
+   you want to. Most often my students choose to use GitHub Desktop, but you can
+   do it any way you'd like.
+
+<ZoomImage
+  src={imgClone}
+  width={400}
+  alt="Back in your homework repo, use the green Code button to clone your copy"
+/>
+
+This is the process you'll need to take with most (all?) of the data structures
+assignments.
+
+## Work the homework locally
+
+The README.md file in your repo has all the rest of the instructions you'll
+need. When you're happy with the state of things, _commit and push your changes_
+so it is visible at your GitHub repo. The Grader bot will know how to find it
+when we go to grade.
+
+(Yes, there is no Canvas step for turning this in!)
