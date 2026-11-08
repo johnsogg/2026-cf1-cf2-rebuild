@@ -4,6 +4,9 @@ import { MDXProvider } from "@mdx-js/react"
 import { Talk } from "./Talk"
 import { Slide, Notes, Reveal, Columns } from "./Slide"
 import { YouAreHere } from "./YouAreHere"
+import { DoubleDiamond } from "./DoubleDiamond"
+import { JobPath } from "./JobPath"
+import { WickedCriteria } from "./WickedCriteria"
 import { WorldsDiagram } from "./WorldsDiagram"
 import s from "./talks.module.css"
 
@@ -21,6 +24,9 @@ const talkComponents = {
   Columns,
   YouAreHere,
   WorldsDiagram,
+  WickedCriteria,
+  DoubleDiamond,
+  JobPath,
 }
 
 const TalkLoader = ({

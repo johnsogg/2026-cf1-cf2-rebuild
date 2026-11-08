@@ -160,8 +160,17 @@ followed by its notes), `/talks/<slug>/slides` (present; `#4` = slide 4, `#4b` =
   `captions`.
 - **YouAreHere** - The pin / dotted path / X diagram. `emphasize` (1 = current
   reality, 2 = desired reality, 3 = path, "all"; an array steps through
-  states per key press), `pointer`, `numbers` (wicked-problem criteria),
-  `label`.
+  states per key press), `pointer` (a part, or an array stepped per key press
+  alongside `emphasize`; `null` = no arrow), `numbers` (the ten wicked-problem
+  criteria as short, color-coded bubbles), `label`.
+- **WickedCriteria** - The ten wicked-problem criteria as color-coded bubbles
+  (also the source of the labels/colors `YouAreHere numbers` uses).
+- **DoubleDiamond** - Two diamonds (discover/define, develop/deliver) captioned
+  "the right design" / "the design right". `emphasize` (1, 2, "all"; an array
+  steps per key press), `phases`, `captions`.
+- **JobPath** - The straw-man job search (resume, interview, job) as the bottom
+  of a layer cake; three social layers slide in above it, one per key press
+  (`strawMan` shows just the three straw-man layers, one per press).
 
 Present-mode keys: arrows/Space/Enter/Backspace step, Home/End jump, `F`
 fullscreen, `N` notes drawer, Esc leaves (in fullscreen the browser takes Esc

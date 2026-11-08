@@ -1,5 +1,6 @@
 import { useId } from "react"
 import { useSlideStep } from "./Slide"
+import { CRITERIA } from "./WickedCriteria"
 
 type Part = 1 | 2 | 3
 type Emphasis = Part | "all"
@@ -11,27 +12,39 @@ export interface YouAreHereProps {
    * array to step through states, one per key press.
    */
   emphasize?: Emphasis | Emphasis[]
-  /** An arrow pointing up at one part. */
-  pointer?: Part
-  /** Place the ten wicked-problem criteria on the map. */
+  /**
+   * An arrow pointing up at one part. Give an array to step through states
+   * alongside `emphasize`, one per key press (`null` = no arrow).
+   */
+  pointer?: Part | (Part | null)[]
+  /** Place the ten wicked-problem criteria (short labels) on the map. */
   numbers?: boolean
   /** The "you are here" label. */
   label?: boolean
 }
 
-// Where each wicked-problem criterion sits on the map.
-const NUMBERS: { n: number; part: Part; x: number; y: number }[] = [
-  { n: 1, part: 1, x: 50, y: 262 },
-  { n: 2, part: 2, x: 600, y: 112 },
-  { n: 3, part: 2, x: 660, y: 78 },
-  { n: 4, part: 2, x: 730, y: 78 },
-  { n: 5, part: 2, x: 790, y: 118 },
-  { n: 6, part: 2, x: 775, y: 245 },
-  { n: 7, part: 3, x: 330, y: 150 },
-  { n: 8, part: 3, x: 395, y: 135 },
-  { n: 9, part: 3, x: 370, y: 288 },
-  { n: 10, part: 3, x: 440, y: 295 },
-]
+// Where each wicked-problem criterion's bubble is centered on the map. The
+// bubbles carry the short labels, colored as on the criteria slide.
+const BUBBLES: Record<number, { part: Part; x: number; y: number }> = {
+  1: { part: 1, x: 125, y: 300 },
+  2: { part: 2, x: 780, y: 75 },
+  3: { part: 2, x: 765, y: 30 },
+  4: { part: 2, x: 620, y: 30 },
+  5: { part: 2, x: 610, y: 78 },
+  6: { part: 2, x: 715, y: 255 },
+  7: { part: 3, x: 240, y: 150 },
+  8: { part: 3, x: 400, y: 160 },
+  9: { part: 3, x: 400, y: 110 },
+  10: { part: 3, x: 480, y: 300 },
+}
+const BUBBLE_FONT = 15
+const BUBBLE_H = 26
+const bubbleWidth = (text: string) => text.length * 8.2 + 22
+const bubbles = CRITERIA.map((c) => ({
+  ...c,
+  ...BUBBLES[c.n],
+  w: bubbleWidth(c.text),
+}))
 
 const POINTERS: Record<Part, { x: number; tip: number; base: number }> = {
   1: { x: 110, tip: 240, base: 300 },
@@ -46,8 +59,10 @@ export const YouAreHere = ({
   label = true,
 }: YouAreHereProps) => {
   const states = Array.isArray(emphasize) ? emphasize : [emphasize]
-  const step = useSlideStep(states.length - 1)
+  const pointerStates = Array.isArray(pointer) ? pointer : [pointer ?? null]
+  const step = useSlideStep(Math.max(states.length, pointerStates.length) - 1)
   const current = states[Math.min(step, states.length - 1)]
+  const pointing = pointerStates[Math.min(step, pointerStates.length - 1)]
   const filterId = "wobble" + useId().replace(/:/g, "")
 
   const partStyle = (part: Part) => ({
@@ -106,19 +121,29 @@ export const YouAreHere = ({
         </g>
 
         {numbers &&
-          NUMBERS.map(({ n, part, x, y }) => (
-            <g key={n} style={partStyle(part)}>
-              <circle cx={x} cy={y} r={23} strokeWidth={3} />
+          bubbles.map(({ n, part, x, y, w, color }) => (
+            <g key={n} style={{ ...partStyle(part), color }}>
+              <rect
+                x={x - w / 2}
+                y={y - BUBBLE_H / 2}
+                width={w}
+                height={BUBBLE_H}
+                rx={BUBBLE_H / 2}
+                strokeWidth={2.5}
+                style={{
+                  fill: "color-mix(in srgb, currentColor 12%, transparent)",
+                }}
+              />
             </g>
           ))}
 
-        {pointer && (
+        {pointing && (
           <g style={{ color: "var(--accent)" }}>
             <path
-              d={`M${POINTERS[pointer].x} ${POINTERS[pointer].base} L${POINTERS[pointer].x} ${POINTERS[pointer].tip}`}
+              d={`M${POINTERS[pointing].x} ${POINTERS[pointing].base} L${POINTERS[pointing].x} ${POINTERS[pointing].tip}`}
             />
             <path
-              d={`M${POINTERS[pointer].x - 14} ${POINTERS[pointer].tip + 20} L${POINTERS[pointer].x} ${POINTERS[pointer].tip} L${POINTERS[pointer].x + 14} ${POINTERS[pointer].tip + 20}`}
+              d={`M${POINTERS[pointing].x - 14} ${POINTERS[pointing].tip + 20} L${POINTERS[pointing].x} ${POINTERS[pointing].tip} L${POINTERS[pointing].x + 14} ${POINTERS[pointing].tip + 20}`}
             />
           </g>
         )}
@@ -138,17 +163,17 @@ export const YouAreHere = ({
           </text>
         )}
         {numbers &&
-          NUMBERS.map(({ n, part, x, y }) => (
+          bubbles.map(({ n, part, x, y, text }) => (
             <text
               key={n}
               x={x}
               y={y}
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize={n === 10 ? 22 : 26}
-              style={partStyle(part)}
+              fontSize={BUBBLE_FONT}
+              style={{ ...partStyle(part), color: "var(--text)" }}
             >
-              {n}
+              {text}
             </text>
           ))}
       </g>
