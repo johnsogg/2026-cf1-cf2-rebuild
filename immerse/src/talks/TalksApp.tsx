@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentType } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { MDXProvider } from "@mdx-js/react"
 import { Talk } from "./Talk"
-import { Slide, Notes, Reveal, Columns } from "./Slide"
+import { Slide, Notes, Reveal, Columns, Byline, type TalkMeta } from "./Slide"
 import { YouAreHere } from "./YouAreHere"
 import { DoubleDiamond } from "./DoubleDiamond"
 import { JobPath } from "./JobPath"
@@ -10,7 +10,7 @@ import { WickedCriteria } from "./WickedCriteria"
 import { WorldsDiagram } from "./WorldsDiagram"
 import s from "./talks.module.css"
 
-export type TalkEntry = {
+export type TalkEntry = TalkMeta & {
   slug: string
   title: string
   tocTitle: string
@@ -23,6 +23,7 @@ const talkComponents = {
   Notes,
   Reveal,
   Columns,
+  Byline,
   YouAreHere,
   WorldsDiagram,
   WickedCriteria,
@@ -48,6 +49,7 @@ const TalkLoader = ({
       slug={entry.slug}
       title={entry.title}
       Content={Content}
+      meta={{ author: entry.author, date: entry.date, lastRevised: entry.lastRevised }}
       mode={view === "slides" ? "present" : view}
     />
   )

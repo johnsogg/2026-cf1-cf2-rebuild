@@ -103,6 +103,13 @@
   font-size: 132px;
 }
 
+.byline {
+  margin-top: 1.2em;
+  font-size: 44px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .slideNumber {
   position: absolute;
   right: 48px;

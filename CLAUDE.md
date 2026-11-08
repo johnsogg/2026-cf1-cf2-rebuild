@@ -112,6 +112,20 @@ Adds, Structural Notes, Other — each entry dated and given a priority
 (P1/P2/P3). Check it when the user wants a quick, self-contained task, and add
 to it when the user surfaces an idea they want to defer rather than act on now.
 
+## Talks metadata (author / date / lastRevised)
+
+Each talk under `book/src/talks/` exports `author`, `date` (ISO `YYYY-MM-DD`,
+original authoring date, never changed), and optionally `lastRevised` (ISO,
+single field), and its title slide renders them with `<Byline />`. Talks are not
+pinned to a class (no "CF1" on the title slide).
+
+When you edit a talk, judge whether the change is a **substantial content
+revision** (new/removed/reworked slides, changed argument or claims, new
+sections) versus cosmetic (typos, wording polish, styling, layout, notes-only
+tweaks). If substantial, set `lastRevised` to today's date. If it is ambiguous
+whether the change is major, ask the author rather than deciding. Also make sure
+any new talk has `author` and `date` set and `<Byline />` on its title slide.
+
 ## Ask / Solution (presentation vs. progress tracking)
 
 Content (a `p5exercise`/`jsconsole` fence, a `CodeExercise`/

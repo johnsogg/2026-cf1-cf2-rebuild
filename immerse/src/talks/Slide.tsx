@@ -25,6 +25,40 @@ export const SLIDE_H = 1080
 // Reveal steps are lettered: a slide with three steps is 4A, 4B, 4C.
 export const stepLetter = (step: number) => String.fromCharCode(65 + step)
 
+export type TalkMeta = {
+  author?: string
+  /** ISO date (YYYY-MM-DD) of original authoring. */
+  date?: string
+  /** ISO date of the last substantial content revision, if any. */
+  lastRevised?: string
+}
+
+export const TalkMetaContext = createContext<TalkMeta>({})
+
+// "2026-11-07" -> "November 7, 2026". Parsed by hand so time zones can't shift it.
+const formatDate = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+}
+
+/** For a title slide: author, date, and (if present) the revision date. */
+export const Byline = () => {
+  const { author, date, lastRevised } = useContext(TalkMetaContext)
+  if (!author && !date) return null
+  return (
+    <p className={s.byline}>
+      {author}
+      {author && date && <br />}
+      {date && formatDate(date)}
+      {lastRevised && ` (revised ${formatDate(lastRevised)})`}
+    </p>
+  )
+}
+
 type TalkContextValue = {
   mode: TalkMode
   current: number

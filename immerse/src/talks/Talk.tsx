@@ -10,7 +10,7 @@ import {
 } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { ThemePicker } from "../components/ThemePicker"
-import { TalkContext, stepLetter, type TalkMode } from "./Slide"
+import { TalkContext, TalkMetaContext, stepLetter, type TalkMeta, type TalkMode } from "./Slide"
 import s from "./talks.module.css"
 
 const PAGE_RULES: Record<TalkMode, string> = {
@@ -31,9 +31,10 @@ export type TalkProps = {
   title: string
   Content: ComponentType
   mode: TalkMode
+  meta?: TalkMeta
 }
 
-export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
+export const Talk = ({ slug, title, Content, mode, meta = {} }: TalkProps) => {
   const navigate = useNavigate()
   const deckRef = useRef<HTMLDivElement>(null)
   const stepsPerSlide = useRef<number[]>([])
@@ -226,7 +227,9 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
         )}
 
         <div className={s.slides}>
-          <Content />
+          <TalkMetaContext.Provider value={meta}>
+            <Content />
+          </TalkMetaContext.Provider>
         </div>
 
         {mode === "present" && (
