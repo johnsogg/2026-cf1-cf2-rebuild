@@ -340,7 +340,7 @@ export const ImmerseApp = ({
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
             <TalksOrBook talks={talks}>
-              <NavProvider titles={titles} loaders={loaders} order={order} misc={misc}>
+              <NavProvider titles={titles} loaders={loaders} order={order} misc={misc} talks={talks}>
                 <ProgressProvider>
                   <AppLayout
                     overview={overview}

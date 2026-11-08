@@ -189,6 +189,18 @@
 
 .actions button,
 .actions a,
+.controls select {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.5rem;
+  max-width: 22rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
 .controls button,
 .controls a {
   font: inherit;
@@ -204,6 +216,7 @@
 
 .actions button:hover,
 .actions a:hover,
+.controls select:hover,
 .controls button:hover,
 .controls a:hover {
   border-color: var(--accent);

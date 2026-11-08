@@ -76,9 +76,11 @@ export const useSlideArrived = (): boolean =>
 export type SlideProps = {
   children: ReactNode
   layout?: "default" | "title" | "center" | "wide"
+  /** Name in the slide finder. Defaults to the slide's first heading. */
+  title?: string
 }
 
-export const Slide = ({ children, layout = "default" }: SlideProps) => {
+export const Slide = ({ children, layout = "default", title }: SlideProps) => {
   const talk = useContext(TalkContext)
   const sectionRef = useRef<HTMLElement>(null)
   const frameRef = useRef<HTMLDivElement>(null)
@@ -121,10 +123,15 @@ export const Slide = ({ children, layout = "default" }: SlideProps) => {
       r.dataset.resolvedAt = String(at)
       max = Math.max(max, at)
     })
+    el.dataset.title =
+      title ??
+      el.querySelector(`.${s.canvas} h1, .${s.canvas} h2, .${s.canvas} h3`)
+        ?.textContent?.trim() ??
+      ""
     setIndex(i)
     setStepCount(max)
     setSteps(i, max)
-  }, [setSteps])
+  }, [setSteps, title])
 
   // Show or hide each <Reveal> for the current step.
   useLayoutEffect(() => {
@@ -149,6 +156,14 @@ export const Slide = ({ children, layout = "default" }: SlideProps) => {
     ro.observe(frame)
     return () => ro.disconnect()
   }, [])
+
+  // A hidden slide (display: none) measures 0 wide, so it keeps a stale scale.
+  // Re-measure in a layout effect the moment it shows, before the browser
+  // paints, so it never flashes at the wrong size.
+  useLayoutEffect(() => {
+    const w = frameRef.current!.clientWidth
+    if (w > 0) setScale(w / SLIDE_W)
+  }, [visible])
 
   const arrived = talk.mode !== "present" || !(index > talk.current)
   const ctx = useMemo(

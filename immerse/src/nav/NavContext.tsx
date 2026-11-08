@@ -18,6 +18,7 @@ import {
 type NavContextValue = {
   tree: Unit[]
   misc: MiscPage[]
+  talks: { slug: string; title: string }[]
   currentSection: Section
   hasPrev: boolean
   hasNext: boolean
@@ -35,6 +36,7 @@ type NavProviderProps = {
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
   order: OrderMap
   misc: MiscPage[]
+  talks?: { slug: string; title: string }[]
   children: ReactNode
 }
 
@@ -43,6 +45,7 @@ export const NavProvider = ({
   loaders,
   order,
   misc,
+  talks = [],
   children,
 }: NavProviderProps) => {
   const tree = useMemo(
@@ -66,6 +69,7 @@ export const NavProvider = ({
   const value: NavContextValue = {
     tree,
     misc,
+    talks,
     currentSection,
     hasPrev: currentIndex > 0,
     hasNext: currentIndex < flat.length - 1,

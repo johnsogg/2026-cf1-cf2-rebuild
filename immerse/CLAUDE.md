@@ -145,7 +145,8 @@ followed by its notes), `/talks/<slug>/slides` (present; `#4` = slide 4, `#4b` =
 `/talks/<slug>/slides?print` (slides-only print/PDF).
 
 - **Slide** - One 1920x1080 canvas scaled to fit. `layout="title" | "center"`
-  centers content; `"wide"` is nearly edge to edge. Put `<Notes>` inside it.
+  centers content; `"wide"` is nearly edge to edge. `title="..."` names it in the
+  present-mode slide finder (dropdown); default is its first heading. Put `<Notes>` inside it.
 - **Notes** - Presenter notes for the enclosing slide.
 - **Reveal** - Hidden until its key press, in document order (or `at={n}`).
 - **Columns** - Two-column grid for a slide.
@@ -171,6 +172,8 @@ followed by its notes), `/talks/<slug>/slides` (present; `#4` = slide 4, `#4b` =
 - **JobPath** - The straw-man job search (resume, interview, job) as the bottom
   of a layer cake; three social layers slide in above it, one per key press
   (`strawMan` shows just the three straw-man layers, one per press).
+
+The book's table of contents lists `/talks` and each talk at the bottom.
 
 Present-mode keys: arrows/Space/Enter/Backspace step, Home/End jump, `F`
 fullscreen, `N` notes drawer, Esc leaves (in fullscreen the browser takes Esc

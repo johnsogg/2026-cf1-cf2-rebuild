@@ -26,7 +26,7 @@ function findContaining(
 }
 
 export const TableOfContents = () => {
-  const { tree, misc, currentSection } = useNav()
+  const { tree, misc, talks, currentSection } = useNav()
   useProgress() // subscribe to version changes for re-renders
   const location = useLocation()
 
@@ -167,6 +167,23 @@ export const TableOfContents = () => {
       {misc.map((page) => (
         <TocMiscPage key={page.urlPath} page={page} />
       ))}
+      {talks.length > 0 && (
+        <>
+          <Link to="/talks" className={`${s.unit} ${s.unitLink}`}>
+            Talks
+          </Link>
+          {talks.map((talk) => (
+            <Link
+              key={talk.slug}
+              to={`/talks/${talk.slug}`}
+              className={`${s.unit} ${s.unitLink}`}
+              style={{ paddingLeft: "2rem", fontSize: "0.9em" }}
+            >
+              {talk.title}
+            </Link>
+          ))}
+        </>
+      )}
       </nav>
     </div>
   )

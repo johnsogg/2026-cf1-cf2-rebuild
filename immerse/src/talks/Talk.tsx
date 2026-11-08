@@ -40,6 +40,7 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
   const [current, setCurrent] = useState(0)
   const [step, setStep] = useState(0)
   const [total, setTotal] = useState(0)
+  const [slideTitles, setSlideTitles] = useState<string[]>([])
   const [showNotes, setShowNotes] = useState(false)
   const [idle, setIdle] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
@@ -52,6 +53,11 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
   useLayoutEffect(() => {
     const count = deckRef.current!.querySelectorAll("[data-slide]").length
     setTotal(count)
+    setSlideTitles(
+      Array.from(deckRef.current!.querySelectorAll<HTMLElement>("[data-slide]")).map(
+        (el) => el.dataset.title ?? "",
+      ),
+    )
     // #4 is slide 4; #4b is its second reveal step.
     const m = /^(\d+)([a-z]?)$/i.exec(window.location.hash.slice(1))
     if (mode === "present" && m) {
@@ -170,7 +176,7 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
 
   const onDeckClick = (e: MouseEvent<HTMLDivElement>) => {
     if (mode !== "present") return
-    if ((e.target as HTMLElement).closest("a, button, aside")) return
+    if ((e.target as HTMLElement).closest("a, button, aside, select")) return
     go(e.clientX < window.innerWidth / 3 ? -1 : 1)
   }
 
@@ -236,6 +242,20 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
                   : ""}{" "}
                 / {total}
               </span>
+              <select
+                aria-label="Go to slide"
+                value={current}
+                onChange={(e) => {
+                  jump(Number(e.target.value))
+                  e.target.blur()
+                }}
+              >
+                {slideTitles.map((t, i) => (
+                  <option key={i} value={i}>
+                    {i + 1}. {t || "(untitled)"}
+                  </option>
+                ))}
+              </select>
               <button type="button" onClick={() => setShowNotes((v) => !v)}>
                 Notes (N)
               </button>
