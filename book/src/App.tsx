@@ -1,6 +1,7 @@
 import type { ComponentType } from "react"
 import { ImmerseApp } from "immerse/components/ImmerseApp"
 import type { MiscPage } from "immerse/nav/navTree"
+import type { TalkEntry } from "immerse/talks/TalksApp"
 import { glossaryEntries } from "./glossary"
 import { Callout } from "immerse/components/Callout"
 import { P5Sketch } from "immerse/components/P5Sketch"
@@ -36,6 +37,18 @@ const misc: MiscPage[] = Object.entries(miscTitles).map(([path, title]) => ({
   load: miscLoaders[path],
 }))
 
+// Talks: talks/<slug>.mdx or talks/<slug>/index.mdx, each exporting a title.
+const talkTitles = import.meta.glob<string>("./talks/**/*.mdx", {
+  import: "title",
+  eager: true,
+})
+const talkLoaders = import.meta.glob<{ default: ComponentType }>("./talks/**/*.mdx")
+const talks: TalkEntry[] = Object.entries(talkTitles).map(([path, title]) => ({
+  slug: path.replace("./talks/", "").replace(/(\/index)?\.mdx$/, ""),
+  title,
+  load: talkLoaders[path],
+}))
+
 export default () => (
   <ImmerseApp
     bookSlug="cf1cf2"
@@ -47,5 +60,6 @@ export default () => (
     overview={Overview}
     totalExercises={totalExercises}
     misc={misc}
+    talks={talks}
   />
 )

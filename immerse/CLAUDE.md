@@ -134,3 +134,35 @@ import** — noted per component below. The rest need the explicit
   in Doto (a dot-matrix variable Google Font, loaded via `book/index.html`)
   so readers can tell it apart from hand-written material. Wrap the whole
   passage (prose, code fences, an `Ask`, any mixture). No import needed.
+
+## Talks (`src/talks/`)
+
+Slide decks, separate from the book (no TOC, nav, or progress). A talk is
+`book/src/talks/<slug>/index.mdx` (or `<slug>.mdx`) exporting a `title`, built
+from the components below, which are available in a talk's `.mdx` with no
+import. Routes: `/talks` (index), `/talks/<slug>` (notes view: each slide
+followed by its notes), `/talks/<slug>/slides` (present; `#4` = slide 4, `#4b` = its second reveal step),
+`/talks/<slug>/slides?print` (slides-only print/PDF).
+
+- **Slide** - One 1920x1080 canvas scaled to fit. `layout="title" | "center"`
+  centers content; `"wide"` is nearly edge to edge. Put `<Notes>` inside it.
+- **Notes** - Presenter notes for the enclosing slide.
+- **Reveal** - Hidden until its key press, in document order (or `at={n}`).
+- **Columns** - Two-column grid for a slide.
+- **WorldsDiagram** - The two-blob diagram: "the world as it is", "the world as
+  is imagined", and a separate Plan shape cut to fit between the two
+  worlds' shared "coastlines". Shape 0 is a tall single-view "hero"; 1, 2, 3
+  sit at top / middle / bottom, overlapping partway (`shapes={[[1], [1, 2], [1, 2, 3]]}` adds one per key press).
+  Optional `labels` (by index), `agreement` (0-1, or an array stepped per key
+  press: pulls each view toward the hero shape, animated), `from` (the
+  agreement to hold until the slide is reached, so it animates on arrival),
+  `plan`,
+  `captions`.
+- **YouAreHere** - The pin / dotted path / X diagram. `emphasize` (1 = current
+  reality, 2 = desired reality, 3 = path, "all"; an array steps through
+  states per key press), `pointer`, `numbers` (wicked-problem criteria),
+  `label`.
+
+Present-mode keys: arrows/Space/Enter/Backspace step, Home/End jump, `F`
+fullscreen, `N` notes drawer, Esc leaves (in fullscreen the browser takes Esc
+first). Components that change per key press use `useSlideStep(extraSteps)`.

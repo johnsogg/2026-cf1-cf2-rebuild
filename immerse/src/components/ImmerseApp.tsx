@@ -5,8 +5,10 @@ import {
   useRef,
   useState,
   type ComponentType,
+  type ReactNode,
 } from "react"
 import { BrowserRouter, Link, useLocation } from "react-router-dom"
+import { TalksApp, type TalkEntry } from "../talks/TalksApp"
 import { Ask, AskProvider } from "./Ask"
 import { Solution } from "./Solution"
 import { CodeExercise } from "./CodeExercise"
@@ -49,6 +51,20 @@ export type ImmerseAppProps = {
   overview?: ComponentType
   totalExercises?: number
   misc?: MiscPage[]
+  talks?: TalkEntry[]
+}
+
+// Talks live outside the book: no table of contents, nav, or progress.
+const TalksOrBook = ({
+  talks,
+  children,
+}: {
+  talks: TalkEntry[]
+  children: ReactNode
+}) => {
+  const { pathname } = useLocation()
+  const isTalks = pathname === "/talks" || pathname.startsWith("/talks/")
+  return isTalks ? <TalksApp talks={talks} /> : children
 }
 
 const MiscPageView = ({ page }: { page: MiscPage }) => {
@@ -314,6 +330,7 @@ export const ImmerseApp = ({
   overview,
   totalExercises,
   misc = [],
+  talks = [],
 }: ImmerseAppProps) => {
   initStorage(bookSlug)
   const mdxComponents = { ...defaultComponents, ...components }
@@ -322,15 +339,17 @@ export const ImmerseApp = ({
       <ThemeProvider>
         <GlossaryProvider entries={glossaryEntries}>
           <MDXProvider components={mdxComponents}>
-            <NavProvider titles={titles} loaders={loaders} order={order} misc={misc}>
-              <ProgressProvider>
-                <AppLayout
-                  overview={overview}
-                  totalExercises={totalExercises}
-                  misc={misc}
-                />
-              </ProgressProvider>
-            </NavProvider>
+            <TalksOrBook talks={talks}>
+              <NavProvider titles={titles} loaders={loaders} order={order} misc={misc}>
+                <ProgressProvider>
+                  <AppLayout
+                    overview={overview}
+                    totalExercises={totalExercises}
+                    misc={misc}
+                  />
+                </ProgressProvider>
+              </NavProvider>
+            </TalksOrBook>
           </MDXProvider>
         </GlossaryProvider>
       </ThemeProvider>
