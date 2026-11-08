@@ -4,6 +4,9 @@
 
 .toc {
   color: var(--text);
+  /* Room for mobile browser UI over the last item (padding, not margin, so it
+     can't collapse away inside the scroll container). */
+  padding-bottom: 48px;
   overflow-y: auto;
   height: 100%;
   scrollbar-width: thin;
@@ -59,7 +62,7 @@
     z-index: 100;
     overflow-y: auto;
     background: var(--bg);
-    padding: 24px 16px;
+    padding: 24px 16px 48px;
     border-right: 1px solid
       var(--border, color-mix(in srgb, var(--text) 15%, transparent));
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
@@ -235,6 +238,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.talkLink {
+  display: block;
+  font-size: 18px;
+  padding: 2px 16px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    background: color-mix(in srgb, var(--accent-subtle) 50%, var(--bg));
+  }
 }
 
 .unitLinkActive {

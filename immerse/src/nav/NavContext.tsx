@@ -18,7 +18,7 @@ import {
 type NavContextValue = {
   tree: Unit[]
   misc: MiscPage[]
-  talks: { slug: string; title: string }[]
+  talks: { slug: string; title: string; tocTitle: string }[]
   currentSection: Section
   hasPrev: boolean
   hasNext: boolean
@@ -36,7 +36,7 @@ type NavProviderProps = {
   loaders: Record<string, () => Promise<{ default: ComponentType }>>
   order: OrderMap
   misc: MiscPage[]
-  talks?: { slug: string; title: string }[]
+  talks?: { slug: string; title: string; tocTitle: string }[]
   children: ReactNode
 }
 

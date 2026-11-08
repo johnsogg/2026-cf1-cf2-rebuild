@@ -13,6 +13,7 @@ import s from "./talks.module.css"
 export type TalkEntry = {
   slug: string
   title: string
+  tocTitle: string
   load: () => Promise<{ default: ComponentType }>
 }
 
@@ -72,9 +73,6 @@ export const TalksApp = ({ talks }: { talks: TalkEntry[] }) => {
             </li>
           ))}
         </ul>
-        <p>
-          <Link to="/">← Back to the book</Link>
-        </p>
       </div>
     )
   }
@@ -83,7 +81,7 @@ export const TalksApp = ({ talks }: { talks: TalkEntry[] }) => {
     return (
       <div className={s.index}>
         <h1>No such talk</h1>
-        <Link to="/talks">← All talks</Link>
+        <Link to="/talks">All talks</Link>
       </div>
     )
   }

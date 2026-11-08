@@ -12,7 +12,7 @@ function key() {
 
 export type StorageData = {
   nav?: { lastSection?: string }
-  toc?: { expandedUnits?: string[]; expandedChapters?: string[] }
+  toc?: { expandedUnits?: string[]; expandedChapters?: string[]; talksExpanded?: boolean }
   theme?: string
   sections?: Record<string, { read?: boolean; exercises?: string[] }>
   exercises?: Record<

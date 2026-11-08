@@ -204,9 +204,6 @@ export const Talk = ({ slug, title, Content, mode }: TalkProps) => {
       >
         {mode === "notes" && (
           <header className={s.header}>
-            <Link to="/talks" className={s.back}>
-              ← All talks
-            </Link>
             <h1>{title}</h1>
             <div className={s.actions}>
               <button type="button" onClick={present}>

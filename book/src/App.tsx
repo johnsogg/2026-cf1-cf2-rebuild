@@ -37,15 +37,18 @@ const misc: MiscPage[] = Object.entries(miscTitles).map(([path, title]) => ({
   load: miscLoaders[path],
 }))
 
-// Talks: talks/<slug>.mdx or talks/<slug>/index.mdx, each exporting a title.
-const talkTitles = import.meta.glob<string>("./talks/**/*.mdx", {
-  import: "title",
-  eager: true,
-})
+// Talks: talks/<slug>.mdx or talks/<slug>/index.mdx. Each exports `title` (shown
+// in the talk) and optionally `tocTitle` (shorter, shown in the table of
+// contents; falls back to `title`).
+const talkMeta = import.meta.glob<{ title: string; tocTitle?: string }>(
+  "./talks/**/*.mdx",
+  { eager: true },
+)
 const talkLoaders = import.meta.glob<{ default: ComponentType }>("./talks/**/*.mdx")
-const talks: TalkEntry[] = Object.entries(talkTitles).map(([path, title]) => ({
+const talks: TalkEntry[] = Object.entries(talkMeta).map(([path, meta]) => ({
   slug: path.replace("./talks/", "").replace(/(\/index)?\.mdx$/, ""),
-  title,
+  title: meta.title,
+  tocTitle: meta.tocTitle ?? meta.title,
   load: talkLoaders[path],
 }))
 

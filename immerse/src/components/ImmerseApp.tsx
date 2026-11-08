@@ -54,7 +54,8 @@ export type ImmerseAppProps = {
   talks?: TalkEntry[]
 }
 
-// Talks live outside the book: no table of contents, nav, or progress.
+// Only the full-screen slide view (/talks/<slug>/slides) lives outside the
+// book layout. Everything else under /talks renders beside the TOC.
 const TalksOrBook = ({
   talks,
   children,
@@ -63,8 +64,8 @@ const TalksOrBook = ({
   children: ReactNode
 }) => {
   const { pathname } = useLocation()
-  const isTalks = pathname === "/talks" || pathname.startsWith("/talks/")
-  return isTalks ? <TalksApp talks={talks} /> : children
+  const isSlides = /^\/talks\/[^/]+\/slides\/?$/.test(pathname)
+  return isSlides ? <TalksApp talks={talks} /> : children
 }
 
 const MiscPageView = ({ page }: { page: MiscPage }) => {
@@ -183,10 +184,12 @@ const AppLayout = ({
   overview,
   totalExercises,
   misc,
+  talks,
 }: {
   overview?: ComponentType
   totalExercises?: number
   misc?: MiscPage[]
+  talks: TalkEntry[]
 }) => {
   const { currentSection } = useNav()
   const { notifyExerciseChange } = useProgress()
@@ -201,18 +204,20 @@ const AppLayout = ({
   const isGlossary = location.pathname === "/glossary"
   const currentMiscPage = misc?.find((m) => m.urlPath === location.pathname)
   const isMisc = !!currentMiscPage
+  const isTalks =
+    location.pathname === "/talks" || location.pathname.startsWith("/talks/")
 
   // Persist last visited section (not when at root, glossary, or misc)
   useEffect(() => {
-    if (!isRoot && !isGlossary && !isMisc) {
+    if (!isRoot && !isGlossary && !isMisc && !isTalks) {
       setStorageValue((d) => {
         ;(d.nav ??= {}).lastSection = currentSection.urlPath
       })
     }
-  }, [currentSection.urlPath, isRoot, isGlossary])
+  }, [currentSection.urlPath, isRoot, isGlossary, isMisc, isTalks])
 
   useEffect(() => {
-    if (isRoot || isGlossary || isMisc) return
+    if (isRoot || isGlossary || isMisc || isTalks) return
     const el = contentAreaRef.current
     if (!el) return
     const urlPath = currentSection.urlPath
@@ -264,7 +269,7 @@ const AppLayout = ({
     }
     el.addEventListener("scroll", handleScroll, { passive: true })
     return () => el.removeEventListener("scroll", handleScroll)
-  }, [currentSection.urlPath, notifyExerciseChange, isRoot, isGlossary])
+  }, [currentSection.urlPath, notifyExerciseChange, isRoot, isGlossary, isMisc, isTalks])
 
   const handleSectionLoaded = useCallback(() => {
     const el = contentAreaRef.current
@@ -300,6 +305,10 @@ const AppLayout = ({
         ) : isGlossary ? (
           <div className={s.lesson}>
             <GlossaryView />
+          </div>
+        ) : isTalks ? (
+          <div className={s.lesson}>
+            <TalksApp talks={talks} />
           </div>
         ) : isMisc ? (
           <AskProvider>
@@ -346,6 +355,7 @@ export const ImmerseApp = ({
                     overview={overview}
                     totalExercises={totalExercises}
                     misc={misc}
+                    talks={talks}
                   />
                 </ProgressProvider>
               </NavProvider>

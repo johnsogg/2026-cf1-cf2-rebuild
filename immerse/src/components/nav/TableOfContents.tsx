@@ -73,6 +73,22 @@ export const TableOfContents = () => {
     }
   }, [currentSection, tree])
 
+  const onTalksPath =
+    location.pathname === "/talks" || location.pathname.startsWith("/talks/")
+  const [talksExpanded, setTalksExpanded] = useState<boolean>(
+    () => onTalksPath || !!getStorageValue((d) => d.toc?.talksExpanded),
+  )
+  const setTalks = (open: boolean) => {
+    setTalksExpanded(open)
+    setStorageValue((d) => {
+      ;(d.toc ??= {}).talksExpanded = open
+    })
+  }
+  // Arriving at a talk (e.g. by URL) opens the Talks group.
+  useEffect(() => {
+    if (onTalksPath) setTalksExpanded(true)
+  }, [onTalksPath])
+
   const toggleUnit = (slug: string) =>
     setExpandedUnits((prev) => {
       const next = new Set(prev)
@@ -100,6 +116,7 @@ export const TableOfContents = () => {
     )
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
+    setTalks(true)
     setStorageValue((d) => {
       ;(d.toc ??= {}).expandedUnits = [...nextUnits]
       d.toc.expandedChapters = [...nextChapters]
@@ -109,6 +126,7 @@ export const TableOfContents = () => {
   const revealNone = () => {
     setExpandedUnits(new Set())
     setExpandedChapters(new Set())
+    setTalks(false)
     setStorageValue((d) => {
       ;(d.toc ??= {}).expandedUnits = []
       d.toc.expandedChapters = []
@@ -118,6 +136,7 @@ export const TableOfContents = () => {
   const revealCurrent = () => {
     const nextUnits = findContaining(tree, currentSection, "unit")
     const nextChapters = findContaining(tree, currentSection, "chapter")
+    setTalks(onTalksPath)
     setExpandedUnits(nextUnits)
     setExpandedChapters(nextChapters)
     setStorageValue((d) => {
@@ -156,7 +175,6 @@ export const TableOfContents = () => {
           key={unit.slug}
           unit={unit}
           num={idx + 1}
-          currentSection={currentSection}
           isExpanded={expandedUnits.has(unit.slug)}
           onToggle={() => toggleUnit(unit.slug)}
           expandedChapters={expandedChapters}
@@ -169,19 +187,41 @@ export const TableOfContents = () => {
       ))}
       {talks.length > 0 && (
         <>
-          <Link to="/talks" className={`${s.unit} ${s.unitLink}`}>
-            Talks
-          </Link>
-          {talks.map((talk) => (
-            <Link
-              key={talk.slug}
-              to={`/talks/${talk.slug}`}
-              className={`${s.unit} ${s.unitLink}`}
-              style={{ paddingLeft: "2rem", fontSize: "0.9em" }}
-            >
-              {talk.title}
-            </Link>
-          ))}
+          <div
+            className={s.unit}
+            onClick={() => setTalks(!talksExpanded)}
+            role="button"
+            aria-expanded={talksExpanded}
+          >
+            <span>Talks</span>
+            <SvgIcon
+              name={talksExpanded ? "chevronUp" : "chevronDown"}
+              size={18}
+            />
+          </div>
+          <div
+            className={`${s.collapsible} ${talksExpanded ? s.collapsibleOpen : ""}`}
+          >
+            <ul>
+              {talks.map((talk) => {
+                const href = `/talks/${talk.slug}`
+                const active =
+                  location.pathname === href ||
+                  location.pathname.startsWith(`${href}/`)
+                return (
+                  <li key={talk.slug}>
+                    <Link
+                      to={href}
+                      aria-current={active ? "page" : undefined}
+                      className={`${s.talkLink} ${active ? s.sectionSelected : ""}`}
+                    >
+                      {talk.tocTitle}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </>
       )}
       </nav>
@@ -237,7 +277,6 @@ const TocMiscPage = ({ page }: { page: MiscPage }) => {
 const TocUnit = ({
   unit,
   num,
-  currentSection,
   isExpanded,
   onToggle,
   expandedChapters,
@@ -245,7 +284,6 @@ const TocUnit = ({
 }: {
   unit: Unit
   num: number
-  currentSection: Section
   isExpanded: boolean
   onToggle: () => void
   expandedChapters: Set<string>
@@ -274,7 +312,6 @@ const TocUnit = ({
               chapter={chapter}
               unitNum={num}
               num={idx + 1}
-              currentSection={currentSection}
               isExpanded={expandedChapters.has(chapter.slug)}
               onToggle={() => onToggleChapter(chapter.slug)}
             />
@@ -289,14 +326,12 @@ const TocChapter = ({
   chapter,
   unitNum,
   num,
-  currentSection,
   isExpanded,
   onToggle,
 }: {
   chapter: Chapter
   unitNum: number
   num: number
-  currentSection: Section
   isExpanded: boolean
   onToggle: () => void
 }) => {
@@ -337,9 +372,7 @@ const TocChapter = ({
               path={[unitNum, num, idx + 1]}
               status={getSectionStatus(section.urlPath)}
               section={section}
-              isCurrentSection={
-                currentSection === section && location.pathname !== "/"
-              }
+              isCurrentSection={location.pathname === section.urlPath}
             />
           ))}
         </ul>
